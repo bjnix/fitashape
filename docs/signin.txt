@@ -1,0 +1,18 @@
+Please checkout, insert your name below, and check the document back 
+into the repo. By signing this document you are saying that you have 
+read the coding standards and either accept them and are willing to 
+uphold them, or have input on doing them differently
+
+NOTE: This has been reset from the main repository, to confirm that
+      everyone has checked out the new, FitAShape-only repository
+      
+
+Names:  
+- Nick Lanam
+- Brent Nix 
+- 
+- 
+- 
+- 
+-
+Kyle Mills
