@@ -1,15 +1,5 @@
-/** Example 004 Movement
-
-This Tutorial shows how to move and animate SceneNodes. The
-basic concept of SceneNodeAnimators is shown as well as manual
-movement of nodes using the keyboard.  We'll demonstrate framerate
-independent movement, which means moving by an amount dependent
-on the duration of the last run of the Irrlicht loop.
-
-Example 19.MouseAndJoystick shows how to handle those kinds of input.
-
-As always, I include the header files, use the irr namespace,
-and tell the linker to link with the .lib file.
+/**
+	FIT A SHAPE!
 */
 #ifdef _MSC_VER
 // We'll also define this to stop MSVC complaining about sprintf().
@@ -44,7 +34,6 @@ std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
 
 struct CircleNode{
 	scene::ISceneNode* node;
-	CircleNode* nextNode;
 	scene::ISceneNode* target;
 };
 
@@ -61,12 +50,6 @@ scene::ISceneNode * LFTarget;
 scene::ISceneNode * RFTarget;
 
 video::IVideoDriver* driver;
-
-//TODO delete once we have body tested
-//	scene::ISceneNode * LShoulderN;
-//	scene::ISceneNode * RShoulderN;
-//	scene::ISceneNode * LHipN;
-//	scene::ISceneNode * RHipN;
 
 //0=LeftHand, 1=RightHand, 2=LeftFoot 3=RightFoot
 //4=LeftShoulder, 5=RightShoulder 6=LeftHip
@@ -86,6 +69,8 @@ const char * objects[4] = {"HandL","HandR","FootL","FootR"};
 ITimer* myClock;
 int score = 0;
 int timesUp = 10;
+
+scene::ITextSceneNode * text;
 
 /*
 To receive events like mouse and keyboard input, or GUI events like "the OK
@@ -145,9 +130,8 @@ IFDEBUG std::cout << "leaving setCurrent\n"<< std::flush;
 }
 
 /*
-This method will detect where the persons body is and the relative shape of the arms and legs.
+This method will detect the relative shape of the body, arms, and legs.
 uses the first 4 locations stored in initLoc[] and sets the last 5
-TODO remove last part when done with testing body
 */
 void initializePosition(scene::ISceneManager* smgr){
 	vector3df LShoulder;
@@ -179,36 +163,6 @@ void initializePosition(scene::ISceneManager* smgr){
 	initLoc[7] = RHip;
 	initLoc[8] = centerBody;
 	
-	//TODO ~~~~~delete once we are done testing body~~~~~~~~
-	/*LShoulderN = smgr->addSphereSceneNode(.5);
-	if (LShoulderN)
-	{
-		LShoulderN->setPosition(LShoulder);
-		LShoulderN->setMaterialTexture(0, NULL);
-		LShoulderN->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
-	RShoulderN = smgr->addSphereSceneNode(.5);
-	if (RShoulderN)
-	{
-		RShoulderN->setPosition(RShoulder);
-		RShoulderN->setMaterialTexture(0, NULL);
-		RShoulderN->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
-	LHipN = smgr->addSphereSceneNode(.5);
-	if (LHipN)
-	{
-		LHipN->setPosition(LHip);
-		LHipN->setMaterialTexture(0, NULL);
-		LHipN->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
-	RHipN = smgr->addSphereSceneNode(.5);
-	if (RHipN)
-	{
-		RHipN->setPosition(RHip);
-		RHipN->setMaterialTexture(0, NULL);
-		RHipN->setMaterialFlag(video::EMF_LIGHTING, false);
-	}*/
-	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 
@@ -225,31 +179,29 @@ void randomTargets(){
 	vector3df RHip;
 	vector3df centerBody;
 
-	//srand (time(0));
+	srand (time(0));
+	
 	spin = (f32) (rand() % 90 - 45);
 	f32 bodySpin = spin;
 
 	//rotate the body randomly to one side or the other
-	temp = initLoc[4];// LShoulderN->getPosition();
-	temp.rotateXYBy(spin,initLoc[8]);//centerBody);
+	temp = initLoc[4];// position of left shoulder
+	temp.rotateXYBy(spin,initLoc[8]);
 	LShoulder = temp;
-	//LShoulderN->setPosition(temp);
 
-	temp = initLoc[5];//RShoulderN->getPosition();
-	temp.rotateXYBy(spin,initLoc[8]);//centerBody);
+	temp = initLoc[5];// position of right shoulder
+	temp.rotateXYBy(spin,initLoc[8]);
 	RShoulder = temp;
-	//RShoulderN->setPosition(temp);
 
-	temp = initLoc[6];//LHipN->getPosition();
-	temp.rotateXYBy(spin,initLoc[8]);//centerBody);
+	temp = initLoc[6];// position of left hip
+	temp.rotateXYBy(spin,initLoc[8]);
 	LHip = temp;
-	//LHipN->setPosition(temp);
 
-	temp = initLoc[7];//RHipN->getPosition();
-	temp.rotateXYBy(spin,initLoc[8]);//centerBody);
+	temp = initLoc[7];// position of right hip
+	temp.rotateXYBy(spin,initLoc[8]);
 	RHip = temp;
-	//RHipN->setPosition(temp);	
 
+	//figure out which foot will be on the ground
 	if(bodySpin < 0){//Right foot down!
 		spin = (f32) (rand() % 50 - 25);
 		temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
@@ -261,7 +213,7 @@ void randomTargets(){
 		temp.rotateXYBy(spin,LHip);
 		LFTarget->setPosition(temp);
 
-		//get the amout to move up
+		//get the amount we have to move up for the foot to be on the ground
 		shift = ground - RFTarget->getPosition().Y;
 	}else{//left foot down!
 		spin = (f32) (rand() % 50 - 25);
@@ -275,7 +227,7 @@ void randomTargets(){
 		temp.rotateXYBy(spin,RHip);
 		RFTarget->setPosition(temp);
 
-		//get the amout to move up
+		//get the amount we have to move up for the foot to be on the ground
 		shift = ground - LFTarget->getPosition().Y;
 	}
 
@@ -296,34 +248,26 @@ void randomTargets(){
 	RHTarget->setPosition(vector3df(RHTarget->getPosition().X,RHTarget->getPosition().Y + shift,RHTarget->getPosition().Z));
 	LFTarget->setPosition(vector3df(LFTarget->getPosition().X,LFTarget->getPosition().Y + shift,LFTarget->getPosition().Z));
 	RFTarget->setPosition(vector3df(RFTarget->getPosition().X,RFTarget->getPosition().Y + shift,RFTarget->getPosition().Z));
-	//LShoulderN->setPosition(vector3df(LShoulderN->getPosition().X,LShoulderN->getPosition().Y + shift,LShoulderN->getPosition().Z));
-	//RShoulderN->setPosition(vector3df(RShoulderN->getPosition().X,RShoulderN->getPosition().Y + shift,RShoulderN->getPosition().Z));
-	//LHipN->setPosition(vector3df(LHipN->getPosition().X,LHipN->getPosition().Y + shift,LHipN->getPosition().Z));
-	//RHipN->setPosition(vector3df(RHipN->getPosition().X,RHipN->getPosition().Y + shift,RHipN->getPosition().Z));
-	LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
-	RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
-	LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
-	RHip = vector3df(RHip.X,RHip.Y + shift, RHip.Z);
-	centerBody = vector3df(centerBody.X,centerBody.Y + shift, centerBody.Z);
+	
 }
 
 /*
-method to draw the target location for the limb orbs
+method to create the target for the limbs and place them in the scene
 */
 void drawTargets(scene::ISceneManager* smgr){
+	//target for left hand
 	LHTarget = smgr->addSphereSceneNode(1);
-	if (LHTarget)
-	{
-		LH.target = LHTarget;
-		LHTarget->setPosition(LH.node->getPosition());
+	if (LHTarget){
+		LH.target = LHTarget; //assign the object it's target
+		LHTarget->setPosition(LH.node->getPosition()); // set it's position to a temp spot
 		LHTarget->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-		LHTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+		LHTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 		LHTarget->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
+	//target for right hand
 	RHTarget = smgr->addSphereSceneNode(1);
-	if (RHTarget)
-	{
+	if (RHTarget){
 		RH.target = RHTarget;
 		RHTarget->setPosition(RH.node->getPosition());
 		RHTarget->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
@@ -331,9 +275,9 @@ void drawTargets(scene::ISceneManager* smgr){
 		RHTarget->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
+	//target for left foot
 	LFTarget = smgr->addSphereSceneNode(1);
-	if (LFTarget)
-	{
+	if (LFTarget){
 		LF.target = LFTarget;
 		LFTarget->setPosition(LF.node->getPosition());
 		LFTarget->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
@@ -341,9 +285,9 @@ void drawTargets(scene::ISceneManager* smgr){
 		LFTarget->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
+	//target for right foot
 	RFTarget = smgr->addSphereSceneNode(1);
-	if (RFTarget)
-	{		
+	if (RFTarget){		
 		RF.target = RFTarget;
 		RFTarget->setPosition(RF.node->getPosition());
 		RFTarget->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
@@ -352,49 +296,36 @@ void drawTargets(scene::ISceneManager* smgr){
 	}
 }
 /*
-method to draw the limb orbs
+method to create the limb orbs and place them in the scene
 */
 void drawLimbs(scene::ISceneManager* smgr){
-IFDEBUG std::cout << "In drawLimbs\n"<< std::flush;
-
-IFDEBUG std::cout << "LH is: " << &LH << "\n" << std::flush;
-IFDEBUG std::cout << "LH.node is: "<< &LH.node << "\n" << std::flush;
-IFDEBUG std::cout << "smgr is: "<< &smgr << "\n" << std::flush;
+	//left hand
 	LH.node = smgr->addSphereSceneNode(1);
-IFDEBUG std::cout << "after LH.node is: "<< &LH.node << "\n" << std::flush;
-	if (LH.node)
-	{
-		LH.nextNode = &RH;
-		LH.node->setPosition(core::vector3df(-13,10,30));
-		LH.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-		LH.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	if (LH.node){
+		LH.node->setPosition(core::vector3df(-13,10,30)); //set its position
+		LH.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp")); //set the texture
+		LH.node->setMaterialFlag(video::EMF_LIGHTING, false); //turn of the emf lighting flag
 	}
 
-IFDEBUG std::cout << "about to RH node add sphere\n"<< std::flush;
+	//right hand
 	RH.node = smgr->addSphereSceneNode(1);
-	if (RH.node)
-	{
-		RH.nextNode = &LF;
+	if (RH.node){
 		RH.node->setPosition(core::vector3df(13,10,30));
 		RH.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 		RH.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
-IFDEBUG std::cout << "about to LF node add sphere\n"<< std::flush;
+	//left foot
 	LF.node = smgr->addSphereSceneNode(1);
-	if (LF.node)
-	{
-		LF.nextNode = &RF;
+	if (LF.node){
 		LF.node->setPosition(core::vector3df(-3,-7,30));
 		LF.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
 		LF.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
-IFDEBUG std::cout << "about to RF node add sphere\n"<< std::flush;
+	//right foot
 	RF.node = smgr->addSphereSceneNode(1);
-	if (RF.node)
-	{
-		RF.nextNode = &LH;
+	if (RF.node){
 		RF.node->setPosition(vector3df(3,-7,30));
 		RF.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
 		RF.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -402,63 +333,40 @@ IFDEBUG std::cout << "about to RF node add sphere\n"<< std::flush;
 }
 
 /*
-method to determin if the passed node is close to its targert
+method to determin if the passed node is close to its targert returns true if collided
 */
 bool collide (CircleNode node){
 	vector3df nodeLocation = node.node->getPosition();
 	vector3df targetLocation = node.target->getPosition();
 	double collideDist = 2; // determins how close the orbs have to be. easy to change
 	
+	//check to see of the distance between the two nodes is less than the required distance
 	if(nodeLocation.getDistanceFrom(targetLocation) > collideDist){
+		//did not collide so make sure it is the normal texture and transparent
 		node.target->setMaterialTexture(0, node.node->getMaterial(0).getTexture(0));
-		node.target->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);		
+		node.target->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		return false;
 	}
+	//did collide, change texture to a different one and make it look solid
 	node.target->setMaterialTexture(0, driver->getTexture("../assets/particlered.bmp"));
 	node.target->setMaterialType(video::EMT_SOLID);	
 	return true;
 }
 
 /*
-	Method that uses keyboard input with local running
+	Method that uses keyboard input with local running. 
+	W,S,A,D to move an orb, H,J,K,L to switch between them
 */
 void moveKeyboard(MyEventReceiver receiver, const f32 frameDeltaTime ){
 	
-	//developer keys to show different things
-	//TODO remove when we no longer want them
-	/*if(receiver.IsKeyDown(irr::KEY_KEY_Z)){
-		LShoulderN->setVisible(false);
-		RShoulderN->setVisible(false);
-		LHipN->setVisible(false);
-		RHipN->setVisible(false);
-		LHTarget->setVisible(false);
-		RHTarget->setVisible(false);
-		LFTarget->setVisible(false);
-		RFTarget->setVisible(false);
-	}
-	if(receiver.IsKeyDown(irr::KEY_KEY_X)){
-		LShoulderN->setVisible(true);
-		RShoulderN->setVisible(true);
-		LHipN->setVisible(true);
-		RHipN->setVisible(true);
-		LHTarget->setVisible(true);
-		RHTarget->setVisible(true);
-		LFTarget->setVisible(true);
-		RFTarget->setVisible(true);
-		randomTargets();
-	}*/
-
-
 	//check if the user want to switch nodes
-	//if(receiver.IsKeyDown(irr::KEY_SPACE))
-	//	current = *current.nextNode;
-	if(receiver.IsKeyDown(irr::KEY_KEY_H))
+	if(receiver.IsKeyDown(irr::KEY_KEY_H))// left hand
 		current = LH;
-	else if(receiver.IsKeyDown(irr::KEY_KEY_J))
+	else if(receiver.IsKeyDown(irr::KEY_KEY_J))// right hand
 		current = RH;
-	else if(receiver.IsKeyDown(irr::KEY_KEY_K))
+	else if(receiver.IsKeyDown(irr::KEY_KEY_K))// left foot
 		current = LF;
-	else if(receiver.IsKeyDown(irr::KEY_KEY_L))
+	else if(receiver.IsKeyDown(irr::KEY_KEY_L))// right foot
 		current = RF;
 
 	// This is the movemen speed in units per second.
@@ -507,27 +415,32 @@ void motionTracking(ViconSegment **segment){
 
 /*
 	Method to determine where and when the person is 
-	standing when trying to get the initial locations
-	*/
+	standing when trying to get the initial locations.
+	Takes in instance every second and checks to see if the
+	play has stood still for the last three seconds
+*/
 void startLocation(ViconSegment **segment, scene::ISceneManager* smgr){
-	bool moving = true;
+	bool moving = true;// boolean for when they are still moving
+	//positons for the first second
 	vector3df LHpos1;
 	vector3df RHpos1;
 	vector3df LFpos1;
 	vector3df RFpos1;
 
+	//positions for the second second
 	vector3df LHpos2;
 	vector3df RHpos2;
 	vector3df LFpos2;
 	vector3df RFpos2;
 
+	//position for the third second
 	vector3df LHpos3;
 	vector3df RHpos3;
 	vector3df LFpos3;
 	vector3df RFpos3;
 
-	int temp = -1;//keep track of which one we are going to update
-	myClock->start();//start a clock to keep track of time
+	int temp = -1;// keeps track of which group we are going to update
+	myClock->start();// start a clock to keep track of time
 
 	//loop to keep checking the locations of the nodes till they come close to stopping
 	while(moving){
@@ -536,11 +449,10 @@ void startLocation(ViconSegment **segment, scene::ISceneManager* smgr){
 		
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		smgr->drawAll(); // draw the 3d scene
-		//device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
+		smgr->drawAll(); 
 		driver->endScene();
 
-
+		//call the motion tracking method to get up to date locaitons
 		motionTracking(segment);
 		if(temp != 0 && 0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
 			printf("CHECK 1\n");
@@ -552,11 +464,10 @@ void startLocation(ViconSegment **segment, scene::ISceneManager* smgr){
 		}
 
 		//make stuff appear on screen		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		smgr->drawAll(); // draw the 3d scene
-		//device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
+		smgr->drawAll();
 		driver->endScene();
 	
-
+		//call the motion tracking method to get up to date locaitons
 		motionTracking(segment);
 		if(temp != 1 && 1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 2\n");
@@ -569,11 +480,10 @@ void startLocation(ViconSegment **segment, scene::ISceneManager* smgr){
 		
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		smgr->drawAll(); // draw the 3d scene
-		//device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
+		smgr->drawAll();
 		driver->endScene();
 
-
+		//call the motion tracking method to get up to date locaitons
 		motionTracking(segment);
 		if(temp != 2 && 2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 3\n");
@@ -586,33 +496,30 @@ void startLocation(ViconSegment **segment, scene::ISceneManager* smgr){
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		smgr->drawAll(); // draw the 3d scene
-		//device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
+		smgr->drawAll();
 		driver->endScene();
-
-		//printf("LH1: %f,%f,%f, LH2: %f,%f,%f, LH3: %f,%f,%f\n", LHpos1.X,LHpos1.Y,LHpos1.Z,LHpos2.X,LHpos2.Y,LHpos2.Z,LHpos3.X,LHpos3.Y,LHpos3.Z);
-		//printf("RH1: %f,%f,%f, RH2: %f,%f,%f, RH3: %f,%f,%f\n", RHpos1.X,RHpos1.Y,RHpos1.Z,RHpos2.X,RHpos2.Y,RHpos2.Z,RHpos3.X,RHpos3.Y,RHpos3.Z);
-		//printf("LF1: %f,%f,%f, LF2: %f,%f,%f, LF3: %f,%f,%f\n", LFpos1.X,LFpos1.Y,LFpos1.Z,LFpos2.X,LFpos2.Y,LFpos2.Z,LFpos3.X,LFpos3.Y,LFpos3.Z);
-		//printf("RF1: %f,%f,%f, RF2: %f,%f,%f, RF3: %f,%f,%f\n", RFpos1.X,RFpos1.Y,RFpos1.Z,RFpos2.X,RFpos2.Y,RFpos2.Z,RFpos3.X,RFpos3.Y,RFpos3.Z);		
 		
-		//check to see if they are close to staying still
-		double close = .5;
+		//check to see if the player is close to staying still
+		double close = .5; //number to define how close is enough
 		if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
 			RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
 			LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
 			RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
 				//check to see if they look like they are in the right possition
+				//makes sure the arms are at about the same hight and  that the arms are about the same length
 				//TODO add more restrictions if necessary
-				if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) && ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5))
-						moving = false;
-				
+				if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
+					&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5))
+						moving = false; //they have stopped moving!
 		}
 	}
-	initLoc[0] = LHpos3;
-	initLoc[1] = RHpos3;
-	initLoc[2] = LFpos3;
-	initLoc[3] = RFpos3;
+	//store this position for later use
+	initLoc[0] = LHpos3; //left hand
+	initLoc[1] = RHpos3; //right hand
+	initLoc[2] = LFpos3; //left foot
+	initLoc[3] = RFpos3; //right foot
 	
+	//calls the method that determines what the body looks like
 	initializePosition(smgr);
 	return;
 }
@@ -841,68 +748,80 @@ void printViconData(ViconSegment *segment){
 
 
 /*
-This method creates our clock object and puts it in the title bar
+This method creates our clock object and displays it in the title bar
 */
 void createClock(IrrlichtDevice* device, ISceneManager* smgr){
-	myClock = device->getTimer();
+	myClock = device->getTimer(); //gets the clock from the device
+	//set up the string that will go into the title bar
 	wchar_t tmp[255] = {};
 	swprintf(tmp,255, L"CLOCK: %d",myClock->getTime());
-	device->setWindowCaption(tmp);
+	
+	//put the text in the window caption
+	//device->setWindowCaption(tmp);
+	
+	//text that will be displayed on the screen
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,irr::video::SColor(255,0,0,0),0,irr::core::vector3df(0,25,30));
 }
 
 /*
-This method updates our clock in the title bar and also checks to see if we have won
-depending on the time
+This method updates our clock in the title bar 
+and also checks to see if we have won depending on the time
 */
 void updateClock(IrrlichtDevice* device){ 
-	wchar_t tmp[255] = {}; 
-	int seconds = (myClock->getTime() / 1000) % 60;
+	wchar_t tmp[255] = {}; //string to display in the tital bar
+	int seconds = (myClock->getTime() / 1000) % 60; //current time
 
+	//display the clock with latest seconds
 	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Score: %d",timesUp - seconds,score);
- 	device->setWindowCaption(tmp);
+ 	
+	//device->setWindowCaption(tmp);
+	text->setText(tmp);
+	
 	//check to see if we have ran out of time
-	if(seconds >= timesUp){ //checks to see if all the nodes match their targets
+	if(seconds >= timesUp){ 
+		//checks to see if all the nodes match their targets
 		bool win = collide(LH);
 		win = collide(RH) && win; 
 		win = collide(LF) && win; 
 		win = collide(RF) && win; 
+		//if we won then we gain a point and get a new target
 		if(win){ 
-			myClock->setTime(0);
 			randomTargets(); 
 			score++;
 		}else{ 
-			score--;			
+			//if we lost then we lose a point
+			score--;
+			//if we hit a score of -10 the game is over, other wise we just get a new target
 			if(score < -10){
 				exit(0);
 			}else{
-				myClock->setTime(0);
 				randomTargets(); 
 			}
 		}
+		//reset the clock
+		myClock->setTime(0);
+		
+		//sets what the time is for the next round
 		if(score/2 < 10)
 			timesUp = 10 - (score/2);
-		printf("timesUp: %d score: %d\n",timesUp,score);
 
-	}else{
+	}else{//else we are not at the end time so just update any collisions
 		collide(LH);
 		collide(RH);
 		collide(LF);
 		collide(RF);
 	}
+
+	//display the clock with updated score
+	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Score: %d",timesUp - seconds,score);
+ 	device->setWindowCaption(tmp);
 }
 
 
 
 /*
-The event receiver for keeping the pressed keys is ready, the actual responses
-will be made inside the render loop, right before drawing the scene. So lets
-just create an irr::IrrlichtDevice and the scene node we want to move. We also
-create some other additional scene nodes, to show that there are also some
-different possibilities to move and animate scene nodes.
-*/
-/**
- * \param argc currently takes upto one input
- * \param argv expects a string, if "Local" then will run with keyboard inputs.
+	Main method for the game.
+	if argv[1] is "Local" then will run with keyboard inputs.
  */
 int main(int argc, char* argv[]){
 std::cout << "Starting main \n"<< std::flush;
@@ -913,6 +832,7 @@ std::cout << "Starting main \n"<< std::flush;
 IFDEBUG	std::cout << "creating bool local \n"<< std::flush;
 
 	bool local = false;
+	//check to see if we are testing on local or with tracking system
 	if(argc !=1 && (strcmp(argv[1],"Local") == 0 || strcmp(argv[1],"local") == 0))
 		local = true;
 
@@ -923,33 +843,35 @@ IFDEBUG	std::cout << "creating bool local \n"<< std::flush;
 		return 1;
 
 IFDEBUG std::cout << "creating the event reciever for KB \n"<< std::flush;
-	// create device
+	
+	// create reciever and device
 	MyEventReceiver receiver;
-
 	IrrlichtDevice* device = createDevice(driverType,
 			core::dimension2d<u32>(1280, 1024), 16, false, false, false, &receiver);
-
 	if (device == 0)
-		return 1; // could not create selected driver.
-
+		return 1; // could not create selected device.
+	
+	//get the driver and the scene manager
 	driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
+	
 IFDEBUG std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::flush;
 
+	//adds a camera scene node 
 	smgr->addCameraSceneNode();
 
+	//creates the clock.
 	createClock(device, smgr);
-	//myClock->start();
 
-	//draws the limbs
+	//create and draw the limbs
 	drawLimbs(smgr);
-
-
 
 IFDEBUG std::cout << "returned from drawLimbs \n"<< std::flush;
 
-	//get the initial position if the person is using the tracking system
+
 	if(!local){
+	//using the tracking system
+	
 IFDEBUG std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
 		viconInit();
@@ -975,39 +897,41 @@ IFDEBUG std::cout << "calling viconInit() \n"<< std::flush;
 IFDEBUG std::cout << objects[0] << std::endl;
 
 
-
+		//sets up the player's body and stuff
 		startLocation(viSegments,smgr);	
 
 IFDEBUG std::cout << "Just finished Method Calls \n"<< std::flush;
 	}
 	else{
-		//gets the initial position of the person
+		//manually set the initial position of the limbs
 		initLoc[0]=LH.node->getPosition();
 		initLoc[1]=RH.node->getPosition();
 		initLoc[2]=LF.node->getPosition();
 		initLoc[3]=RF.node->getPosition();
+		//then sets up the body, arms, and legs
 		initializePosition(smgr);
 	}
 
-
 IFDEBUG std::cout << "about to draw targets \n"<< std::flush;
+
 	//set up the target
 	drawTargets(smgr);
 		
 
-	srand (time(0));
 IFDEBUG std::cout << "calling randomTargets\n"<< std::flush;
+
+	//gets a new target for the player to play with
 	randomTargets();
+	
 IFDEBUG std::cout << "calling setCurrent\n"<< std::flush;
+	
 	//needed for keyboard input
 	setCurrent(LH);
+	
 IFDEBUG std::cout << "just setCurrent\n"<< std::flush;
 
-	/*
-	Sets the camera view at 0,0,0
-	*/
-	//smgr->addCameraSceneNode();
-	//smgr->addCameraSceneNodeFPS();	
+	
+	//centers the camera on the players position	
 	smgr->addCameraSceneNode(0, irr::core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), irr::core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 
 	/*
@@ -1023,6 +947,7 @@ IFDEBUG std::cout << "just setCurrent\n"<< std::flush;
 	// how long it was since the last frame
 	u32 then = device->getTimer()->getTime();
 
+	//reset the clock for the start of the game!
 	myClock->setTime(0);
 	while(device->run())
 	{
@@ -1045,18 +970,14 @@ IFDEBUG std::cout << "just setCurrent\n"<< std::flush;
 		if(local)
 			moveKeyboard(receiver, frameDeltaTime);
 		else
-		{
 			motionTracking(viSegments);
-		}
 
 		//update the clock and check for win/lose
 		updateClock(device);
 
+		//puts the stuff on the screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
-
 		smgr->drawAll(); // draw the 3d scene
-		//device->getGUIEnvironment()->drawAll(); // draw the gui environment (the logo)
-
 		driver->endScene();
 
 	}
