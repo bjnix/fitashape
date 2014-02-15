@@ -820,7 +820,7 @@ void updateClock(IrrlichtDevice* device){
 void makeBackground () {
 
 	driver->beginScene();
-	ITexture* background = driver->getTexture("../assets/012shot.jpg");
+	ITexture* background = driver->getTexture("../assets/Background(Fitashape).png");
 	if ( background == 0 ) printf("Failed to read texture");
 	else driver->draw2DImage(background, core::position2d<s32>(0.0f,0.0f));
 	driver->endScene();
@@ -989,9 +989,9 @@ IFDEBUG std::cout << "just setCurrent\n"<< std::flush;
 		//puts the stuff on the screen
 		
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		ITexture* background = driver->getTexture("../assets/012shot.jpg");
+		ITexture* background = driver->getTexture("../assets/Background(Fitashape).png");
 	if ( background == 0 ) printf("Failed to read texture");
-	else driver->draw2DImage(background, core::position2d<s32>(0.0f,0.0f));
+	else driver->draw2DImage(background, core::rect<s32>(core::position2d<s32>(0.0f,0.0f),core::position2d<s32>(800.0f,600.0f)),core::rect<s32>(core::position2d<s32>(0.0f,0.0f),core::position2d<s32>(11520.0f,4320.0f)),0,0,false);
 		smgr->drawAll(); // draw the 3d scene
 		driver->endScene();
 
