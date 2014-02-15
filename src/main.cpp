@@ -463,7 +463,7 @@ void startLocation(ViconSegment **segment, scene::ISceneManager* smgr){
 			temp = 0;
 		}
 
-		//make stuff appear on screen		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		//make stuff appear on screen		driver->beginScene(true, true, video::SColor(255,113,113,133));
 		smgr->drawAll();
 		driver->endScene();
 	
@@ -760,7 +760,7 @@ void createClock(IrrlichtDevice* device, ISceneManager* smgr){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
-	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,irr::video::SColor(255,0,0,0),0,irr::core::vector3df(0,25,30));
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/fitashape.xml"),tmp,irr::video::SColor(255,0,0,0),0,irr::core::vector3df(0,25,30));
 }
 
 /*
