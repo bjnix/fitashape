@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-
 #include "vector3d.h"
 #include "time.h"
 #include "ViconClient.h"
@@ -818,6 +817,15 @@ void updateClock(IrrlichtDevice* device){
 }
 
 
+void makeBackground () {
+
+	driver->beginScene();
+	ITexture* background = driver->getTexture("../assets/012shot.jpg");
+	if ( background == 0 ) printf("Failed to read texture");
+	else driver->draw2DImage(background, core::position2d<s32>(0.0f,0.0f));
+	driver->endScene();
+
+}
 
 /*
 	Main method for the game.
@@ -859,6 +867,9 @@ IFDEBUG std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::f
 
 	//adds a camera scene node 
 	smgr->addCameraSceneNode();
+
+	//makes the background
+	makeBackground();
 
 	//creates the clock.
 	createClock(device, smgr);
@@ -946,13 +957,13 @@ IFDEBUG std::cout << "just setCurrent\n"<< std::flush;
 	// In order to do framerate independent movement, we have to know
 	// how long it was since the last frame
 	u32 then = device->getTimer()->getTime();
-
+	
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
 	while(device->run())
 	{
 
-
+		
 		//This code is to test one object at a time//
 		//if(DEBUG){printViconData(WandSeg);}//print the debug info for vicon segments
 		//if(DEBUG){printViconData(HandOR);}//print the debug info for vicon segments
@@ -976,7 +987,11 @@ IFDEBUG std::cout << "just setCurrent\n"<< std::flush;
 		updateClock(device);
 
 		//puts the stuff on the screen
+		
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		ITexture* background = driver->getTexture("../assets/012shot.jpg");
+	if ( background == 0 ) printf("Failed to read texture");
+	else driver->draw2DImage(background, core::position2d<s32>(0.0f,0.0f));
 		smgr->drawAll(); // draw the 3d scene
 		driver->endScene();
 
