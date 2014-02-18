@@ -42,7 +42,7 @@ void Player::initializePosition(){
 	vector3df RHip;
 	vector3df centerBody;
 
-	ground = initLoc[3].Y; //sets ground to how high right foot is
+	ground = (initLoc[3].Y + initLoc[2].Y) / 2; //sets ground to how the average height of the feet are
 
 	LShoulder = core::vector3df(initLoc[2].X,initLoc[0].Y,initLoc[0].Z);//(leftfoot.x,lefthand.y,lefthand.x)
 	RShoulder = core::vector3df(initLoc[3].X,initLoc[1].Y,initLoc[1].Z);//(rightfoot.x,righthand.y,righthand.x)
@@ -73,7 +73,7 @@ void Player::initializePosition(){
 	Takes in instance every second and checks to see if the
 	play has stood still for the last three seconds
 */
-void Player::startLocation(ViconSegment **segment, scene::ISceneManager* playerSmgr){
+void Player::startLocation(ViconInputClient * vClient, scene::ISceneManager* playerSmgr){
 
 	bool moving = true;// boolean for when they are still moving
 	//positons for the first second
@@ -108,7 +108,7 @@ void Player::startLocation(ViconSegment **segment, scene::ISceneManager* playerS
 		playerDriver->endScene();
 
 		//call the motion tracking method to get up to date locaitons
-		//motionTracking(segment);
+		motionTracking(vClient->GetSolidBodies());
 		if(temp != 0 && 0 == ((playerClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
 			printf("CHECK 1\n");
 			LHpos1 = LH.node->getPosition();
@@ -124,7 +124,7 @@ void Player::startLocation(ViconSegment **segment, scene::ISceneManager* playerS
 		playerDriver->endScene();
 	
 		//call the motion tracking method to get up to date locaitons
-		//motionTracking(segment);
+		motionTracking(vClient->GetSolidBodies());
 		if(temp != 1 && 1 == ((playerClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 2\n");
 			LHpos2 = LH.node->getPosition();
@@ -140,7 +140,7 @@ void Player::startLocation(ViconSegment **segment, scene::ISceneManager* playerS
 		playerDriver->endScene();
 
 		//call the motion tracking method to get up to date locaitons
-		//motionTracking(segment);
+		motionTracking(vClient->GetSolidBodies());
 		if(temp != 2 && 2 == ((playerClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 3\n");
 			LHpos3 = LH.node->getPosition();

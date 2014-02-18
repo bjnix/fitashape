@@ -8,8 +8,7 @@
 
 #include "vector3d.h"
 #include "time.h"
-#include "ViconClient.h"
-#include "ViconSegment.h"
+#include "vicon/ViconInputClient.h"
 
 using namespace irr;
 using namespace core;
@@ -23,29 +22,8 @@ struct CircleNode{
 	scene::ISceneNode* target;
 };
 
-class Player{
-public:
-
-	virtual~Player(void);	
-	Player(IrrlichtDevice* d, scene::ISceneManager* s);
-	scene::ISceneNode * currentNode();
-	void setCurrent(CircleNode& node);
-	void initializePosition();
-	void randomTargets();
-	void drawTargets();
-	void drawLimbs();
-	bool collide (CircleNode node);
-	void setPosition(std::vector<vector3df> vec);
-	void startLocation(ViconSegment **segment, scene::ISceneManager* smgr);
-	bool collideAll();
-	void setCurrentLH();
-	void setCurrentRH();
-	void setCurrentLF();
-	void setCurrentRF();
-	void setPositions(vector3df pos[4]);
-	void localInitPos();
-	void addCameraScene();
-
+class Player
+{
 private:
 
 	ITimer* playerClock;
@@ -76,6 +54,30 @@ private:
 	f32 LLeg; //estimated length of left leg
 	f32 RLeg; //estimated length of right leg
 	f32 ground; //estimated height of the ground
+
+
+public:
+
+	virtual~Player(void);	
+	Player(IrrlichtDevice* d, scene::ISceneManager* s);
+	scene::ISceneNode * currentNode();
+	void setCurrent(CircleNode& node);
+	void initializePosition();
+	void randomTargets();
+	void drawTargets();
+	void drawLimbs();
+	bool collide (CircleNode node);
+	void setPosition(std::vector<vector3df> vec);
+	void startLocation(ViconSegment **segment, scene::ISceneManager* smgr);
+	bool collideAll();
+	void setCurrentLH();
+	void setCurrentRH();
+	void setCurrentLF();
+	void setCurrentRF();
+	void setPositions(vector3df pos[4]);
+	void localInitPos();
+	void addCameraScene();
+
 
 };
 
