@@ -5,16 +5,16 @@ Class for the Game object
 #include "fitashape/Game.h"
 
 
-Game::Game(int numplayers){
+Game::Game(){
 	score = 0;
 	timesUP = 0;
-	if( numplayers == 1 )
-		Player* p1;
-	else if (numplayers == 2)
-		Player* p1;
-		Player* p2;
-	else
-}
+// 	if( numplayers == 1 )
+// 		Player* p1;
+// 	else if (numplayers == 2)
+// 		Player* p1;
+// 		Player* p2;
+// 	else
+// }
 
 
 Game::~Game(void){

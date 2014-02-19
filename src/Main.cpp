@@ -27,13 +27,14 @@ using namespace ViconDataStreamSDK::CPP;
 std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
 
 std::vector<std::string> * names = {
-	"HandL",
-	"HandR",
-	"FootL",
-	"FootR"
+	{"HandL"},
+	{"HandR"},
+	{"FootL"},
+	{"FootR"}
 	};
 
 ViconInputClient * vClient;
+Game * fit_Game;
 
 Player* p1;
 
@@ -91,8 +92,10 @@ IFDEBUG std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::f
 	//adds a camera scene node 
 	smgr->addCameraSceneNode();
 
+IFDEBUG std::cout << "creating Game object \n"<< std::flush;
+	fit_Game = new Game();
 	//creates the clock.
-	Game::createClock(device, smgr);
+	fit_Game->createClock(device, smgr);
 
 
 	p1 = new Player(device, smgr);
@@ -102,7 +105,7 @@ IFDEBUG std::cout << "creating the player object \n"<< std::flush;
 	//create and draw the limbs
 	p1->drawLimbs();
 
-IFDEBUG std::cout << "returned from drawLimbs \n"<< std::flush;
+
 
 
 	if(!local)
@@ -111,11 +114,11 @@ IFDEBUG std::cout << "returned from drawLimbs \n"<< std::flush;
 	
 IFDEBUG std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
-	vClient = new ViconInputClient("141.219.28.17:801",names,names);
+	vClient = new ViconInputClient("141.219.28.17:801",names,names)
 
 printf("GOING IN!!!\n");
 		//sets up the player's body and stuff
-		p1->startLocation(&vClient,&smgr);	
+		p1->startLocation(vClient,smgr);	
 printf("Done calibrating\n");
 IFDEBUG std::cout << "Just finished Method Calls \n"<< std::flush;
 	}
@@ -175,9 +178,9 @@ IFDEBUG std::cout << "just setCurrent\n"<< std::flush;
 		
 		//move the orbs around
 		if(local)
-			moveKeyboard(receiver, frameDeltaTime);
+			fit_Game->moveKeyboard(receiver, frameDeltaTime);
 		else
-			motionTracking(vClient->getSolidBodies());
+			fit_Game->motionTracking(vClient->getSolidBodies());
 
 		//update the clock and check for win/lose
 		updateClock(device);

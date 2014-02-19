@@ -10,6 +10,7 @@
 #include "irrlicht/vector3d.h"
 #include "time.h"
 #include "vicon/ViconInputClient.h"
+#include "fitashape/Game.h"
 
 using namespace irr;
 using namespace core;
@@ -26,6 +27,7 @@ struct CircleNode{
 class Player
 {
 private:
+	Game * fit_Game;
 
 	ITimer* playerClock;
 
@@ -76,7 +78,7 @@ public:
 	void setCurrentLF();
 	void setCurrentRF();
 	void setPositions(vector3df pos[4]);
-	void localInitPos();
+	void localInitPos();	
 	void addCameraScene();
 
 

@@ -5,11 +5,12 @@ Class for the player object
 #include "fitashape/Player.h"
 
 
-Player::Player(IrrlichtDevice* d, scene::ISceneManager* s){
+Player::Player(IrrlichtDevice* d, scene::ISceneManager* s, Game * g){
 	playerDevice = d;
 	playerSmgr = s;
 	playerClock = playerDevice->getTimer();
 	playerDriver = playerDevice->getVideoDriver();
+	fit_Game = g;
 }
 
 
