@@ -10,7 +10,7 @@
 #include "irrlicht/vector3d.h"
 #include "vicon/ViconSegment.h"
 #include "vicon/ViconInputClient.h"
-#include "fitashape/player.h"
+#include "fitashape/Player.h"
 
 using namespace irr;
 using namespace core;

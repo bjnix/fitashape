@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "irrlicht/irrlicht.h"
-#include "vector3d.h"
+#include "irrlicht/vector3d.h"
 #include "time.h"
 #include "vicon/ViconInputClient.h"
 
