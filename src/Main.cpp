@@ -33,13 +33,13 @@ std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
 // T * end(T (&ra)[N]) {
 //     return ra + N;
 // }
-const char *names[] = {
+const char *nameList[] = {
 	"HandL",
 	"HandR",
 	"FootL",
 	"FootR"
 	};
-std::vector<std::string> * names(names,std::end(names));
+std::vector<std::string> * names(nameList,std::end(names));
 
 ViconInputClient * vClient;
 Game * fit_Game;
@@ -106,7 +106,7 @@ IFDEBUG std::cout << "creating Game object \n"<< std::flush;
 	fit_Game->createClock(device, smgr);
 
 
-	p1 = new Player(device, smgr);
+	p1 = new Player(device, smgr,fit_Game);
 
 IFDEBUG std::cout << "creating the player object \n"<< std::flush;
 
