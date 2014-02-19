@@ -69,7 +69,7 @@ public:
 	void drawLimbs();
 	bool collide (CircleNode node);
 	void setPosition(std::vector<vector3df> vec);
-	void startLocation(ViconSegment **segment, scene::ISceneManager* smgr);
+	void startLocation(ViconInputClient * vClient, scene::ISceneManager* smgr);
 	bool collideAll();
 	void setCurrentLH();
 	void setCurrentRH();

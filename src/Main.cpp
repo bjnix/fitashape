@@ -26,7 +26,7 @@ using namespace ViconDataStreamSDK::CPP;
 
 std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
 
-std::vector<std::string> names = {
+std::vector<std::string> * names = {
 	"HandL",
 	"HandR",
 	"FootL",
@@ -92,7 +92,7 @@ IFDEBUG std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::f
 	smgr->addCameraSceneNode();
 
 	//creates the clock.
-	createClock(device, smgr);
+	Game::createClock(device, smgr);
 
 
 	p1 = new Player(device, smgr);
@@ -115,7 +115,7 @@ IFDEBUG std::cout << "calling viconInit() \n"<< std::flush;
 
 printf("GOING IN!!!\n");
 		//sets up the player's body and stuff
-		p1->startLocation(vClient,smgr);	
+		p1->startLocation(&vClient,&smgr);	
 printf("Done calibrating\n");
 IFDEBUG std::cout << "Just finished Method Calls \n"<< std::flush;
 	}
