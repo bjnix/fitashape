@@ -27,10 +27,10 @@ using namespace ViconDataStreamSDK::CPP;
 std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
 
 std::vector<std::string> * names = {
-	{"HandL"},
-	{"HandR"},
-	{"FootL"},
-	{"FootR"}
+	{L"HandL"},
+	{L"HandR"},
+	{L"FootL"},
+	{L"FootR"}
 	};
 
 ViconInputClient * vClient;
