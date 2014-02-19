@@ -39,7 +39,7 @@ const char *nameList[] = {
 	"FootL",
 	"FootR"
 	};
-std::vector<std::string> * names(nameList,std::end(nameList));
+std::vector<std::string> * names(nameList,end(nameList));
 
 ViconInputClient * vClient;
 Game * fit_Game;

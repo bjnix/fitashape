@@ -79,7 +79,7 @@ public:
 
 
 	void moveKeyboard(MyEventReceiver receiver, const f32 frameDeltaTime );
-	void motionTracking(ViconInputClient * vClient);
+	void motionTracking(std::vector<ViconSegment> * segment);
 	void createClock(IrrlichtDevice * device, ISceneManager * smgr);
 	void updateClock(IrrlichtDevice * device);
 
