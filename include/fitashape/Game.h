@@ -19,6 +19,16 @@ using namespace scene;
 
 class Game
 {
+	
+private:
+//clock to race and score to keep track of
+	ITimer* myClock;
+	int score; 
+	int timesUp;
+
+	scene::ITextSceneNode * text;
+
+public:
 
 	/**	To receive events like mouse and keyboard input, or GUI events like "the OK
 	 *	button has been clicked", we need an object which is derived from the
@@ -28,6 +38,7 @@ class Game
 	 *	held down, and so we will remember the current state of each key.
 	 *
 	 */
+
 	class MyEventReceiver : public IEventReceiver
 	{
 	public:
@@ -61,24 +72,16 @@ class Game
 	};
 
 
-private:
-//clock to race and score to keep track of
-	ITimer* myClock;
-	int score = 0;
-	int timesUp = 10;
-
-	scene::ITextSceneNode * text;
-
-public:
 	video::IVideoDriver* driver;
 	scene::ISceneManager* smgr;
 	Game();
 	~Game();
 
+
 	void moveKeyboard(MyEventReceiver receiver, const f32 frameDeltaTime );
 	void motionTracking(ViconInputClient * vClient);
 	void createClock(IrrlichtDevice * device, ISceneManager * smgr);
-	void updateClock(IrrlichtDevice * device)
+	void updateClock(IrrlichtDevice * device);
 
 };
 

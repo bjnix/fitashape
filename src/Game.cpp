@@ -6,6 +6,8 @@ Class for the Game object
 
 
 Game::Game(int numplayers){
+	score = 0;
+	timesUP = 0;
 	if( numplayers == 1 )
 		Player* p1;
 	else if (numplayers == 2)

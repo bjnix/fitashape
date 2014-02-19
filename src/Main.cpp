@@ -76,7 +76,7 @@ IFDEBUG	std::cout << "creating bool local \n"<< std::flush;
 IFDEBUG std::cout << "creating the event reciever for KB \n"<< std::flush;
 	
 	// create reciever and device
-	MyEventReceiver receiver;
+	Game::MyEventReceiver receiver;
 	IrrlichtDevice* device = createDevice(driverType,
 			core::dimension2d<u32>(1280, 1024), 16, false, false, false, &receiver);
 	if (device == 0)
