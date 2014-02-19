@@ -39,7 +39,7 @@ const char *nameList[] = {
 	"FootL",
 	"FootR"
 	};
-std::vector<std::string> * names(nameList,end(nameList));
+std::vector<std::string> names(nameList,end(nameList));
 
 ViconInputClient * vClient;
 Game * fit_Game;
@@ -122,7 +122,7 @@ IFDEBUG std::cout << "creating the player object \n"<< std::flush;
 	
 IFDEBUG std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
-	vClient = new ViconInputClient("141.219.28.17:801",names,names);
+	vClient = new ViconInputClient(&HostName,&names,&names);
 
 printf("GOING IN!!!\n");
 		//sets up the player's body and stuff
