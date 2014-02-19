@@ -62,7 +62,7 @@ private:
 public:
 
 	virtual~Player(void);	
-	Player(IrrlichtDevice* d, scene::ISceneManager* s);
+	Player(IrrlichtDevice* d, scene::ISceneManager*, Game * g);
 	scene::ISceneNode * currentNode();
 	void setCurrent(CircleNode& node);
 	void initializePosition();
@@ -71,7 +71,7 @@ public:
 	void drawLimbs();
 	bool collide (CircleNode node);
 	void setPosition(std::vector<vector3df> vec);
-	void startLocation(ViconInputClient * vClient, scene::ISceneManager* smgr, Game * g);
+	void startLocation(ViconInputClient * vClient, scene::ISceneManager* smgr);
 	bool collideAll();
 	void setCurrentLH();
 	void setCurrentRH();
