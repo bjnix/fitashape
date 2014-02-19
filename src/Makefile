@@ -32,8 +32,8 @@ all_win32: CPPFLAGS += -D__GNUWIN32__ -D_WIN32 -DWIN32 -D_WINDOWS -D_MBCS -D_USR
 all_win32 clean_win32: SYSTEM=Win32-gcc
 all_win32 clean_win32: SUF=.exe
 # name of the binary - only valid for targets which set SYSTEM
-DESTPATH = ../bin/$(SYSTEM)/$(Target)$(SUF)
-#DESTPATH = ../bin/$(Target)$(SUF)
+#DESTPATH = ../bin/$(SYSTEM)/$(Target)$(SUF)
+DESTPATH = ../bin/$(Target)$(SUF)
 
 all_linux all_win32:
 	$(warning Building...)

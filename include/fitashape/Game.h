@@ -74,9 +74,9 @@ public:
 
 	video::IVideoDriver* driver;
 	scene::ISceneManager* smgr;
+	
 	Game();
 	~Game();
-
 
 	void moveKeyboard(MyEventReceiver receiver, const f32 frameDeltaTime );
 	void motionTracking(std::vector<ViconSegment> * segment);

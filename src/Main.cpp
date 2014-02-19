@@ -39,10 +39,10 @@ const char *nameList[] = {
 	"FootL",
 	"FootR"
 	};
-std::vector<std::string> * names(nameList,end(nameList));
+std::vector<std::string> names(nameList,end(nameList));
 
 ViconInputClient * vClient;
-Game * fit_Game;
+Game fit_Game = new Game();
 
 Player* p1;
 
@@ -101,12 +101,12 @@ IFDEBUG std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::f
 	smgr->addCameraSceneNode();
 
 IFDEBUG std::cout << "creating Game object \n"<< std::flush;
-	fit_Game = new Game();
+	//fit_Game = new Game();
 	//creates the clock.
-	fit_Game->createClock(device, smgr);
+	fit_Game.createClock(device, smgr);
 
 
-	p1 = new Player(device, smgr,fit_Game);
+	p1 = new Player(device, smgr,&fit_Game);
 
 IFDEBUG std::cout << "creating the player object \n"<< std::flush;
 
@@ -122,7 +122,7 @@ IFDEBUG std::cout << "creating the player object \n"<< std::flush;
 	
 IFDEBUG std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
-	vClient = new ViconInputClient("141.219.28.17:801",names,names);
+	vClient = new ViconInputClient(&HostName,&names,&names);
 
 printf("GOING IN!!!\n");
 		//sets up the player's body and stuff
@@ -186,12 +186,12 @@ IFDEBUG std::cout << "just setCurrent\n"<< std::flush;
 		
 		//move the orbs around
 		if(local)
-			fit_Game->moveKeyboard(receiver, frameDeltaTime);
+			fit_Game.moveKeyboard(receiver, frameDeltaTime);
 		else
-			fit_Game->motionTracking(vClient->GetSolidBodies());
+			fit_Game.motionTracking(vClient->GetSolidBodies());
 
 		//update the clock and check for win/lose
-		fit_Game->updateClock(device);
+		fit_Game.updateClock(device);
 
 		//puts the stuff on the screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));

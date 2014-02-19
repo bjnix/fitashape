@@ -110,7 +110,7 @@ void Player::startLocation(ViconInputClient * vClient, scene::ISceneManager* pla
 		playerDriver->endScene();
 
 		//call the motion tracking method to get up to date locaitons
-		motionTracking(vClient->GetSolidBodies());
+		fit_Game->motionTracking(vClient->GetSolidBodies());
 		if(temp != 0 && 0 == ((playerClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
 			printf("CHECK 1\n");
 			LHpos1 = LH.node->getPosition();
@@ -126,7 +126,7 @@ void Player::startLocation(ViconInputClient * vClient, scene::ISceneManager* pla
 		playerDriver->endScene();
 	
 		//call the motion tracking method to get up to date locaitons
-		motionTracking(vClient->GetSolidBodies());
+		fit_Game->motionTracking(vClient->GetSolidBodies());
 		if(temp != 1 && 1 == ((playerClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 2\n");
 			LHpos2 = LH.node->getPosition();
@@ -142,7 +142,7 @@ void Player::startLocation(ViconInputClient * vClient, scene::ISceneManager* pla
 		playerDriver->endScene();
 
 		//call the motion tracking method to get up to date locaitons
-		motionTracking(vClient->GetSolidBodies());
+		fit_Game->motionTracking(vClient->GetSolidBodies());
 		if(temp != 2 && 2 == ((playerClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 3\n");
 			LHpos3 = LH.node->getPosition();

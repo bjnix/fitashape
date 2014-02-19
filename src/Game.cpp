@@ -14,7 +14,7 @@ Game::Game(){
 // 		Player* p1;
 // 		Player* p2;
 // 	else
-// }
+}
 
 
 Game::~Game(void){
