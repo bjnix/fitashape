@@ -10,7 +10,7 @@ X11_INC = -I/usr/X11R6/include
 
 # general compiler settings
 CPPFLAGS = $(X11_INC) $(FIT_INC)
-CXXFLAGS = -O3 -ffast-math -g -Wall
+CXXFLAGS = -std=c++0x -O3 -ffast-math -g -Wall 
 
 #default target is Linux
 all: all_linux
