@@ -29,17 +29,17 @@ std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
 
 
 
-// template<typename T, size_t N>
-// T * end(T (&ra)[N]) {
-//     return ra + N;
-// }
+template<typename T, size_t N>
+T * end(T (&ra)[N]) {
+    return ra + N;
+}
 const char *nameList[] = {
 	"HandL",
 	"HandR",
 	"FootL",
 	"FootR"
 	};
-std::vector<std::string> * names(nameList,std::end(names));
+std::vector<std::string> * names(nameList,std::end(nameList));
 
 ViconInputClient * vClient;
 Game * fit_Game;
