@@ -26,12 +26,20 @@ using namespace ViconDataStreamSDK::CPP;
 
 std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
 
-std::vector<std::string> * names = {
-	{L"HandL"},
-	{L"HandR"},
-	{L"FootL"},
-	{L"FootR"}
+
+
+
+// template<typename T, size_t N>
+// T * end(T (&ra)[N]) {
+//     return ra + N;
+// }
+const char *names[] = {
+	"HandL",
+	"HandR",
+	"FootL",
+	"FootR"
 	};
+std::vector<std::string> * names(names,std::end(names));
 
 ViconInputClient * vClient;
 Game * fit_Game;
@@ -114,7 +122,7 @@ IFDEBUG std::cout << "creating the player object \n"<< std::flush;
 	
 IFDEBUG std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
-	vClient = new ViconInputClient("141.219.28.17:801",names,names)
+	vClient = new ViconInputClient("141.219.28.17:801",names,names);
 
 printf("GOING IN!!!\n");
 		//sets up the player's body and stuff
@@ -180,10 +188,10 @@ IFDEBUG std::cout << "just setCurrent\n"<< std::flush;
 		if(local)
 			fit_Game->moveKeyboard(receiver, frameDeltaTime);
 		else
-			fit_Game->motionTracking(vClient->getSolidBodies());
+			fit_Game->motionTracking(vClient->GetSolidBodies());
 
 		//update the clock and check for win/lose
-		updateClock(device);
+		fit_Game->updateClock(device);
 
 		//puts the stuff on the screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));

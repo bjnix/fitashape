@@ -5,6 +5,7 @@ Class for the player object
 #include "fitashape/Player.h"
 
 
+
 Player::Player(IrrlichtDevice* d, scene::ISceneManager* s, Game * g){
 	playerDevice = d;
 	playerSmgr = s;
