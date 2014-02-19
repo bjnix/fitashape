@@ -5,7 +5,7 @@
 #define DEBUG 1
 #define IFDEBUG if(DEBUG)
 
-#include <irrlicht.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -13,6 +13,7 @@
 #include "vector3d.h"
 #include "time.h"
 
+#include "irrlicht/irrlicht.h"
 #include "vicon/ViconInputClient.h"
 #include "fitashape/Player.h"
 #include "fitashape/Game.h"

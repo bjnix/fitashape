@@ -1,11 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H 
 
-#include <irrlicht.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 
+#include "irrlicht/irrlicht.h"
 #include "vector3d.h"
 #include "time.h"
 #include "vicon/ViconInputClient.h"

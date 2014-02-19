@@ -1,13 +1,13 @@
 #ifndef FITASHAPE_GAME_H
 #define FITASHAPE_GAME_H
 
-#include <irrlicht.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-
-#include "vector3d.h"
 #include "time.h"
+
+#include "irrlicht/irrlicht.h"
+#include "irrlicht/vector3d.h"
 #include "vicon/ViconSegment.h"
 #include "vicon/ViconInputClient.h"
 #include "fitashape/player.h"
