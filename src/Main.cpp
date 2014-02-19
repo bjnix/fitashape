@@ -10,9 +10,9 @@
 #include <stdio.h>
 #include <iostream>
 
-#include "vector3d.h"
-#include "time.h"
 
+#include "time.h"
+#include "irrlicht/vector3d.h"
 #include "irrlicht/irrlicht.h"
 #include "vicon/ViconInputClient.h"
 #include "fitashape/Player.h"
