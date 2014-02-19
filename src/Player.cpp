@@ -2,7 +2,7 @@
 Class for the player object
 **/
 
-#include "Player.h"
+#include "fitashape/Player.h"
 
 
 Player::Player(IrrlichtDevice* d, scene::ISceneManager* s){

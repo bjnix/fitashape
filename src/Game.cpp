@@ -2,7 +2,7 @@
 Class for the Game object
 */
 
-#include "Game.h"
+#include "fitashape/Game.h"
 
 
 Game::Game(int numplayers){
