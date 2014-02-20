@@ -1,22 +1,21 @@
-#ifndef PLAYER_H
-#define PLAYER_H 
+#ifndef FITASHAPE_PLAYER_H
+#define FITASHAPE_PLAYER_H 
 
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 
 #include "irrlicht/irrlicht.h"
 #include "irrlicht/vector3d.h"
 #include "time.h"
-#include "vicon/ViconInputClient.h"
-#include "fitashape/Game.h"
+//#include "fitashape/Game.h"
 
 using namespace irr;
 using namespace core;
 using namespace video;
 using namespace scene;
-using namespace ViconDataStreamSDK::CPP;
 
 struct CircleNode{
 	scene::ISceneNode* node;
@@ -24,12 +23,15 @@ struct CircleNode{
 	scene::ISceneNode* target;
 };
 
+
+
 class Player
 {
+	friend class Game;
 private:
-	Game * fit_Game;
-
-	ITimer* playerClock;
+	
+	video::IVideoDriver* driver;
+	scene::ISceneManager* smgr;
 
 	CircleNode current;
 	
@@ -43,9 +45,7 @@ private:
 	scene::ISceneNode * LFTarget;
 	scene::ISceneNode * RFTarget;
 
-	IrrlichtDevice* playerDevice;
-	video::IVideoDriver* playerDriver;
-	scene::ISceneManager* playerSmgr;
+	
 
 	//0=LeftHand, 1=RightHand, 2=LeftFoot 3=RightFoot
 	//4=LeftShoulder, 5=RightShoulder 6=LeftHip
@@ -60,10 +60,11 @@ private:
 
 
 public:
-
-	virtual~Player(void);	
-	Player(IrrlichtDevice* d, scene::ISceneManager*, Game * g);
 	scene::ISceneNode * currentNode();
+	
+	virtual~Player(void);	
+	Player(IVideoDriver * d, ISceneManager * s);
+
 	void setCurrent(CircleNode& node);
 	void initializePosition();
 	void randomTargets();
@@ -71,7 +72,6 @@ public:
 	void drawLimbs();
 	bool collide (CircleNode node);
 	void setPosition(std::vector<vector3df> vec);
-	void startLocation(ViconInputClient * vClient, scene::ISceneManager* smgr);
 	bool collideAll();
 	void setCurrentLH();
 	void setCurrentRH();

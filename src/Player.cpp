@@ -3,22 +3,11 @@ Class for the player object
 **/
 
 #include "fitashape/Player.h"
-
-
-
-Player::Player(IrrlichtDevice* d, scene::ISceneManager* s, Game * g){
-	playerDevice = d;
-	playerSmgr = s;
-	playerClock = playerDevice->getTimer();
-	playerDriver = playerDevice->getVideoDriver();
-	fit_Game = g;
+Player::Player(IVideoDriver * d, ISceneManager * s){
+	driver = d;
+	smgr = s;
 }
-
-
-Player::~Player(void){
-}
-
-
+Player::~Player(void){}
 /*
 get the current node
 */
@@ -75,112 +64,7 @@ void Player::initializePosition(){
 	Takes in instance every second and checks to see if the
 	play has stood still for the last three seconds
 */
-void Player::startLocation(ViconInputClient * vClient, scene::ISceneManager* playerSmgr){
 
-	bool moving = true;// boolean for when they are still moving
-	//positons for the first second
-	vector3df LHpos1;
-	vector3df RHpos1;
-	vector3df LFpos1;
-	vector3df RFpos1;
-
-	//positions for the second second
-	vector3df LHpos2;
-	vector3df RHpos2;
-	vector3df LFpos2;
-	vector3df RFpos2;
-
-	//position for the third second
-	vector3df LHpos3;
-	vector3df RHpos3;
-	vector3df LFpos3;
-	vector3df RFpos3;
-
-	int temp = -1;// keeps track of which group we are going to update
-	playerClock->start();// start a clock to keep track of time
-
-	//loop to keep checking the locations of the nodes till they come close to stopping
-	while(moving){
-		playerClock->tick();//move the clock
-		printf("Finding body... Stand still!\n");		
-
-		//make stuff appear on screen
-		playerDriver->beginScene(true, true, video::SColor(255,113,113,133));
-		playerSmgr->drawAll(); 
-		playerDriver->endScene();
-
-		//call the motion tracking method to get up to date locaitons
-		fit_Game->motionTracking(vClient->GetSolidBodies());
-		if(temp != 0 && 0 == ((playerClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
-			printf("CHECK 1\n");
-			LHpos1 = LH.node->getPosition();
-			RHpos1 = RH.node->getPosition();
-			LFpos1 = LF.node->getPosition();
-			RFpos1 = RF.node->getPosition();
-			temp = 0;
-		}
-
-		//make stuff appear on screen
-		playerDriver->beginScene(true, true, video::SColor(255,113,113,133));
-		playerSmgr->drawAll();
-		playerDriver->endScene();
-	
-		//call the motion tracking method to get up to date locaitons
-		fit_Game->motionTracking(vClient->GetSolidBodies());
-		if(temp != 1 && 1 == ((playerClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
-			printf("CHECK 2\n");
-			LHpos2 = LH.node->getPosition();
-			RHpos2 = RH.node->getPosition();
-			LFpos2 = LF.node->getPosition();
-			RFpos2 = RF.node->getPosition();
-			temp = 1;
-		}
-		
-		//make stuff appear on screen
-		playerDriver->beginScene(true, true, video::SColor(255,113,113,133));
-		playerSmgr->drawAll();
-		playerDriver->endScene();
-
-		//call the motion tracking method to get up to date locaitons
-		fit_Game->motionTracking(vClient->GetSolidBodies());
-		if(temp != 2 && 2 == ((playerClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
-			printf("CHECK 3\n");
-			LHpos3 = LH.node->getPosition();
-			RHpos3 = RH.node->getPosition();
-			LFpos3 = LF.node->getPosition();
-			RFpos3 = RF.node->getPosition();
-			temp = 2;
-		}
-
-		//make stuff appear on screen
-		playerDriver->beginScene(true, true, video::SColor(255,113,113,133));
-		playerSmgr->drawAll();
-		playerDriver->endScene();
-		
-		//check to see if the player is close to staying still
-		double close = .5; //number to define how close is enough
-		if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
-			RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
-			LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
-			RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
-				//check to see if they look like they are in the right possition
-				//makes sure the arms are at about the same hight and  that the arms are about the same length
-				//TODO add more restrictions if necessary
-				if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
-					&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5))
-						moving = false; //they have stopped moving!
-		}
-	}
-	//store this position for later use
-	initLoc[0] = LHpos3; //left hand
-	initLoc[1] = RHpos3; //right hand
-	initLoc[2] = LFpos3; //left foot
-	initLoc[3] = RFpos3; //right foot
-	
-	//calls the method that determines what the body looks like
-	initializePosition();
-	return;
-}
 
 
 /*
@@ -278,38 +162,38 @@ void Player::randomTargets(){
 method to set up the targets for each limb
 */
 void Player::drawTargets(){
-	LHTarget = playerSmgr->addSphereSceneNode(1);
+	LHTarget = smgr->addSphereSceneNode(1);
 	if (LHTarget){
 		LH.target = LHTarget;
 		LHTarget->setPosition(LH.node->getPosition());
-		LHTarget->setMaterialTexture(0, playerDriver->getTexture("../assets/fire.bmp"));
+		LHTarget->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 		LHTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		LHTarget->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
-	RHTarget = playerSmgr->addSphereSceneNode(1);
+	RHTarget = smgr->addSphereSceneNode(1);
 	if (RHTarget){
 		RH.target = RHTarget;
 		RHTarget->setPosition(RH.node->getPosition());
-		RHTarget->setMaterialTexture(0, playerDriver->getTexture("../assets/lightFalloff.png"));
+		RHTarget->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 		RHTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		RHTarget->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
-	LFTarget = playerSmgr->addSphereSceneNode(1);
+	LFTarget = smgr->addSphereSceneNode(1);
 	if (LFTarget){
 		LF.target = LFTarget;
 		LFTarget->setPosition(LF.node->getPosition());
-		LFTarget->setMaterialTexture(0, playerDriver->getTexture("../assets/particlegreen.jpg"));
+		LFTarget->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
 		LFTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		LFTarget->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
-	RFTarget = playerSmgr->addSphereSceneNode(1);
+	RFTarget = smgr->addSphereSceneNode(1);
 	if (RFTarget){		
 		RF.target = RFTarget;
 		RFTarget->setPosition(RF.node->getPosition());
-		RFTarget->setMaterialTexture(0, playerDriver->getTexture("../assets/portal7.bmp"));
+		RFTarget->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
 		RFTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		RFTarget->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
@@ -319,36 +203,36 @@ method to draw the limb orbs
 */
 void Player::drawLimbs(){
 
-	LH.node = playerSmgr->addSphereSceneNode(1);
+	LH.node = smgr->addSphereSceneNode(1);
 	if (LH.node){
 		LH.nextNode = &RH;
 		LH.node->setPosition(core::vector3df(-13,10,30));
-		LH.node->setMaterialTexture(0, playerDriver->getTexture("../assets/fire.bmp"));
+		LH.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 		LH.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
 
-	RH.node = playerSmgr->addSphereSceneNode(1);
+	RH.node = smgr->addSphereSceneNode(1);
 	if (RH.node){
 		RH.nextNode = &LF;
 		RH.node->setPosition(core::vector3df(13,10,30));
-		RH.node->setMaterialTexture(0, playerDriver->getTexture("../assets/lightFalloff.png"));
+		RH.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 		RH.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
-	LF.node = playerSmgr->addSphereSceneNode(1);
+	LF.node = smgr->addSphereSceneNode(1);
 	if (LF.node){
 		LF.nextNode = &RF;
 		LF.node->setPosition(core::vector3df(-3,-7,30));
-		LF.node->setMaterialTexture(0, playerDriver->getTexture("../assets/particlegreen.jpg"));
+		LF.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
 		LF.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 
-	RF.node = playerSmgr->addSphereSceneNode(1);
+	RF.node = smgr->addSphereSceneNode(1);
 	if (RF.node){
 		RF.nextNode = &LH;
 		RF.node->setPosition(vector3df(3,-7,30));
-		RF.node->setMaterialTexture(0, playerDriver->getTexture("../assets/portal7.bmp"));
+		RF.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
 		RF.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	}
 }
@@ -366,7 +250,7 @@ bool Player::collide (CircleNode node){
 		node.target->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);		
 		return false;
 	}
-	node.target->setMaterialTexture(0, playerDriver->getTexture("../assets/particlered.bmp"));
+	node.target->setMaterialTexture(0, driver->getTexture("../assets/particlered.bmp"));
 	node.target->setMaterialType(video::EMT_SOLID);	
 	return true;
 }
@@ -448,5 +332,5 @@ void Player::localInitPos(){
 method to add a camera scene node that is centered on the player
 */
 void Player::addCameraScene(){
-	playerSmgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
+	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 }

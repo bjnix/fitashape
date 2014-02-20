@@ -19,14 +19,10 @@ using namespace scene;
 
 class Game
 {
-	
 private:
-//clock to race and score to keep track of
-	ITimer* myClock;
-	int score; 
-	int timesUp;
 
-	scene::ITextSceneNode * text;
+	
+
 
 public:
 
@@ -70,18 +66,28 @@ public:
 		// We use this array to store the current state of each key
 		bool KeyIsDown[KEY_KEY_CODES_COUNT];
 	};
-
-
+	
+	ViconInputClient * vClient;
+	Player* p1;
 	video::IVideoDriver* driver;
 	scene::ISceneManager* smgr;
-	
-	Game();
-	~Game();
+	IrrlichtDevice * device;
+	ITimer* myClock;
+	int score;
+	int timesUp;
+	scene::ITextSceneNode * text;
+	MyEventReceiver receiver;
 
+	Game(bool local);
+	~Game();
+	
+	int run(bool local);
 	void moveKeyboard(MyEventReceiver receiver, const f32 frameDeltaTime );
-	void motionTracking(std::vector<ViconSegment> * segment);
-	void createClock(IrrlichtDevice * device, ISceneManager * smgr);
-	void updateClock(IrrlichtDevice * device);
+	void motionTracking();
+	void createClock();
+	void updateClock();
+	void startLocation();
+	
 
 };
 
