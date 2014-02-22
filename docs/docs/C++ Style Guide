@@ -1,0 +1,215 @@
+C++ Style Guide
+
+CONTENTS:
+I.	  Background
+II.   Header Files
+III.  Scoping
+IV.	  Naming Conventions
+V.	  Commenting
+VI.	  Attribution
+
+I. BACKGROUND:
+	- Because code needs to be developed by more than one person in the HuskyGames environment, and the
+      fact that code must be maintainable, consistent and clean code styling is a must! Write code
+      that is readable! Avoid the esoteric unless completely necessary! Comment well!
+
+
+II. HEADER FILES:
+	- For the most part, there should be a .h file for every .cc file. There are exceptions such as 
+	  unittests and small .cc files containing just a main() function. Correct usage of header files
+	  helps out project organization and cleans up code making it more readable, smaller and more
+	  efficient
+
+	The #define Guard:
+	- All header files should have #define guards to prevent multiple inclusion. The symbol name should
+	  be the name of the file separated into words:
+	  
+	  // CyberWall.h
+	  #ifndef CYBER_WALL_H
+	  #define CYBER_WALL_H
+	  ...
+	  #endif // CYBER_WALL_H
+
+	Forward Declarations:
+	- Forward-decalare ordinary classes in order to avoid unnecessary #includes
+	- When using a function declared in a header file, always #include that header
+	- When using a class template, prefer to #include its header file
+	- Do not replace data members with pointers just to avoid an #include
+
+	Inline Functions:
+		- Only use inline functions when they are small (10 lines or less)
+
+
+III. SCOPING:
+	Name Spaces:
+	- Unnamed namespaces are allowed and encouraged in .cc files as this avoids runtime naming conflicts
+		
+		namespace{
+		// The content of a namespace is not indented
+		enum { kUnused, kEOF, Kerror };			// commonly used tokens
+		bool AtEof() { return pos_ == kEOF; }	// Uses our namespace's EOF
+		} 	// namespace
+
+	- Do not declare anything in 'namespace std'. Declaring entities in 'namespace std' is undefined 
+	  behavior and is not portable
+	- Do not use the 'using-directive' as follows:
+		
+		// Forbidden -- This pollutes the namespace
+		using namespace foo
+	
+	- You may use a 'using-declaration'
+		
+		// Okay in .cc files.
+		// Must be in a function, method or class in .h files.
+		using ::foo::bar;
+
+	Nested Classes:
+	- Public nested classes may be allowed when they are a necessary part of an interface, but consider 
+	  using a namespaces to keep declarations out of global scope
+
+	Nonmember, Static Member, and Global Functions:
+	- Choose to use nonmember functions within a namespace or static member functions over global 
+	  functions. Avoid using global functions
+
+	Local Variables:
+	- Place a function's variables in the narrowest scope possible, and initialize variables in the 
+	  declaration
+
+		// Bad example:
+		int i;
+		i = f();	// Initialization separate from declaration
+
+		// Good example:
+		int j = g();	//declaration with initialization
+
+	- The 'for', 'while', and 'if' control structures maintain a local scope so 'i' can be used by two 
+	  'for' loops is allowed
+		
+		// reuse of local iterative variables:
+		while(const char* p = strchr(str0, '/')) str0 = p + 1;
+		while(const char* p = strchr(str1, '?')) str1 = p + 1;
+		
+		// Also:
+		for(int i = 0; i < 10; ++i) base = i * i;
+		for(int i = 0; i < 30; ++i) head = i + i;
+
+	- NOTE: for large loops, declare the variable outside the loop
+		
+		// Proper declaration for large loops
+		int iter_F; //constructor and destructor called once each
+		for(int i = 0; i < 1000000; ++i) iter_F.DoSomething(i);
+
+	Static and Global Variables:
+	- Avoid static or glabal variables of class type as they cause hard-to-find bugs due to 
+	  indeterminate order of construction and destruction
+	- Variables that are fine are those to contain plain old data: ints, chars, floats, pointers, or
+	  arrays/structs of plain old data
+
+
+IV. NAMING CONVENTION:
+	- Name things in a sensible way that allows for other people to understand what an object is
+	- Avoid one letter variables, or ambiguous shortened/abbreviated names
+	- If anything isn't covered or is in doubt, be consistent, clean and communicating
+
+	File Names:
+	- Should be all lowercase and can inlude underscores. 
+	- Although other suffixes may be legal, always use .cpp
+	- Do not use filenames that already exist in /usr/include
+	- Err on the side of making the names of files too specific i.e.:
+		
+		http_server_logs.h
+		//vs
+		logs.h
+
+	Type Names:
+	- Should start with a capital letter and have a capital letter for each new word. This applies
+	  for all types - classes, structs, typedefs, and enums
+
+	Variable Names:
+	- Should be all lowercase with underscores between words
+
+	Function Names:
+	- Regular functions should start with a capital letter and have a capital letter for each new word
+	- Get and set functions should be all lowecase and should match the name of the variable they are
+	  accessing or changing
+
+	Macro Names:
+	- Nope, bad idea, ... okay so it's really necessary? Then do it like this:
+	  MY_MACRO_THAT_SCARES_SMALL_CHILDREN
+
+
+V. COMMENTING:
+	- Maintaining, editing, and interfacing with existing code is on of the most common tasks that a 
+	  programmer is confronted with, so pay karma forward by making readable accessable code. If
+	  any programmer off the street cannot pick up your code and understand what is going on. Good 
+	  commenting is an art of balancing verbosity and succinctness.
+	
+	Function commenting:
+	- As dOxygen is already an implemented tool, please use comments in this style for functions
+
+		 /**
+		  * \brief Creates a CyberWall, create one of these per player.
+		  * 
+		  * \param player the player id.
+		  * \param initial the initial anchor point for the wall.
+		  */
+		  CyberWall::CyberWall(int player, osg::Vec3f initial) : old(initial), firstTime(true), player(player){
+		  ...
+		  }
+
+	- Make sure to include a description of each parameter using \param in the description comment 
+	  and give a descriptive \brief section especially if there are any particularly tricky portions
+	  in the code.
+
+	Implementation Commenting:
+	- If there are any parts of the code that are not obvious, interesting, or important, leave a
+      comment for the next person. Example:
+	      
+	      //Divide result by two, taking into account that x contains the carry from the add.
+	      for (int i = 0; i < result->size(); ++i) {
+	      	x = (x << 8) + (*result)[i];
+	      	(*result)[i] = x >> i;
+	      	x &= 1;
+	      }
+
+	Passing Literals:
+	- When passing literal integers, null pointers, or booleans, it might be better to add a comment 
+	  about what those values mean:
+
+	  	// Not-As-Great example:
+	  	bool success = CalculateSomething(interesting_value,
+	  									  10,
+	  									  false,
+	  									  NULL);
+
+	  	// Easier to read:
+	  	bool success = CalculateSomething(interesting_value,
+	  									  10, 	  // Default base value
+	  									  false,  // Not the first time we're calling this)
+	  									  NULL);  // No callback
+
+	  	// Also not that the comments are alligned ^ for easier reading
+
+	Useless Comments:
+	- Never describe the code itself because there is a good chance that the person reading your code
+	  knows C++ better than you do, even though they do not know what you are trying to do
+
+	  	// Now go through the b array and make sure that if i occurs,
+	  	// the next element is i+1
+	  	// ^ this is a example of what not to do!
+
+	TODO:
+	- If commiting a TODO comment to the repository, make a ticket for that item in redmine and add
+	  your mtu username like so:
+
+	  	//TODO(bjnix): modify user object to take data from blade system
+
+	- This doesn't mean that you will be held responsible to fix the item, it just means that you
+	  are the best place to get information on the task to do.
+
+
+=============================
+VI. ATTRIBUTION:
+=============================
+This is minimized and adapted version of the google c++ styleguide found at http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
+This version was made Sept 2013 by Brent Nix - bjnix@mtu.edu 
