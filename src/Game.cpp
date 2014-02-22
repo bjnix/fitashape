@@ -21,6 +21,8 @@ const char *nameList[] = {
 std::vector<std::string> names(nameList,end(nameList));
 
 Game::Game(bool local){
+	timesUp = 10;
+	score = 0;
 	run(local);
 }
 
@@ -114,6 +116,7 @@ int Game::run(bool local){
 
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
+
 	while(device->run())
 	{
 
@@ -124,11 +127,11 @@ int Game::run(bool local){
 		then = now;
 		
 		//move the orbs around
-		if(local)
+		if(local){
 			moveKeyboard(receiver, frameDeltaTime);
+		}
 		else
 			motionTracking();
-
 		//update the clock and check for win/lose
 		updateClock();
 
@@ -216,6 +219,7 @@ This method updates our clock in the title bar
 and also checks to see if we have won depending on the time
 */
 void Game::updateClock(){ 
+	
 	wchar_t tmp[255] = {}; //string to display in the tital bar
 	int seconds = (myClock->getTime() / 1000) % 60; //current time
 
