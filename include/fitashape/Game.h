@@ -82,7 +82,7 @@ public:
 	~Game();
 	
 	int run(bool local);
-	void moveKeyboard(MyEventReceiver receiver, const f32 frameDeltaTime );
+	void moveKeyboard(MyEventReceiver receiver);
 	void motionTracking();
 	void createClock();
 	void updateClock();

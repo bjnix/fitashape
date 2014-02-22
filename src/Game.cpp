@@ -21,6 +21,7 @@ const char *nameList[] = {
 std::vector<std::string> names(nameList,end(nameList));
 
 Game::Game(bool local){
+	score = 0;
 	run(local);
 }
 
@@ -64,21 +65,18 @@ int Game::run(bool local){
 	p1 = new Player(driver,smgr);
 	p1->drawLimbs();
 
-	if(!local)
-	{
-	//using the tracking system
+	if(!local){
+		//using the tracking system
 	
-	std::cout << "calling viconInit() \n"<< std::flush;
-	//get the initial setup for the player if using tracking system
-	vClient = new ViconInputClient(&HostName,&names,&names);
+		std::cout << "calling viconInit() \n"<< std::flush;
+		//get the initial setup for the player if using tracking system
+		vClient = new ViconInputClient(&HostName,&names,&names);
 
-	printf("GOING IN!!!\n");
-	//sets up the player's body and stuff
-	startLocation();	
-	printf("Done calibrating\n");
-	std::cout << "Just finished Method Calls \n"<< std::flush;
-	}
-	else{
+		//sets up the player's body and stuff
+		startLocation();	
+		printf("Done calibrating\n");
+		std::cout << "Just finished Method Calls \n"<< std::flush;
+	}else{
 		//manually set the initial position of the limbs
 		p1->localInitPos();
 		//then sets up the body, arms, and legs
@@ -108,24 +106,14 @@ int Game::run(bool local){
 	p1->addCameraScene();
 	
 
-	// In order to do framerate independent movement, we have to know
-	// how long it was since the last frame
-	u32 then = device->getTimer()->getTime();
-
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
 	while(device->run())
 	{
 
-
-		// Work out a frame delta time.
-		const u32 now = device->getTimer()->getTime();
-		const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
-		then = now;
-		
 		//move the orbs around
 		if(local)
-			moveKeyboard(receiver, frameDeltaTime);
+			moveKeyboard(receiver);
 		else
 			motionTracking();
 
@@ -143,9 +131,10 @@ int Game::run(bool local){
 	In the end, delete the Irrlicht device.
 	*/
 	device->drop();
+	return 0;
 }
 
-void Game::moveKeyboard(MyEventReceiver receiver, const f32 frameDeltaTime ){
+void Game::moveKeyboard(MyEventReceiver receiver){
 	
 	//check if the user want to switch nodes
 	if(receiver.IsKeyDown(KEY_KEY_H))// left hand
@@ -157,22 +146,20 @@ void Game::moveKeyboard(MyEventReceiver receiver, const f32 frameDeltaTime ){
 	else if(receiver.IsKeyDown(KEY_KEY_L))// right foot
 		p1->setCurrentRF();
 
-	// This is the movemen speed in units per second.
-	const f32 MOVEMENT_SPEED = 5.f;
-
+	
 	/* Check if keys W, S, A or D are being held down, and move the
 	sphere node around respectively. */
 	core::vector3df nodePosition = p1->currentNode()->getPosition();
 	
 	if(receiver.IsKeyDown(KEY_KEY_W))
-		nodePosition.Y += MOVEMENT_SPEED * frameDeltaTime;
+		nodePosition.Y += 1;
 	else if(receiver.IsKeyDown(KEY_KEY_S))
-		nodePosition.Y -= MOVEMENT_SPEED * frameDeltaTime;
+		nodePosition.Y -= 1;
 	
 	if(receiver.IsKeyDown(KEY_KEY_A))
-		nodePosition.X -= MOVEMENT_SPEED * frameDeltaTime;
+		nodePosition.X -= 1;
 	else if(receiver.IsKeyDown(KEY_KEY_D))
-		nodePosition.X += MOVEMENT_SPEED * frameDeltaTime;
+		nodePosition.X += 1;
 
 	p1->currentNode()->setPosition(nodePosition);
 }
