@@ -20,7 +20,7 @@ using namespace scene;
 class Game
 {
 private:
-
+	bool gameOver;
 	
 
 
@@ -73,6 +73,7 @@ public:
 	scene::ISceneManager * smgr;
 	IrrlichtDevice * device;
 	ITimer * myClock;
+	int zen;
 	int score;
 	int timesUp;
 	scene::ITextSceneNode * text;

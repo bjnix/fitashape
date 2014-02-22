@@ -28,7 +28,8 @@ int main(int argc, char* argv[])
 	//check to see if we are testing on local or with tracking system
 	if(argc !=1 && (strcmp(argv[1],"Local") == 0 || strcmp(argv[1],"local") == 0))
 		local = true;
-	Game fit_Game = new Game(local);
+	Game * fit_Game = new Game(local);
+	delete fit_Game;
 	return 0;
 }
 

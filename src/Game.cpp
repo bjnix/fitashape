@@ -21,12 +21,17 @@ const char *nameList[] = {
 std::vector<std::string> names(nameList,end(nameList));
 
 Game::Game(bool local){
+	gameOver = false;
+	zen = 50;
 	timesUp = 10;
 	score = 0;
 	run(local);
 }
 
-Game::~Game(void){}
+Game::~Game(void){
+	delete p1;
+	delete vClient;
+}
 
 /*
 	Method that uses keyboard input with local running. 
@@ -126,6 +131,9 @@ int Game::run(bool local){
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
 		smgr->drawAll(); // draw the 3d scene
 		driver->endScene();
+		//end the game correctly
+		if(gameOver)
+			break;
 
 	}
 
@@ -218,7 +226,8 @@ void Game::updateClock(){
 	//check to see if we have ran out of time
 	if(seconds >= timesUp){ 
 		//checks to see if all the nodes match their targets
-		bool win = p1->collideAll();
+		//bool win = p1->collideAll();
+		/*int match = p1->collideNum();
 		//if we won then we gain a point and get a new target
 		if(win){ 
 			p1->randomTargets(); 
@@ -238,14 +247,47 @@ void Game::updateClock(){
 		
 		//sets what the time is for the next round
 		if(score/2 < 10)
-			timesUp = 10 - (score/2);
+			timesUp = 10 - (score/2);//*/
+		
+		//get number of orbs matched, then score based on that
+		switch(p1->collideNum()){
+			
+			case 0:
+				zen -= 25;
+				break;
+			case 1:
+				score += 5;
+				zen -= 15;
+				break;
+			case 2:
+				score += 15;
+				zen -= 5;
+				break;
+			case 3:
+				score += 25;
+				break;
+			case 4:
+				score += 50;
+				zen += 10;
+				break;
+			default:
+				break;
+		}
+		if(zen > 100) // so zen cant get above 100%
+			zen = 100;
+		if(zen <= 0) // if zen <= 0 player loses and game quits
+			gameOver = true; //this is bad, fix this later!!!!! -Trent
+		p1->randomTargets(); 
+		//reset the clock
+		myClock->setTime(0);
 
-	}else{//else we are not at the end time so just update any collisions
+	}
+	else{//else we are not at the end time so just update any collisions
 		p1->collideAll();
 	}
 
 	//display the clock with updated score
-	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Score: %d",timesUp - seconds,score);
+	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds,zen, score);
  	device->setWindowCaption(tmp);
 }
 

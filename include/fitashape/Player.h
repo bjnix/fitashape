@@ -66,6 +66,7 @@ public:
 	virtual~Player(void);	
 	Player(IVideoDriver * d, ISceneManager * s);
 
+	int collideNum();
 	void setCurrent(CircleNode& node);
 	void initializePosition();
 	void randomTargets();

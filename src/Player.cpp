@@ -291,6 +291,13 @@ bool Player::collideAll(){
 }
 
 /*
+returns the number of collided nodes
+*/
+int Player::collideNum(){
+	return collide(LHTarget) + collide(RHTarget) + collide(LFTarget) + collide(RFTarget);
+}
+
+/*
 method to set the current node to LH
 */
 void Player::setCurrentLH(){
