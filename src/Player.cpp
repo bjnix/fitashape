@@ -250,7 +250,7 @@ bool Player::collide (CircleNode node){
 		node.target->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);		
 		return false;
 	}
-	node.target->setMaterialTexture(0, driver->getTexture("../assets/particlered.bmp"));
+	node.target->setMaterialTexture(0, driver->getTexture("../assets/particlewhite.bmp"));
 	node.target->setMaterialType(video::EMT_SOLID);	
 	return true;
 }
