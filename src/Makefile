@@ -2,7 +2,7 @@
 # It's usually sufficient to change just the target name and source file list
 # and be sure that CXX is set to a valid compiler
 Target = fitashape
-Sources = Main.cpp Player.cpp Game.cpp
+Sources = Main.cpp Player.cpp Game.cpp CircleNode.cpp
 
 FIT_INC = -I../include 
 X11_INC = -I/usr/X11R6/include

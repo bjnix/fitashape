@@ -10,6 +10,7 @@
 #include "irrlicht/irrlicht.h"
 #include "irrlicht/vector3d.h"
 #include "time.h"
+#include "fitashape/CircleNode.h"
 //#include "fitashape/Game.h"
 
 using namespace irr;
@@ -17,11 +18,11 @@ using namespace core;
 using namespace video;
 using namespace scene;
 
-struct CircleNode{
+/*struct CircleNode{
 	scene::ISceneNode* node;
 	CircleNode* nextNode;
 	scene::ISceneNode* target;
-};
+};//*/
 
 
 
@@ -40,10 +41,10 @@ private:
 	CircleNode LF;
 	CircleNode RF;
 
-	scene::ISceneNode * LHTarget;
-	scene::ISceneNode * RHTarget;
-	scene::ISceneNode * LFTarget;
-	scene::ISceneNode * RFTarget;
+	CircleNode LHTarget;
+	CircleNode RHTarget;
+	CircleNode LFTarget;
+	CircleNode RFTarget;
 
 	
 

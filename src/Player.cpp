@@ -109,29 +109,29 @@ void Player::randomTargets(){
 		spin = (f32) (rand() % 50 - 25);
 		temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
 		temp.rotateXYBy(spin,RHip);
-		RFTarget->setPosition(temp);
+		RFTarget.setPosition(temp);
 
 		//put the left foot somewhere
 		temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
 		temp.rotateXYBy(spin,LHip);
-		LFTarget->setPosition(temp);
+		LFTarget.setPosition(temp);
 
 		//get the amout to move up
-		shift = ground - RFTarget->getPosition().Y;
+		shift = ground - RFTarget.getPosition().Y;
 	}else{//left foot down!
 		spin = (f32) (rand() % 50 - 25);
 		temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
 		temp.rotateXYBy(spin,LHip);
-		LFTarget->setPosition(temp);
+		LFTarget.setPosition(temp);
 
 		//put the right foot somewhere
 		spin =  90 - 45 + bodySpin;
 		temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
 		temp.rotateXYBy(spin,RHip);
-		RFTarget->setPosition(temp);
+		RFTarget.setPosition(temp);
 
 		//get the amout to move up
-		shift = ground - LFTarget->getPosition().Y;
+		shift = ground - LFTarget.getPosition().Y;
 	}
 
 	//move the arms around!
@@ -139,18 +139,18 @@ void Player::randomTargets(){
 	spin = rand() % 160 - 80 + bodySpin;
 	temp = vector3df(LShoulder.X - LArm,LShoulder.Y ,LShoulder.Z);
 	temp.rotateXYBy(spin,LShoulder);
-	LHTarget->setPosition(temp);
+	LHTarget.setPosition(temp);
 	//right hand now
 	spin = rand() % 160 - 80 + bodySpin;
 	temp = vector3df(RShoulder.X + RArm,RShoulder.Y ,RShoulder.Z);
 	temp.rotateXYBy(spin,RShoulder);
-	RHTarget->setPosition(temp);
+	RHTarget.setPosition(temp);
 
 	//shift everything to line up with the ground
-	LHTarget->setPosition(vector3df(LHTarget->getPosition().X,LHTarget->getPosition().Y + shift,LHTarget->getPosition().Z));
-	RHTarget->setPosition(vector3df(RHTarget->getPosition().X,RHTarget->getPosition().Y + shift,RHTarget->getPosition().Z));
-	LFTarget->setPosition(vector3df(LFTarget->getPosition().X,LFTarget->getPosition().Y + shift,LFTarget->getPosition().Z));
-	RFTarget->setPosition(vector3df(RFTarget->getPosition().X,RFTarget->getPosition().Y + shift,RFTarget->getPosition().Z));
+	LHTarget.setPosition(vector3df(LHTarget.getPosition().X,LHTarget.getPosition().Y + shift,LHTarget.getPosition().Z));
+	RHTarget.setPosition(vector3df(RHTarget.getPosition().X,RHTarget.getPosition().Y + shift,RHTarget.getPosition().Z));
+	LFTarget.setPosition(vector3df(LFTarget.getPosition().X,LFTarget.getPosition().Y + shift,LFTarget.getPosition().Z));
+	RFTarget.setPosition(vector3df(RFTarget.getPosition().X,RFTarget.getPosition().Y + shift,RFTarget.getPosition().Z));
 	LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
 	RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
 	LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
@@ -162,79 +162,88 @@ void Player::randomTargets(){
 method to set up the targets for each limb
 */
 void Player::drawTargets(){
-	LHTarget = smgr->addSphereSceneNode(1);
-	if (LHTarget){
-		LH.target = LHTarget;
-		LHTarget->setPosition(LH.node->getPosition());
-		LHTarget->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-		LHTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-		LHTarget->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
+	LHTarget.init(smgr, 1);
+	
+	LHTarget.setTarget(&LH);
+	LHTarget.node->setPosition(LH.node->getPosition()); // set it's position to a temp spot
+	LHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+	LHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	LHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	//}
 
-	RHTarget = smgr->addSphereSceneNode(1);
-	if (RHTarget){
-		RH.target = RHTarget;
-		RHTarget->setPosition(RH.node->getPosition());
-		RHTarget->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
-		RHTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-		RHTarget->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
+	//target for right hand
+	//RHTarget = smgr->addSphereSceneNode(1);
+	RHTarget.init(smgr, 1);
+	//if (RHTarget){
+		//RH.target = RHTarget;
+	RHTarget.setTarget(&RH);
+	RHTarget.node->setPosition(RH.node->getPosition());
+	RHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
+	RHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	RHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	//}
 
-	LFTarget = smgr->addSphereSceneNode(1);
-	if (LFTarget){
-		LF.target = LFTarget;
-		LFTarget->setPosition(LF.node->getPosition());
-		LFTarget->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
-		LFTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-		LFTarget->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
+	//target for left foot
+	//LFTarget = smgr->addSphereSceneNode(1);
+	LFTarget.init(smgr, 1);
+	//if (LFTarget){
+		//LF.target = LFTarget;
+	LFTarget.setTarget(&LF);
+	LFTarget.node->setPosition(LF.node->getPosition());
+	LFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
+	LFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	LFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	//}
 
-	RFTarget = smgr->addSphereSceneNode(1);
-	if (RFTarget){		
-		RF.target = RFTarget;
-		RFTarget->setPosition(RF.node->getPosition());
-		RFTarget->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
-		RFTarget->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-		RFTarget->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
+	//target for right foot
+	//RFTarget = smgr->addSphereSceneNode(1);
+	RFTarget.init(smgr, 1);
+	//if (RFTarget){		
+		//RF.target = RFTarget;
+	RFTarget.setTarget(&RF);
+	RFTarget.node->setPosition(RF.node->getPosition());
+	RFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
+	RFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	RFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 }
 /*
 method to draw the limb orbs
 */
 void Player::drawLimbs(){
 
-	LH.node = smgr->addSphereSceneNode(1);
-	if (LH.node){
-		LH.nextNode = &RH;
-		LH.node->setPosition(core::vector3df(-13,10,30));
-		LH.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-		LH.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
+	LH.init(smgr, 1);
+	//if (LH.node){
+		LH.node->setPosition(core::vector3df(-13,10,30)); //set its position
+		LH.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp")); //set the texture
+		LH.node->setMaterialFlag(video::EMF_LIGHTING, false); //turn of the emf lighting flag
+	//}
 
-
-	RH.node = smgr->addSphereSceneNode(1);
-	if (RH.node){
-		RH.nextNode = &LF;
+	//right hand
+	//RH.node = smgr->addSphereSceneNode(1);
+	RH.init(smgr, 1);
+	//if (RH.node){
 		RH.node->setPosition(core::vector3df(13,10,30));
 		RH.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 		RH.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
+	//}
 
-	LF.node = smgr->addSphereSceneNode(1);
-	if (LF.node){
-		LF.nextNode = &RF;
+	//left foot
+	//LF.node = smgr->addSphereSceneNode(1);
+	LF.init(smgr, 1);
+	//if (LF.node){
 		LF.node->setPosition(core::vector3df(-3,-7,30));
 		LF.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
 		LF.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
+	//}
 
-	RF.node = smgr->addSphereSceneNode(1);
-	if (RF.node){
-		RF.nextNode = &LH;
+	//right foot
+	//RF.node = smgr->addSphereSceneNode(1);
+	RF.init(smgr, 1);
+	//if (RF.node){
 		RF.node->setPosition(vector3df(3,-7,30));
 		RF.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
 		RF.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	}
+	//}
 }
 
 /*
@@ -242,16 +251,19 @@ method to determin if the passed node is close to its targert
 */
 bool Player::collide (CircleNode node){
 	vector3df nodeLocation = node.node->getPosition();
-	vector3df targetLocation = node.target->getPosition();
+	vector3df targetLocation = node.target()->node->getPosition();
 	double collideDist = 2; // determins how close the orbs have to be. easy to change
 	
+	//check to see of the distance between the two nodes is less than the required distance
 	if(nodeLocation.getDistanceFrom(targetLocation) > collideDist){
-		node.target->setMaterialTexture(0, node.node->getMaterial(0).getTexture(0));
-		node.target->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);		
+		//did not collide so make sure it is the normal texture and transparent
+		node.node->setMaterialTexture(0, node.node->getMaterial(0).getTexture(0));
+		node.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		return false;
 	}
 	node.target->setMaterialTexture(0, driver->getTexture("../assets/particlewhite.bmp"));
 	node.target->setMaterialType(video::EMT_SOLID);	
+	//did collide, change texture to a different one and make it look solid
 	return true;
 }
 
@@ -270,12 +282,11 @@ void Player::setPosition(std::vector<vector3df> vec){
 method to update/check if all the orbs are touching their targets
 */
 bool Player::collideAll(){
-
-	bool result = collide(LH);
-	result = collide(RH) && result ; 
-	result = collide(LF) && result ; 
-	result = collide(RF) && result ; 
-
+	bool result = collide(LHTarget);
+	result = collide(RHTarget) && result ;
+	result = collide(LFTarget) && result ; 
+	result = collide(RFTarget) && result ; 
+	
 	return result;
 }
 
@@ -312,20 +323,20 @@ method to set the the positions of all the nodes. Pass an array of the positions
 0 = LH, 1 = RH, 2 = LF, 3 = RF
 */
 void Player::setPositions(vector3df pos[4]){
-	LH.node->setPosition(pos[0]);
-	RH.node->setPosition(pos[1]);
-	LF.node->setPosition(pos[2]);
-	RF.node->setPosition(pos[3]);
+	LH.setPosition(pos[0]);
+	RH.setPosition(pos[1]);
+	LF.setPosition(pos[2]);
+	RF.setPosition(pos[3]);
 }
 
 /*
 method to store the initial positions into the array for local use
 */
 void Player::localInitPos(){
-	initLoc[0]=LH.node->getPosition();
-	initLoc[1]=RH.node->getPosition();
-	initLoc[2]=LF.node->getPosition();
-	initLoc[3]=RF.node->getPosition();
+	initLoc[0]=LH.getPosition();
+	initLoc[1]=RH.getPosition();
+	initLoc[2]=LF.getPosition();
+	initLoc[3]=RF.getPosition();
 }
 
 /*
