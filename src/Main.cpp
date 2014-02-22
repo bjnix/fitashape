@@ -13,7 +13,7 @@
 #include "fitashape/Game.h"
 
 
-std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
+//std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
 
 /*
 	Main method for the game.

@@ -68,11 +68,11 @@ public:
 	};
 	
 	ViconInputClient * vClient;
-	Player* p1;
-	video::IVideoDriver* driver;
-	scene::ISceneManager* smgr;
+	Player * p1;
+	video::IVideoDriver * driver;
+	scene::ISceneManager * smgr;
 	IrrlichtDevice * device;
-	ITimer* myClock;
+	ITimer * myClock;
 	int score;
 	int timesUp;
 	scene::ITextSceneNode * text;

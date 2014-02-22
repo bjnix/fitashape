@@ -49,7 +49,7 @@ int Game::run(bool local){
 	
 	//get the driver and the scene manager
 	driver = device->getVideoDriver();
-	scene::ISceneManager* smgr = device->getSceneManager();
+	smgr = device->getSceneManager();
 	
 	std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::flush;
 

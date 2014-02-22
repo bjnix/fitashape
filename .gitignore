@@ -23,6 +23,7 @@
 *.app
 *.*~
 *~
+*._.
 *.cpp.*
 
 .fuse_hidden*
