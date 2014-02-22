@@ -3,7 +3,7 @@
 # Compiled Object files
 *.slo
 #*.lo
-#*.o
+*.o
 *.obj
 
 # Compiled Dynamic libraries
@@ -21,6 +21,12 @@
 *.exe
 *.out
 *.app
+*.*~
+*~
+*._.
+*.cpp.*
+
+.fuse_hidden*
 
 # Specific files
 libIrrlicht.a

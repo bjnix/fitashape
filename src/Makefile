@@ -2,7 +2,7 @@
 # It's usually sufficient to change just the target name and source file list
 # and be sure that CXX is set to a valid compiler
 Target = fitashape
-Sources = Main.cpp Player.cpp
+Sources = Main.cpp Player.cpp Game.cpp
 
 FIT_INC = -I../include 
 X11_INC = -I/usr/X11R6/include
@@ -22,7 +22,11 @@ X11_LIBS= -L/usr/X11R6/lib$(LIBSELECT) -lGL -lXxf86vm -lXext -lX11 -lXcursor
 IRR_LIBS = -L../lib/irrlicht -lIrrlicht
 VICON_LIBS = -L../lib/vicon-libs -Wl,-rpath,../lib/vicon-libs -lViconDataStreamSDK_CPP
 VII_LIBS = -L../lib -Wl,-rpath,../lib -lVII
-BASIC_LIBS =
+# If sound enabled, add the proper library for linking
+#LDFLAGS += -lIrrKlang
+#LDFLAGS += -laudiere
+#LDFLAGS += -lSDL_mixer -lSDL
+
 
 # target specific settings
 all_linux: LDFLAGS = $(X11_LIBS) $(IRR_LIBS) $(VICON_LIBS) $(VII_LIBS)
@@ -32,12 +36,13 @@ all_win32: CPPFLAGS += -D__GNUWIN32__ -D_WIN32 -DWIN32 -D_WINDOWS -D_MBCS -D_USR
 all_win32 clean_win32: SYSTEM=Win32-gcc
 all_win32 clean_win32: SUF=.exe
 # name of the binary - only valid for targets which set SYSTEM
-DESTPATH = ../bin/$(SYSTEM)/$(Target)$(SUF)
-#DESTPATH = ../bin/$(Target)$(SUF)
+#DESTPATH = ../bin/$(SYSTEM)/$(Target)$(SUF)
+DESTPATH = ../bin/$(Target)
+OBJ = $(Sources:.cpp=.o)
 
-all_linux all_win32:
+all_linux all_win32:$(OBJ) 
 	$(warning Building...)
-	$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) $(Sources) -o $(DESTPATH) $(LDFLAGS) 
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $(DESTPATH) $(LDFLAGS) 
 
 clean: clean_linux clean_win32
 	$(warning Cleaning...)

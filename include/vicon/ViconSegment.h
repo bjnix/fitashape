@@ -1,8 +1,7 @@
 #ifndef VICONSEGMENT_H
 #define VICONSEGMENT_H
 #include "ViconClient.h"
-#include <string>
-#include <vector>
+
 
 class ViconSegment
 {
@@ -11,8 +10,10 @@ class ViconSegment
     double * phi_theta_psi;
     std::string SegmentName;
     std::string SubjectName;
-    ViconDataStreamSDK::CPP::Client *SegClient;
+    ViconDataStreamSDK::CPP::Client * segClient;
   public:
+    double * setTranslation(ViconDataStreamSDK::CPP::Output_GetSegmentGlobalTranslation);
+    double * setOrientationEuler(ViconDataStreamSDK::CPP::Output_GetSegmentGlobalRotationEulerXYZ);
     double * getTranslation();
     double * getOrientationEuler();
     double getX();
@@ -22,11 +23,11 @@ class ViconSegment
     double getTheta();
     double getPsi(); 
 
-    //TODO add printing or preferably return a string
-    //void printSubjectName();
-    //void printSegmentName();
+    
+    std::string getSubjectName();
+    std::string getSegmentName();
 
-    ViconSegment(std::string &SubjectName, std::string &SegmentName, ViconDataStreamSDK::CPP::Client *SegClient);
+    ViconSegment(std::string SubjectName, std::string SegmentName, ViconDataStreamSDK::CPP::Client *SegClient);
     //~ViconSegment();
 
 
