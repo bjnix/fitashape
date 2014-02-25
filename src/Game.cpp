@@ -30,7 +30,7 @@ Game::Game(bool local){
 
 Game::~Game(void){
 	delete p1;
-	delete vClient;
+	//delete vClient;
 }
 
 /*
@@ -162,14 +162,14 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 	core::vector3df nodePosition = p1->currentNode()->getPosition();
 	
 	if(receiver.IsKeyDown(KEY_KEY_W))
-		nodePosition.Y += 1;
+		nodePosition.Y += .5;
 	else if(receiver.IsKeyDown(KEY_KEY_S))
-		nodePosition.Y -= 1;
+		nodePosition.Y -= .5;
 	
 	if(receiver.IsKeyDown(KEY_KEY_A))
-		nodePosition.X -= 1;
+		nodePosition.X -= .5;
 	else if(receiver.IsKeyDown(KEY_KEY_D))
-		nodePosition.X += 1;
+		nodePosition.X += .5;
 
 	p1->currentNode()->setPosition(nodePosition);
 }
@@ -187,7 +187,7 @@ void Game::motionTracking(){
 				vector3df(segment[1].getX()/100,segment[1].getZ()/100,30),
 				vector3df(segment[2].getX()/100,segment[2].getZ()/100,30),
 				vector3df(segment[3].getX()/100,segment[3].getZ()/100,30)};
-
+	printViconData();
 	p1->setPositions(temp);
 
 }
@@ -377,16 +377,19 @@ void Game::startLocation(){
 		
 		//check to see if the player is close to staying still
 		double close = .5; //number to define how close is enough
+		double min = 5;
 		if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
 			RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
 			LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
 			RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
 				//check to see if they look like they are in the right possition
-				//makes sure the arms are at about the same hight and  that the arms are about the same length
 				//TODO add more restrictions if necessary
-				if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
-					&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5))
-						moving = false; //they have stopped moving!
+				//check to see that they are an actual size, not just a dot
+				if(LHpos3.getDistanceFrom(LFpos3) > min && RHpos3.getDistanceFrom(RFpos3) > min && LHpos3.getDistanceFrom(LHpos3) > min)
+					//makes sure the arms are at about the same hight and  that the arms are about the same length
+					if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
+						&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5))
+							moving = false; //they have stopped moving!
 		}
 	}
 	//store this position for later use
