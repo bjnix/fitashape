@@ -187,7 +187,7 @@ void Game::motionTracking(){
 				vector3df(segment[1].getX()/100,segment[1].getZ()/100,30),
 				vector3df(segment[2].getX()/100,segment[2].getZ()/100,30),
 				vector3df(segment[3].getX()/100,segment[3].getZ()/100,30)};
-	printViconData();
+	vClient->printViconData();
 	p1->setPositions(temp);
 
 }
