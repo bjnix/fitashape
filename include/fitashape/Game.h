@@ -21,6 +21,9 @@ class Game
 {
 private:
 	bool gameOver;
+	bool toExit;
+	bool pause;
+	bool local;
 	
 
 
@@ -79,15 +82,17 @@ public:
 	scene::ITextSceneNode * text;
 	MyEventReceiver receiver;
 
-	Game(bool local);
+	Game(bool);
 	~Game();
 	
-	int run(bool local);
+	int run();
 	void moveKeyboard(MyEventReceiver receiver);
 	void motionTracking();
 	void createClock();
 	void updateClock();
 	void startLocation();
+	void retryMenu(); //delete this later
+	void pauseMenu();
 	
 
 };

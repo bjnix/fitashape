@@ -46,6 +46,14 @@ private:
 	CircleNode LFTarget;
 	CircleNode RFTarget;
 
+	CircleNode RestartYes;
+	CircleNode RestartNo;
+
+	CircleNode NewGame;
+	CircleNode ResumeGame;
+	CircleNode ExitGame;
+	CircleNode Select;
+
 	
 
 	//0=LeftHand, 1=RightHand, 2=LeftFoot 3=RightFoot
@@ -82,6 +90,9 @@ public:
 	void setPositions(vector3df pos[4]);
 	void localInitPos();	
 	void addCameraScene();
+	void setTargetVisible(bool, bool);
+	int restartCollide(); //delete later
+	int pauseCollide();
 
 
 };

@@ -5,7 +5,7 @@ Class for the Game object
 #include "fitashape/Game.h"
 
 
-std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
+std::string HostName = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
 
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
@@ -20,17 +20,20 @@ const char *nameList[] = {
 
 std::vector<std::string> names(nameList,end(nameList));
 
-Game::Game(bool local){
-	gameOver = false;
+Game::Game(bool isLocal){
+	gameOver = true;
 	zen = 50;
 	timesUp = 10;
 	score = 0;
-	run(local);
+	toExit = false;
+	pause = true;
+	local = isLocal;
+	run();
 }
 
 Game::~Game(void){
 	delete p1;
-	delete vClient;
+
 }
 
 /*
@@ -38,7 +41,7 @@ Game::~Game(void){
 	W,S,A,D to move an orb, H,J,K,L to switch between them
 */
 
-int Game::run(bool local){	
+int Game::run(){	
 
 	// ask user for driver
 	//video::E_DRIVER_TYPE driverType=driverChoiceConsole();
@@ -78,9 +81,9 @@ int Game::run(bool local){
 		//get the initial setup for the player if using tracking system
 		vClient = new ViconInputClient(&HostName,&names,&names);
 
-		//sets up the player's body and stuff
-		startLocation();	
-		printf("Done calibrating\n");
+		//sets up the player's body and stuff - Now done in the menu 
+		//startLocation();	
+		//printf("Done calibrating\n");
 		std::cout << "Just finished Method Calls \n"<< std::flush;
 	}else{
 		//manually set the initial position of the limbs
@@ -114,8 +117,8 @@ int Game::run(bool local){
 
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
-
-	while(device->run())
+	p1->setTargetVisible(false, gameOver);
+	while(device->run() && !toExit)
 	{
 
 		//move the orbs around
@@ -124,16 +127,24 @@ int Game::run(bool local){
 
 		else
 			motionTracking();
-		//update the clock and check for win/lose
-		updateClock();
+
+		//normal scoring while the game runs
+		if(!pause){
+			//update the clock and check for win/lose
+			updateClock();
+		}
+		//menu for game overness
+		else{
+			pauseMenu();
+		}
 
 		//puts the stuff on the screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
 		smgr->drawAll(); // draw the 3d scene
 		driver->endScene();
-		//end the game correctly
-		if(gameOver)
-			break;
+		//end the current session, asking if want to play again.
+		
+			
 
 	}
 
@@ -208,6 +219,54 @@ void Game::createClock(){
 	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,25,30));
 }
 
+
+void Game::retryMenu(){
+	switch(p1->restartCollide()){
+		//if yes is selected, reinitialize the variables
+		case 1:
+			gameOver = false;
+			zen = 50;
+			timesUp = 10;
+			score = 0;
+			p1->setTargetVisible(true, gameOver);
+			myClock->setTime(0);
+			break;
+		//if no selected, set exit bool to be true
+		case 2: 
+			toExit = true;
+			break;
+	}
+}
+
+void Game::pauseMenu(){
+	switch(p1->pauseCollide()){
+		case 1:
+			pause = false;
+			break;
+		case 2:
+			if(!local){
+				startLocation();
+				printf("Done calibrating\n");
+			}
+			gameOver = false;
+			zen = 50;
+			timesUp = 10;
+			score = 0;
+			p1->setTargetVisible(true, gameOver);
+			myClock->setTime(0);
+			pause = false;
+			break;
+		
+		case 3:
+			toExit = true;
+			break;
+	}
+}
+
+
+
+
+
 /*
 This method updates our clock in the title bar 
 and also checks to see if we have won depending on the time
@@ -218,7 +277,7 @@ void Game::updateClock(){
 	int seconds = (myClock->getTime() / 1000) % 60; //current time
 
 	//display the clock with latest seconds
-	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Score: %d",timesUp - seconds,score);
+	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds, zen, score);
  	
 	//device->setWindowCaption(tmp);
 	text->setText(tmp);
@@ -275,8 +334,12 @@ void Game::updateClock(){
 		}
 		if(zen > 100) // so zen cant get above 100%
 			zen = 100;
-		if(zen <= 0) // if zen <= 0 player loses and game quits
-			gameOver = true; //this is bad, fix this later!!!!! -Trent
+		if(zen <= 0){ // if zen <= 0 player loses and game quits
+			gameOver = true;
+			pause = true;
+			p1->setTargetVisible(false, gameOver);
+			//p1->setTargetVisible(false);
+		} 
 		p1->randomTargets(); 
 		//reset the clock
 		myClock->setTime(0);
@@ -287,7 +350,10 @@ void Game::updateClock(){
 	}
 
 	//display the clock with updated score
-	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds,zen, score);
+	//if(!gameOver)
+		swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds,zen, score);
+	/*else
+		swprintf(tmp, 255, L)//*/
  	device->setWindowCaption(tmp);
 }
 
