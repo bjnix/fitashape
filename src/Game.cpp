@@ -179,27 +179,38 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 
 
 void Game::motionTracking(){
-	vector3df temp[4];	
-	while(MyClient.GetFrame().Result != Result::Success) 
-	{
-		sleep(1);
-		std::cout << ".";
-	}	
-	std::cout<<std::flush;
-	for(int i = 0; i < 4; i++)
-	{
-		ViconDataStreamSDK::CPP::Output_GetSegmentGlobalTranslation Output = 
-			MyClient.GetSegmentGlobalTranslation(names[i],names[i]);
-		//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
-		if(!Output.Occluded)
-	    	{ 
-			std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
-						  <<Output.Translation[1]<<", "
-						  <<Output.Translation[2]<<") " 
-						  <<Output.Occluded << std::endl;
+	vector3df temp[4];
+	bool OccludedMarker = true;	
+	while(OccludedMarker){
+		OccludedMarker = false;
+		while(MyClient.GetFrame().Result != Result::Success) 
+		{
+			sleep(1);
+			std::cout << ".";
+		}	
+		std::cout<<std::flush;
+		for(int i = 0; i < 4; i++)
+		{
+			ViconDataStreamSDK::CPP::Output_GetSegmentGlobalTranslation Output = 
+				MyClient.GetSegmentGlobalTranslation(names[i],names[i]);
+			//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
+			if(!Output.Occluded)
+		    	{ 
+				std::cout<<names[i]<<" NOT occluded!"<< std::endl;
+				/*std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
+							  <<Output.Translation[1]<<", "
+							  <<Output.Translation[2]<<") " 
+							  <<Output.Occluded << std::endl;*/
 
-			temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,30);		
-		}else{ std::cout<<names[i]<<" occluded!"<< std::endl; }
+				temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,30);		
+			}
+			else
+			{ 
+				std::cout<<names[i]<<" occluded!"<< std::endl; 
+				OccludedMarker = true;
+				break;
+			}
+		}
 	}
 	p1->setPositions(temp);
 
@@ -390,19 +401,24 @@ void Game::startLocation(){
 		
 		//check to see if the player is close to staying still
 		double close = .5; //number to define how close is enough
-		double min = 5;
+		double min = 1;
 		if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
 			RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
 			LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
 			RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
+				std::cout<<"stood still!"<<std::endl;
 				//check to see if they look like they are in the right possition
 				//TODO add more restrictions if necessary
 				//check to see that they are an actual size, not just a dot
-				if(LHpos3.getDistanceFrom(LFpos3) > min && RHpos3.getDistanceFrom(RFpos3) > min && LHpos3.getDistanceFrom(LHpos3) > min)
+				//if(LHpos3.getDistanceFrom(LFpos3) > min && RHpos3.getDistanceFrom(RFpos3) > min && LHpos3.getDistanceFrom(LHpos3) > min){
+					//std::cout<<"real size person!"<<std::endl;
 					//makes sure the arms are at about the same hight and  that the arms are about the same length
 					if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
-						&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5))
+						&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5)){
 							moving = false; //they have stopped moving!
+						std::cout<<"T position"<<std::endl;
+					}
+				//}
 		}
 	}
 	//store this position for later use
