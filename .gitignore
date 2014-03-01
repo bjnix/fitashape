@@ -25,7 +25,7 @@
 *~
 *._.
 *.cpp.*
-
+out
 .fuse_hidden*
 
 # Specific files

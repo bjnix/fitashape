@@ -8,14 +8,42 @@
 
 #include "irrlicht/irrlicht.h"
 #include "irrlicht/vector3d.h"
-#include "vicon/ViconSegment.h"
-#include "vicon/ViconInputClient.h"
+#include "vicon/ViconClient.h"
 #include "fitashape/Player.h"
 
 using namespace irr;
 using namespace core;
 using namespace video;
 using namespace scene;
+using namespace ViconDataStreamSDK::CPP;
+namespace
+{
+	std::string Adapt( const bool i_Value )
+	{
+		return i_Value ? "True" : "False";
+	}
+
+	std::string Adapt( const Direction::Enum i_Direction )
+	{
+		switch( i_Direction )
+		{
+			case Direction::Forward:
+				return "Forward";
+			case Direction::Backward:
+				return "Backward";
+			case Direction::Left:
+				return "Left";
+			case Direction::Right:
+				return "Right";
+			case Direction::Up:
+				return "Up";
+			case Direction::Down:
+				return "Down";
+			default:
+				return "Unknown";
+		}
+	}
+}
 
 class Game
 {
@@ -70,7 +98,7 @@ public:
 		bool KeyIsDown[KEY_KEY_CODES_COUNT];
 	};
 	
-	ViconInputClient * vClient;
+	
 	Player * p1;
 	video::IVideoDriver * driver;
 	scene::ISceneManager * smgr;
@@ -94,6 +122,8 @@ public:
 	void retryMenu(); //delete this later
 	void pauseMenu();
 	
+	int viconInit();
+	void viconExit();
 
 };
 
