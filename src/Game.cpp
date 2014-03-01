@@ -5,7 +5,8 @@ Class for the Game object
 #include "fitashape/Game.h"
 
 
-std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
+std::string hostname = "141.219.28.17:801";//was 141.219.28.107:801
+ViconDataStreamSDK::CPP::Client MyClient;
 
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
@@ -30,7 +31,6 @@ Game::Game(bool local){
 
 Game::~Game(void){
 	delete p1;
-	delete vClient;
 }
 
 /*
@@ -76,7 +76,9 @@ int Game::run(bool local){
 	
 		std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
-		vClient = new ViconInputClient(&HostName,&names,&names);
+		if(viconInit() != 0)
+		{ gameOver = true;}
+
 
 		//sets up the player's body and stuff
 		startLocation();	
@@ -140,6 +142,7 @@ int Game::run(bool local){
 	/*
 	In the end, delete the Irrlicht device.
 	*/
+	viconExit();
 	device->drop();
 	return 0;
 }
@@ -162,32 +165,53 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 	core::vector3df nodePosition = p1->currentNode()->getPosition();
 	
 	if(receiver.IsKeyDown(KEY_KEY_W))
-		nodePosition.Y += 1;
+		nodePosition.Y += .5;
 	else if(receiver.IsKeyDown(KEY_KEY_S))
-		nodePosition.Y -= 1;
+		nodePosition.Y -= .5;
 	
 	if(receiver.IsKeyDown(KEY_KEY_A))
-		nodePosition.X -= 1;
+		nodePosition.X -= .5;
 	else if(receiver.IsKeyDown(KEY_KEY_D))
-		nodePosition.X += 1;
+		nodePosition.X += .5;
 
 	p1->currentNode()->setPosition(nodePosition);
 }
 
-/*
-	TODO - matt
-	Placeholder Method that will use the tracking system to move 
-	nodes to the current location of the hardbody
-	move each node once per method call
-*/
+
 void Game::motionTracking(){
+	vector3df temp[4];
+	bool OccludedMarker = true;	
+	while(OccludedMarker){
+		OccludedMarker = false;
+		while(MyClient.GetFrame().Result != Result::Success) 
+		{
+			sleep(1);
+			std::cout << ".";
+		}	
+		std::cout<<std::flush;
+		for(int i = 0; i < 4; i++)
+		{
+			ViconDataStreamSDK::CPP::Output_GetSegmentGlobalTranslation Output = 
+				MyClient.GetSegmentGlobalTranslation(names[i],names[i]);
+			//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
+			if(!Output.Occluded)
+		    	{ 
+				std::cout<<names[i]<<" NOT occluded!"<< std::endl;
+				/*std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
+							  <<Output.Translation[1]<<", "
+							  <<Output.Translation[2]<<") " 
+							  <<Output.Occluded << std::endl;*/
 
-	std::vector<ViconSegment> segment = vClient->GetRigidBodies();
-	vector3df temp[4] ={vector3df(segment[0].getX()/100,segment[0].getZ()/100,30),
-				vector3df(segment[1].getX()/100,segment[1].getZ()/100,30),
-				vector3df(segment[2].getX()/100,segment[2].getZ()/100,30),
-				vector3df(segment[3].getX()/100,segment[3].getZ()/100,30)};
-
+				temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,30);		
+			}
+			else
+			{ 
+				std::cout<<names[i]<<" occluded!"<< std::endl; 
+				OccludedMarker = true;
+				break;
+			}
+		}
+	}
 	p1->setPositions(temp);
 
 }
@@ -377,16 +401,24 @@ void Game::startLocation(){
 		
 		//check to see if the player is close to staying still
 		double close = .5; //number to define how close is enough
+		double min = 1;
 		if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
 			RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
 			LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
 			RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
+				std::cout<<"stood still!"<<std::endl;
 				//check to see if they look like they are in the right possition
-				//makes sure the arms are at about the same hight and  that the arms are about the same length
 				//TODO add more restrictions if necessary
-				if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
-					&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5))
-						moving = false; //they have stopped moving!
+				//check to see that they are an actual size, not just a dot
+				//if(LHpos3.getDistanceFrom(LFpos3) > min && RHpos3.getDistanceFrom(RFpos3) > min && LHpos3.getDistanceFrom(LHpos3) > min){
+					//std::cout<<"real size person!"<<std::endl;
+					//makes sure the arms are at about the same hight and  that the arms are about the same length
+					if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
+						&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5)){
+							moving = false; //they have stopped moving!
+						std::cout<<"T position"<<std::endl;
+					}
+				//}
 		}
 	}
 	//store this position for later use
@@ -399,3 +431,88 @@ void Game::startLocation(){
 	p1->initializePosition();
 	return;
 }
+int Game::viconInit()
+{
+    // Connect to a server
+    std::cout << "Connecting to " << hostname.c_str() << " ..." << std::flush;
+	int attemptConnectCount = 0;
+	const int MAX_CONNECT_ATTEMPTS=2;
+    while( !MyClient.IsConnected().Connected && attemptConnectCount < MAX_CONNECT_ATTEMPTS)
+    {
+		attemptConnectCount++;
+		bool ok = false;
+		ok =( MyClient.Connect( hostname ).Result == Result::Success );
+		if(!ok)
+			std::cout << "Warning - connect failed..." << std::endl;
+		std::cout << ".";
+		sleep(1);
+    }
+	if(attemptConnectCount == MAX_CONNECT_ATTEMPTS)
+	{
+		printf("Giving up making connection to Vicon system\n");
+		return 1;
+	}
+    std::cout << std::endl;
+/* TODO: bjnix at mtu dot edu | 11.13.2013
+	add enumeration for input, so as to let user input what types of data to enable
+*/
+    // Enable some different data types
+    MyClient.EnableSegmentData();
+    //MyClient.EnableMarkerData();
+    //MyClient.EnableUnlabeledMarkerData();
+    //MyClient.EnableDeviceData();
+
+    std::cout << "Segment Data Enabled: "          << Adapt( MyClient.IsSegmentDataEnabled().Enabled )         << std::endl;
+    std::cout << "Marker Data Enabled: "           << Adapt( MyClient.IsMarkerDataEnabled().Enabled )          << std::endl;
+    std::cout << "Unlabeled Marker Data Enabled: " << Adapt( MyClient.IsUnlabeledMarkerDataEnabled().Enabled ) << std::endl;
+    std::cout << "Device Data Enabled: "           << Adapt( MyClient.IsDeviceDataEnabled().Enabled )          << std::endl;
+
+    // Set the streaming mode
+    //MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPull );
+    // MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPullPreFetch );
+    MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ServerPush );
+
+    // Set the global up axis
+    MyClient.SetAxisMapping( Direction::Forward, 
+                             Direction::Left, 
+                             Direction::Up ); // Z-up
+    // MyClient.SetGlobalUpAxis( Direction::Forward, 
+    //                           Direction::Up, 
+    //                           Direction::Right ); // Y-up
+
+    Output_GetAxisMapping _Output_GetAxisMapping = MyClient.GetAxisMapping();
+    std::cout << "Axis Mapping: X-" << Adapt( _Output_GetAxisMapping.XAxis ) 
+			  << " Y-" << Adapt( _Output_GetAxisMapping.YAxis ) 
+			  << " Z-" << Adapt( _Output_GetAxisMapping.ZAxis ) << std::endl;
+
+    // Discover the version number
+    Output_GetVersion _Output_GetVersion = MyClient.GetVersion();
+    std::cout << "Version: " << _Output_GetVersion.Major << "." 
+			  << _Output_GetVersion.Minor << "." 
+			  << _Output_GetVersion.Point << std::endl;
+	return 0;
+}
+void Game::viconExit()
+{
+    MyClient.DisableSegmentData();
+//    MyClient.DisableMarkerData();
+//    MyClient.DisableUnlabeledMarkerData();
+//    MyClient.DisableDeviceData();
+
+	// TODO: Disconnect seems to cause a hang. -Scott Kuhl
+    // Disconnect and dispose
+    int t = clock();
+    std::cout << " Disconnecting..." << std::endl;
+    MyClient.Disconnect();
+    int dt = clock() - t;
+    double secs = (double) (dt)/(double)CLOCKS_PER_SEC;
+    std::cout << " Disconnect time = " << secs << " secs" << std::endl;
+}
+/*
+// an atexit() callback:
+void exitCallback()
+{
+	viconExit();
+	return;
+}
+*/
