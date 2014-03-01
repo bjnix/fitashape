@@ -327,7 +327,7 @@ void Game::startLocation(){
 		smgr->drawAll(); 
 		ITexture* background = driver->getTexture("../assets/Calibration(temp).png");
 		if ( background == 0 ) printf("Failed to read texture");
-		else driver->draw2DImage(background, &core::position2d<s32>(0.0f,0.0f));
+		else driver->draw2DImage(background, core::position2d<s32>(0.0f,0.0f));
 		driver->endScene();
 
 		//call the motion tracking method to get up to date locaitons
@@ -343,9 +343,9 @@ void Game::startLocation(){
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		ITexture* background = driver->getTexture("../assets/Calibration(temp).png");
+		
 		if ( background == 0 ) printf("Failed to read texture");
-		else driver->draw2DImage(background, &core::position2d<s32>(0.0f,0.0f));
+		else driver->draw2DImage(background, core::position2d<s32>(0.0f,0.0f));
 		smgr->drawAll();
 		driver->endScene();
 	
@@ -362,9 +362,9 @@ void Game::startLocation(){
 		
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		ITexture* background = driver->getTexture("../assets/Calibration(temp).png");
+		
 		if ( background == 0 ) printf("Failed to read texture");
-		else driver->draw2DImage(background, &core::position2d<s32>(0.0f,0.0f));
+		else driver->draw2DImage(background, core::position2d<s32>(0.0f,0.0f));
 		smgr->drawAll();
 		driver->endScene();
 
@@ -381,9 +381,8 @@ void Game::startLocation(){
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		ITexture* background = driver->getTexture("../assets/Calibration(temp).png");
 		if ( background == 0 ) printf("Failed to read texture");
-		else driver->draw2DImage(background, &core::position2d<s32>(0.0f,0.0f));
+		else driver->draw2DImage(background, core::position2d<s32>(0.0f,0.0f));
 		smgr->drawAll();
 		driver->endScene();
 		
