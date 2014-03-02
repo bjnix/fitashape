@@ -91,8 +91,11 @@ public:
 	void localInitPos();	
 	void addCameraScene();
 	void setTargetVisible(bool, bool);
+	void setMenuInvis();
 	int restartCollide(); //delete later
 	int pauseCollide();
+	bool jump();
+	void setMenu();
 
 
 };

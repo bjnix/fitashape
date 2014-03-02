@@ -88,6 +88,10 @@ int Game::run(){
 		//sets up the player's body and stuff - Now done in the menu 
 		//startLocation();	
 		//printf("Done calibrating\n");
+		p1->localInitPos();
+		//then sets up the body, arms, and legs
+		p1->initializePosition();
+
 		std::cout << "Just finished Method Calls \n"<< std::flush;
 	}else{
 		//manually set the initial position of the limbs
@@ -132,6 +136,10 @@ int Game::run(){
 		else
 			motionTracking();
 
+		/*if(p1->jump()){
+			pause = true;
+			p1->setTargetVisible(false, gameOver);
+		}//*/
 		//normal scoring while the game runs
 		if(!pause){
 			//update the clock and check for win/lose
@@ -265,12 +273,18 @@ void Game::retryMenu(){
 }
 
 void Game::pauseMenu(){
+	wchar_t tmp[100];
+	p1->setMenu();
 	switch(p1->pauseCollide()){
 		case 1:
 			pause = false;
+			p1->setTargetVisible(true, gameOver);
 			break;
 		case 2:
+			p1->setMenuInvis();
 			if(!local){
+				swprintf(tmp, 100, L"Assume The Position!");
+				text->setText(tmp);
 				startLocation();
 				printf("Done calibrating\n");
 			}
@@ -281,13 +295,32 @@ void Game::pauseMenu(){
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
 			pause = false;
+			p1->randomTargets();
 			break;
 		
 		case 3:
 			toExit = true;
 			break;
+		case 4:
+			swprintf(tmp, 100, L"Resume Game");
+			text->setText(tmp);
+			break;
+		case 5:
+			swprintf(tmp, 100, L"New Game");
+			text->setText(tmp);
+			break;
+		case 6:
+			swprintf(tmp, 100, L"Exit Game");
+			text->setText(tmp);
+			break;
+		default:
+			swprintf(tmp, 100, L"Hover Over With Left Hand To Choose Option");
+			text->setText(tmp);
+			break;
 	}
 }
+
+
 
 
 
@@ -335,6 +368,7 @@ void Game::updateClock(){
 			timesUp = 10 - (score/2);//*/
 		
 		//get number of orbs matched, then score based on that
+
 		switch(p1->collideNum()){
 			
 			case 0:
@@ -361,12 +395,13 @@ void Game::updateClock(){
 		if(zen > 100) // so zen cant get above 100%
 			zen = 100;
 		if(zen <= 0){ // if zen <= 0 player loses and game quits
+			zen = 0;
 			gameOver = true;
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
 			//p1->setTargetVisible(false);
 		} 
-		p1->randomTargets(); 
+		p1->randomTargets();
 		//reset the clock
 		myClock->setTime(0);
 

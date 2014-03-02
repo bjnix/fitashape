@@ -224,7 +224,7 @@ void Player::drawTargets(){
 
 	NewGame.init(smgr, 1);
 	NewGame.setTarget(&LH);
-	NewGame.node->setPosition(core::vector3df(-15, 10, 30));
+	NewGame.node->setPosition(core::vector3df(-10, 10, 30));
 	NewGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	NewGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	NewGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -232,7 +232,7 @@ void Player::drawTargets(){
 
 	ResumeGame.init(smgr, 1);
 	ResumeGame.setTarget(&LH);
-	ResumeGame.node->setPosition(core::vector3df(-15, 15, 30));
+	ResumeGame.node->setPosition(core::vector3df(-10, 13, 30));
 	ResumeGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	ResumeGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	ResumeGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -240,7 +240,7 @@ void Player::drawTargets(){
 
 	ExitGame.init(smgr, 1);
 	ExitGame.setTarget(&LH);
-	ExitGame.node->setPosition(core::vector3df(-15, 5, 30));
+	ExitGame.node->setPosition(core::vector3df(-10, 8, 30));
 	ExitGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	ExitGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	ExitGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -412,6 +412,13 @@ void Player::setTargetVisible(bool visibility, bool resume){
 	Select.node->setVisible(!visibility);
 }
 
+void Player::setMenuInvis(){
+	NewGame.node->setVisible(false);
+	ResumeGame.node->setVisible(false);
+	ExitGame.node->setVisible(false);
+	Select.node->setVisible(false);
+}
+
 //figure out which resart button is pressed
 int Player::restartCollide(){
 	if(collide(RestartYes))
@@ -423,13 +430,42 @@ int Player::restartCollide(){
 }
 
 int Player::pauseCollide(){
-	if(ResumeGame.node->isVisible() && collide(ResumeGame) && collide(Select))
-		return 1;
-	else if(collide(NewGame) && collide(Select))
-		return 2;
-	else if(collide (ExitGame) && collide(Select))
-		return 3;
-	else
-		return 0;
+	if(ResumeGame.node->isVisible() && collide(ResumeGame)){
+		if(collide(Select))
+			return 1;
+		else
+			return 4;
+	} 
+		
+	else if(collide(NewGame)){
+		if(collide(Select))
+			return 2;
+		else
+			return 5;
+	}
+	else if(collide (ExitGame)){
+		if(collide(Select))
+			return 3;
+		else
+			return 6;
+	}
+	return 0;
+}
+
+bool Player::jump(){
+	if(LF.getPosition().Y + 1 > ground && RF.getPosition().Y + 1 > ground)
+		return true;
+
+	return false;
+}
+
+void Player::setMenu(){
+	f32 px, py;
+	px = LF.getPosition().X;
+	py = LF.getPosition().Y;
+	Select.setPosition(vector3df(px + 3, py + 12, 30));
+	NewGame.setPosition(vector3df(px -5, py + 12, 30));
+	ResumeGame.setPosition(vector3df(px - 5, py + 15, 30));
+	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
 }
 
