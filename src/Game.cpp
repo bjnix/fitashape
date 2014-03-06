@@ -5,7 +5,10 @@ Class for the Game object
 #include "fitashape/Game.h"
 
 
-std::string HostName = "141.219.28.17:801";//was 141.219.28.107:801
+
+std::string hostname = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
+ViconDataStreamSDK::CPP::Client MyClient;
+
 
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
@@ -20,17 +23,19 @@ const char *nameList[] = {
 
 std::vector<std::string> names(nameList,end(nameList));
 
-Game::Game(bool local){
-	gameOver = false;
+Game::Game(bool isLocal){
+	gameOver = true;
 	zen = 50;
 	timesUp = 10;
 	score = 0;
-	run(local);
+	toExit = false;
+	pause = true;
+	local = isLocal;
+	run();
 }
 
 Game::~Game(void){
 	delete p1;
-	delete vClient;
 }
 
 /*
@@ -38,7 +43,7 @@ Game::~Game(void){
 	W,S,A,D to move an orb, H,J,K,L to switch between them
 */
 
-int Game::run(bool local){	
+int Game::run(){	
 
 	// ask user for driver
 	//video::E_DRIVER_TYPE driverType=driverChoiceConsole();
@@ -76,11 +81,17 @@ int Game::run(bool local){
 	
 		std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
-		vClient = new ViconInputClient(&HostName,&names,&names);
+		if(viconInit() != 0)
+		{ gameOver = true;}
 
-		//sets up the player's body and stuff
-		startLocation();	
-		printf("Done calibrating\n");
+
+		//sets up the player's body and stuff - Now done in the menu 
+		//startLocation();	
+		//printf("Done calibrating\n");
+		p1->localInitPos();
+		//then sets up the body, arms, and legs
+		p1->initializePosition();
+
 		std::cout << "Just finished Method Calls \n"<< std::flush;
 	}else{
 		//manually set the initial position of the limbs
@@ -114,8 +125,8 @@ int Game::run(bool local){
 
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
-
-	while(device->run())
+	p1->setTargetVisible(false, gameOver);
+	while(device->run() && !toExit)
 	{
 
 		//move the orbs around
@@ -124,22 +135,35 @@ int Game::run(bool local){
 
 		else
 			motionTracking();
-		//update the clock and check for win/lose
-		updateClock();
+
+		/*if(p1->jump()){
+			pause = true;
+			p1->setTargetVisible(false, gameOver);
+		}//*/
+		//normal scoring while the game runs
+		if(!pause){
+			//update the clock and check for win/lose
+			updateClock();
+		}
+		//menu for game overness
+		else{
+			pauseMenu();
+		}
 
 		//puts the stuff on the screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
 		smgr->drawAll(); // draw the 3d scene
 		driver->endScene();
-		//end the game correctly
-		if(gameOver)
-			break;
+		//end the current session, asking if want to play again.
+		
+			
 
 	}
 
 	/*
 	In the end, delete the Irrlicht device.
 	*/
+	viconExit();
 	device->drop();
 	return 0;
 }
@@ -162,32 +186,53 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 	core::vector3df nodePosition = p1->currentNode()->getPosition();
 	
 	if(receiver.IsKeyDown(KEY_KEY_W))
-		nodePosition.Y += 1;
+		nodePosition.Y += .5;
 	else if(receiver.IsKeyDown(KEY_KEY_S))
-		nodePosition.Y -= 1;
+		nodePosition.Y -= .5;
 	
 	if(receiver.IsKeyDown(KEY_KEY_A))
-		nodePosition.X -= 1;
+		nodePosition.X -= .5;
 	else if(receiver.IsKeyDown(KEY_KEY_D))
-		nodePosition.X += 1;
+		nodePosition.X += .5;
 
 	p1->currentNode()->setPosition(nodePosition);
 }
 
-/*
-	TODO - matt
-	Placeholder Method that will use the tracking system to move 
-	nodes to the current location of the hardbody
-	move each node once per method call
-*/
+
 void Game::motionTracking(){
+	vector3df temp[4];
+	bool OccludedMarker = true;	
+	while(OccludedMarker){
+		OccludedMarker = false;
+		while(MyClient.GetFrame().Result != Result::Success) 
+		{
+			sleep(1);
+			std::cout << ".";
+		}	
+		std::cout<<std::flush;
+		for(int i = 0; i < 4; i++)
+		{
+			ViconDataStreamSDK::CPP::Output_GetSegmentGlobalTranslation Output = 
+				MyClient.GetSegmentGlobalTranslation(names[i],names[i]);
+			//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
+			if(!Output.Occluded)
+		    	{ 
+				std::cout<<names[i]<<" NOT occluded!"<< std::endl;
+				/*std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
+							  <<Output.Translation[1]<<", "
+							  <<Output.Translation[2]<<") " 
+							  <<Output.Occluded << std::endl;*/
 
-	std::vector<ViconSegment> segment = vClient->GetRigidBodies();
-	vector3df temp[4] ={vector3df(segment[0].getX()/100,segment[0].getZ()/100,30),
-				vector3df(segment[1].getX()/100,segment[1].getZ()/100,30),
-				vector3df(segment[2].getX()/100,segment[2].getZ()/100,30),
-				vector3df(segment[3].getX()/100,segment[3].getZ()/100,30)};
-
+				temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,30);		
+			}
+			else
+			{ 
+				std::cout<<names[i]<<" occluded!"<< std::endl; 
+				OccludedMarker = true;
+				break;
+			}
+		}
+	}
 	p1->setPositions(temp);
 
 }
@@ -208,6 +253,79 @@ void Game::createClock(){
 	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,25,30));
 }
 
+
+void Game::retryMenu(){
+	switch(p1->restartCollide()){
+		//if yes is selected, reinitialize the variables
+		case 1:
+			gameOver = false;
+			zen = 50;
+			timesUp = 10;
+			score = 0;
+			p1->setTargetVisible(true, gameOver);
+			myClock->setTime(0);
+			break;
+		//if no selected, set exit bool to be true
+		case 2: 
+			toExit = true;
+			break;
+	}
+}
+
+void Game::pauseMenu(){
+	wchar_t tmp[100];
+	p1->setMenu();
+	switch(p1->pauseCollide()){
+		case 1:
+			pause = false;
+			p1->setTargetVisible(true, gameOver);
+			break;
+		case 2:
+			p1->setMenuInvis();
+			if(!local){
+				swprintf(tmp, 100, L"Assume The Position!");
+				text->setText(tmp);
+				startLocation();
+				printf("Done calibrating\n");
+			}
+			gameOver = false;
+			zen = 50;
+			timesUp = 10;
+			score = 0;
+			p1->setTargetVisible(true, gameOver);
+			myClock->setTime(0);
+			pause = false;
+			p1->randomTargets();
+			break;
+		
+		case 3:
+			toExit = true;
+			break;
+		case 4:
+			swprintf(tmp, 100, L"Resume Game");
+			text->setText(tmp);
+			break;
+		case 5:
+			swprintf(tmp, 100, L"New Game");
+			text->setText(tmp);
+			break;
+		case 6:
+			swprintf(tmp, 100, L"Exit Game");
+			text->setText(tmp);
+			break;
+		default:
+			swprintf(tmp, 100, L"Hover Over With Left Hand To Choose Option");
+			text->setText(tmp);
+			break;
+	}
+}
+
+
+
+
+
+
+
 /*
 This method updates our clock in the title bar 
 and also checks to see if we have won depending on the time
@@ -218,7 +336,7 @@ void Game::updateClock(){
 	int seconds = (myClock->getTime() / 1000) % 60; //current time
 
 	//display the clock with latest seconds
-	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Score: %d",timesUp - seconds,score);
+	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds, zen, score);
  	
 	//device->setWindowCaption(tmp);
 	text->setText(tmp);
@@ -250,6 +368,7 @@ void Game::updateClock(){
 			timesUp = 10 - (score/2);//*/
 		
 		//get number of orbs matched, then score based on that
+
 		switch(p1->collideNum()){
 			
 			case 0:
@@ -275,9 +394,14 @@ void Game::updateClock(){
 		}
 		if(zen > 100) // so zen cant get above 100%
 			zen = 100;
-		if(zen <= 0) // if zen <= 0 player loses and game quits
-			gameOver = true; //this is bad, fix this later!!!!! -Trent
-		p1->randomTargets(); 
+		if(zen <= 0){ // if zen <= 0 player loses and game quits
+			zen = 0;
+			gameOver = true;
+			pause = true;
+			p1->setTargetVisible(false, gameOver);
+			//p1->setTargetVisible(false);
+		} 
+		p1->randomTargets();
 		//reset the clock
 		myClock->setTime(0);
 
@@ -287,7 +411,10 @@ void Game::updateClock(){
 	}
 
 	//display the clock with updated score
-	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds,zen, score);
+	//if(!gameOver)
+		swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds,zen, score);
+	/*else
+		swprintf(tmp, 255, L)//*/
  	device->setWindowCaption(tmp);
 }
 
@@ -377,16 +504,24 @@ void Game::startLocation(){
 		
 		//check to see if the player is close to staying still
 		double close = .5; //number to define how close is enough
+		double min = 1;
 		if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
 			RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
 			LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
 			RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
+				std::cout<<"stood still!"<<std::endl;
 				//check to see if they look like they are in the right possition
-				//makes sure the arms are at about the same hight and  that the arms are about the same length
 				//TODO add more restrictions if necessary
-				if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
-					&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5))
-						moving = false; //they have stopped moving!
+				//check to see that they are an actual size, not just a dot
+				//if(LHpos3.getDistanceFrom(LFpos3) > min && RHpos3.getDistanceFrom(RFpos3) > min && LHpos3.getDistanceFrom(LHpos3) > min){
+					//std::cout<<"real size person!"<<std::endl;
+					//makes sure the arms are at about the same hight and  that the arms are about the same length
+					if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
+						&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5)){
+							moving = false; //they have stopped moving!
+						std::cout<<"T position"<<std::endl;
+					}
+				//}
 		}
 	}
 	//store this position for later use
@@ -399,3 +534,88 @@ void Game::startLocation(){
 	p1->initializePosition();
 	return;
 }
+int Game::viconInit()
+{
+    // Connect to a server
+    std::cout << "Connecting to " << hostname.c_str() << " ..." << std::flush;
+	int attemptConnectCount = 0;
+	const int MAX_CONNECT_ATTEMPTS=2;
+    while( !MyClient.IsConnected().Connected && attemptConnectCount < MAX_CONNECT_ATTEMPTS)
+    {
+		attemptConnectCount++;
+		bool ok = false;
+		ok =( MyClient.Connect( hostname ).Result == Result::Success );
+		if(!ok)
+			std::cout << "Warning - connect failed..." << std::endl;
+		std::cout << ".";
+		sleep(1);
+    }
+	if(attemptConnectCount == MAX_CONNECT_ATTEMPTS)
+	{
+		printf("Giving up making connection to Vicon system\n");
+		return 1;
+	}
+    std::cout << std::endl;
+/* TODO: bjnix at mtu dot edu | 11.13.2013
+	add enumeration for input, so as to let user input what types of data to enable
+*/
+    // Enable some different data types
+    MyClient.EnableSegmentData();
+    //MyClient.EnableMarkerData();
+    //MyClient.EnableUnlabeledMarkerData();
+    //MyClient.EnableDeviceData();
+
+    std::cout << "Segment Data Enabled: "          << Adapt( MyClient.IsSegmentDataEnabled().Enabled )         << std::endl;
+    std::cout << "Marker Data Enabled: "           << Adapt( MyClient.IsMarkerDataEnabled().Enabled )          << std::endl;
+    std::cout << "Unlabeled Marker Data Enabled: " << Adapt( MyClient.IsUnlabeledMarkerDataEnabled().Enabled ) << std::endl;
+    std::cout << "Device Data Enabled: "           << Adapt( MyClient.IsDeviceDataEnabled().Enabled )          << std::endl;
+
+    // Set the streaming mode
+    //MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPull );
+    // MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPullPreFetch );
+    MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ServerPush );
+
+    // Set the global up axis
+    MyClient.SetAxisMapping( Direction::Forward, 
+                             Direction::Left, 
+                             Direction::Up ); // Z-up
+    // MyClient.SetGlobalUpAxis( Direction::Forward, 
+    //                           Direction::Up, 
+    //                           Direction::Right ); // Y-up
+
+    Output_GetAxisMapping _Output_GetAxisMapping = MyClient.GetAxisMapping();
+    std::cout << "Axis Mapping: X-" << Adapt( _Output_GetAxisMapping.XAxis ) 
+			  << " Y-" << Adapt( _Output_GetAxisMapping.YAxis ) 
+			  << " Z-" << Adapt( _Output_GetAxisMapping.ZAxis ) << std::endl;
+
+    // Discover the version number
+    Output_GetVersion _Output_GetVersion = MyClient.GetVersion();
+    std::cout << "Version: " << _Output_GetVersion.Major << "." 
+			  << _Output_GetVersion.Minor << "." 
+			  << _Output_GetVersion.Point << std::endl;
+	return 0;
+}
+void Game::viconExit()
+{
+    MyClient.DisableSegmentData();
+//    MyClient.DisableMarkerData();
+//    MyClient.DisableUnlabeledMarkerData();
+//    MyClient.DisableDeviceData();
+
+	// TODO: Disconnect seems to cause a hang. -Scott Kuhl
+    // Disconnect and dispose
+    int t = clock();
+    std::cout << " Disconnecting..." << std::endl;
+    MyClient.Disconnect();
+    int dt = clock() - t;
+    double secs = (double) (dt)/(double)CLOCKS_PER_SEC;
+    std::cout << " Disconnect time = " << secs << " secs" << std::endl;
+}
+/*
+// an atexit() callback:
+void exitCallback()
+{
+	viconExit();
+	return;
+}
+*/

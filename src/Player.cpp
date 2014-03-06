@@ -205,6 +205,54 @@ void Player::drawTargets(){
 	RFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
 	RFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	RFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
+
+	RestartYes.init(smgr, 1);
+	RestartYes.setTarget(&LH);
+	RestartYes.node->setPosition(core::vector3df(-20, 10, 30));
+	RestartYes.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+	RestartYes.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	RestartYes.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	RestartYes.node->setVisible(false);
+
+	RestartNo.init(smgr, 1);
+	RestartNo.setTarget(&RH);
+	RestartNo.node->setPosition(core::vector3df(20,10,30));
+	RestartNo.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
+	RestartNo.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	RestartNo.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	RestartNo.node->setVisible(false);
+
+	NewGame.init(smgr, 1);
+	NewGame.setTarget(&LH);
+	NewGame.node->setPosition(core::vector3df(-10, 10, 30));
+	NewGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+	NewGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	NewGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	NewGame.node->setVisible(false);
+
+	ResumeGame.init(smgr, 1);
+	ResumeGame.setTarget(&LH);
+	ResumeGame.node->setPosition(core::vector3df(-10, 13, 30));
+	ResumeGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+	ResumeGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	ResumeGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	ResumeGame.node->setVisible(false);
+
+	ExitGame.init(smgr, 1);
+	ExitGame.setTarget(&LH);
+	ExitGame.node->setPosition(core::vector3df(-10, 8, 30));
+	ExitGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+	ExitGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	ExitGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	ExitGame.node->setVisible(false);
+
+	Select.init(smgr, 1);
+	Select.setTarget(&RH);
+	Select.node->setPosition(core::vector3df(0,10,30));
+	Select.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
+	Select.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	Select.node->setMaterialFlag(video::EMF_LIGHTING, false);
+	Select.node->setVisible(false);
 }
 /*
 method to draw the limb orbs
@@ -352,3 +400,72 @@ method to add a camera scene node that is centered on the player
 void Player::addCameraScene(){
 	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 }
+
+void Player::setTargetVisible(bool visibility, bool resume){
+	RFTarget.node->setVisible(visibility);
+	LFTarget.node->setVisible(visibility);
+	RHTarget.node->setVisible(visibility);
+	LHTarget.node->setVisible(visibility);
+	NewGame.node->setVisible(!visibility);
+	ResumeGame.node->setVisible(!visibility && !resume);
+	ExitGame.node->setVisible(!visibility);
+	Select.node->setVisible(!visibility);
+}
+
+void Player::setMenuInvis(){
+	NewGame.node->setVisible(false);
+	ResumeGame.node->setVisible(false);
+	ExitGame.node->setVisible(false);
+	Select.node->setVisible(false);
+}
+
+//figure out which resart button is pressed
+int Player::restartCollide(){
+	if(collide(RestartYes))
+		return 1;
+	else if(collide(RestartNo))
+		return 2;
+	else 
+		return 0;
+}
+
+int Player::pauseCollide(){
+	if(ResumeGame.node->isVisible() && collide(ResumeGame)){
+		if(collide(Select))
+			return 1;
+		else
+			return 4;
+	} 
+		
+	else if(collide(NewGame)){
+		if(collide(Select))
+			return 2;
+		else
+			return 5;
+	}
+	else if(collide (ExitGame)){
+		if(collide(Select))
+			return 3;
+		else
+			return 6;
+	}
+	return 0;
+}
+
+bool Player::jump(){
+	if(LF.getPosition().Y + 1 > ground && RF.getPosition().Y + 1 > ground)
+		return true;
+
+	return false;
+}
+
+void Player::setMenu(){
+	f32 px, py;
+	px = LF.getPosition().X;
+	py = LF.getPosition().Y;
+	Select.setPosition(vector3df(px + 3, py + 12, 30));
+	NewGame.setPosition(vector3df(px -5, py + 12, 30));
+	ResumeGame.setPosition(vector3df(px - 5, py + 15, 30));
+	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
+}
+
