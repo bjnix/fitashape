@@ -5,8 +5,10 @@ Class for the Game object
 #include "fitashape/Game.h"
 
 
-std::string hostname = "141.219.28.17:801";//was 141.219.28.107:801
+
+std::string hostname = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
 ViconDataStreamSDK::CPP::Client MyClient;
+
 
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
@@ -21,12 +23,15 @@ const char *nameList[] = {
 
 std::vector<std::string> names(nameList,end(nameList));
 
-Game::Game(bool local){
-	gameOver = false;
+Game::Game(bool isLocal){
+	gameOver = true;
 	zen = 50;
-	timesUp = 10;
+	timesUp = 5;
 	score = 0;
-	run(local);
+	toExit = false;
+	pause = true;
+	local = isLocal;
+	run();
 }
 
 Game::~Game(void){
@@ -38,7 +43,7 @@ Game::~Game(void){
 	W,S,A,D to move an orb, H,J,K,L to switch between them
 */
 
-int Game::run(bool local){	
+int Game::run(){	
 
 	// ask user for driver
 	//video::E_DRIVER_TYPE driverType=driverChoiceConsole();
@@ -50,7 +55,7 @@ int Game::run(bool local){
 	
 	// create reciever and device
 	device = createDevice(driverType,
-			core::dimension2d<u32>((1920*6)/12, (1080*4)/12), 16, false, false, false, &receiver);
+			core::dimension2d<u32>(1920, 1080), 16, false, false, false, &receiver);
 	if (device == 0)
 		return 1; // could not create selected device.
 	
@@ -80,9 +85,13 @@ int Game::run(bool local){
 		{ gameOver = true;}
 
 
-		//sets up the player's body and stuff
-		startLocation();	
-		printf("Done calibrating\n");
+		//sets up the player's body and stuff - Now done in the menu 
+		//startLocation();	
+		//printf("Done calibrating\n");
+		p1->localInitPos();
+		//then sets up the body, arms, and legs
+		p1->initializePosition();
+
 		std::cout << "Just finished Method Calls \n"<< std::flush;
 	}else{
 		//manually set the initial position of the limbs
@@ -116,11 +125,11 @@ int Game::run(bool local){
 
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
+	p1->setTargetVisible(false, gameOver);
+	
+	ITexture* background = driver->getTexture("../assets/Background(small).png");
 
-	ITexture* background = driver->getTexture("../assets/Background(Fitashape).png");
-	//background
-
-	while(device->run())
+	while(device->run() && !toExit)
 	{
 
 		//move the orbs around
@@ -129,17 +138,29 @@ int Game::run(bool local){
 
 		else
 			motionTracking();
-		//update the clock and check for win/lose
-		updateClock();
+
+		/*if(p1->jump()){
+			pause = true;
+			p1->setTargetVisible(false, gameOver);
+		}//*/
+		//normal scoring while the game runs
+		if(!pause){
+			//update the clock and check for win/lose
+			updateClock();
+		}
+		//menu for game overness
+		else{
+			pauseMenu();
+		}
 
 		//puts the stuff on the screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
 		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll(); // draw the 3d scene
 		driver->endScene();
-		//end the game correctly
-		if(gameOver)
-			break;
+		//end the current session, asking if want to play again.
+		
+			
 
 	}
 
@@ -179,8 +200,9 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 		nodePosition.X += .5;
 
 	p1->currentNode()->setPosition(nodePosition);
-
+	
 	p1->updateBody();
+
 }
 
 
@@ -221,6 +243,7 @@ void Game::motionTracking(){
 	p1->setPositions(temp);
 
 	p1->updateBody();
+
 }
 
 /*
@@ -239,6 +262,79 @@ void Game::createClock(){
 	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,25,30));
 }
 
+
+void Game::retryMenu(){
+	switch(p1->restartCollide()){
+		//if yes is selected, reinitialize the variables
+		case 1:
+			gameOver = false;
+			zen = 50;
+			timesUp = 10;
+			score = 0;
+			p1->setTargetVisible(true, gameOver);
+			myClock->setTime(0);
+			break;
+		//if no selected, set exit bool to be true
+		case 2: 
+			toExit = true;
+			break;
+	}
+}
+
+void Game::pauseMenu(){
+	wchar_t tmp[100];
+	p1->setMenu();
+	switch(p1->pauseCollide()){
+		case 1:
+			pause = false;
+			p1->setTargetVisible(true, gameOver);
+			break;
+		case 2:
+			p1->setMenuInvis();
+			if(!local){
+				swprintf(tmp, 100, L"Assume The Position!");
+				text->setText(tmp);
+				startLocation();
+				printf("Done calibrating\n");
+			}
+			gameOver = false;
+			zen = 50;
+			timesUp = 10;
+			score = 0;
+			p1->setTargetVisible(true, gameOver);
+			myClock->setTime(0);
+			pause = false;
+			p1->randomTargets();
+			break;
+		
+		case 3:
+			toExit = true;
+			break;
+		case 4:
+			swprintf(tmp, 100, L"Resume Game");
+			text->setText(tmp);
+			break;
+		case 5:
+			swprintf(tmp, 100, L"New Game");
+			text->setText(tmp);
+			break;
+		case 6:
+			swprintf(tmp, 100, L"Exit Game");
+			text->setText(tmp);
+			break;
+		default:
+			swprintf(tmp, 100, L"Hover Over With Left Hand To Choose Option");
+			text->setText(tmp);
+			break;
+	}
+}
+
+
+
+
+
+
+
 /*
 This method updates our clock in the title bar 
 and also checks to see if we have won depending on the time
@@ -249,7 +345,7 @@ void Game::updateClock(){
 	int seconds = (myClock->getTime() / 1000) % 60; //current time
 
 	//display the clock with latest seconds
-	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Score: %d",timesUp - seconds,score);
+	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds, zen, score);
  	
 	//device->setWindowCaption(tmp);
 	text->setText(tmp);
@@ -281,6 +377,7 @@ void Game::updateClock(){
 			timesUp = 10 - (score/2);//*/
 		
 		//get number of orbs matched, then score based on that
+
 		switch(p1->collideNum()){
 			
 			case 0:
@@ -306,9 +403,14 @@ void Game::updateClock(){
 		}
 		if(zen > 100) // so zen cant get above 100%
 			zen = 100;
-		if(zen <= 0) // if zen <= 0 player loses and game quits
-			gameOver = true; //this is bad, fix this later!!!!! -Trent
-		p1->randomTargets(); 
+		if(zen <= 0){ // if zen <= 0 player loses and game quits
+			zen = 0;
+			gameOver = true;
+			pause = true;
+			p1->setTargetVisible(false, gameOver);
+			//p1->setTargetVisible(false);
+		} 
+		p1->randomTargets();
 		//reset the clock
 		myClock->setTime(0);
 
@@ -318,7 +420,10 @@ void Game::updateClock(){
 	}
 
 	//display the clock with updated score
-	swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds,zen, score);
+	//if(!gameOver)
+		swprintf(tmp, 255, L"CLOCK: Seconds: %d \t\t Zen: %d \t\t Score: %d",timesUp - seconds,zen, score);
+	/*else
+		swprintf(tmp, 255, L)//*/
  	device->setWindowCaption(tmp);
 }
 
@@ -343,7 +448,8 @@ void Game::startLocation(){
 	vector3df LFpos3;
 	vector3df RFpos3;
 
-	
+	ITexture* background = driver->getTexture("../assets/Calibration(small).png");
+
 
 	int temp = -1;// keeps track of which group we are going to update
 	myClock->start();// start a clock to keep track of time
@@ -355,12 +461,14 @@ void Game::startLocation(){
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll(); 
 		driver->endScene();
 
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
 		if(temp != 0 && 0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
+			printf("CHECK 1\n");
 			LHpos1 = p1->LH.node->getPosition();
 			RHpos1 = p1->RH.node->getPosition();
 			LFpos1 = p1->LF.node->getPosition();
@@ -370,6 +478,7 @@ void Game::startLocation(){
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll();
 		driver->endScene();
 	
@@ -386,6 +495,7 @@ void Game::startLocation(){
 		
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll();
 		driver->endScene();
 
@@ -402,6 +512,7 @@ void Game::startLocation(){
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll();
 		driver->endScene();
 		
@@ -442,7 +553,6 @@ int Game::viconInit()
     // Connect to a server
     std::cout << "Connecting to " << hostname.c_str() << " ..." << std::flush;
 	int attemptConnectCount = 0;
-
 	const int MAX_CONNECT_ATTEMPTS=2;
     while( !MyClient.IsConnected().Connected && attemptConnectCount < MAX_CONNECT_ATTEMPTS)
     {
