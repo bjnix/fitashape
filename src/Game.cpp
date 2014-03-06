@@ -142,7 +142,7 @@ int Game::run(){
 		/*if(p1->jump()){
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
-		}//*/
+		}*/
 		//normal scoring while the game runs
 		if(!pause){
 			//update the clock and check for win/lose
@@ -269,7 +269,7 @@ void Game::retryMenu(){
 		case 1:
 			gameOver = false;
 			zen = 50;
-			timesUp = 10;
+			timesUp = 5;
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
@@ -299,7 +299,7 @@ void Game::pauseMenu(){
 			}
 			gameOver = false;
 			zen = 50;
-			timesUp = 10;
+			timesUp = 5;
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);

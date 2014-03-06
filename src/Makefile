@@ -21,7 +21,6 @@ endif
 X11_LIBS= -L/usr/X11R6/lib$(LIBSELECT) -lGL -lXxf86vm -lXext -lX11 -lXcursor 
 IRR_LIBS = -L../lib/irrlicht -lIrrlicht
 VICON_LIBS = -L../lib/vicon-libs -Wl,-rpath,../lib/vicon-libs -lViconDataStreamSDK_CPP
-VII_LIBS = -L../lib -Wl,-rpath,../lib -lVII
 # If sound enabled, add the proper library for linking
 #LDFLAGS += -lIrrKlang
 #LDFLAGS += -laudiere
@@ -29,7 +28,7 @@ VII_LIBS = -L../lib -Wl,-rpath,../lib -lVII
 
 
 # target specific settings
-all_linux: LDFLAGS = $(X11_LIBS) $(IRR_LIBS) $(VICON_LIBS) $(VII_LIBS)
+all_linux: LDFLAGS = $(X11_LIBS) $(IRR_LIBS) $(VICON_LIBS) 
 all_linux clean_linux: SYSTEM = Linux
 all_win32: LDFLAGS = -L../irrlicht/lib/Win32-gcc -lIrrlicht -lopengl32 -lm
 all_win32: CPPFLAGS += -D__GNUWIN32__ -D_WIN32 -DWIN32 -D_WINDOWS -D_MBCS -D_USRDLL

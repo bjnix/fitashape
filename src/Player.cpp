@@ -33,7 +33,7 @@ void Player::initializePosition(){
 	vector3df RHip;
 	vector3df centerBody;
 
-	ground = (initLoc[3].Y + initLoc[2].Y) / 2; //sets ground to how the average height of the feet are
+	ground = (initLoc[3].Y + initLoc[2].Y)/2; //sets ground to how the average height of the feet are
 
 	LShoulder = core::vector3df(initLoc[2].X,initLoc[0].Y,initLoc[0].Z);//(leftfoot.x,lefthand.y,lefthand.x)
 	RShoulder = core::vector3df(initLoc[3].X,initLoc[1].Y,initLoc[1].Z);//(rightfoot.x,righthand.y,righthand.x)
@@ -76,7 +76,7 @@ void Player::initializePosition(){
 		printf("body did not work\n");
 		exit(-1);
 	}
-	int scale = (LShoulder.Y - LArm)/4;
+	int scale = (LShoulder.Y - LArm)/5;
 	body->setScale(vector3df(scale,scale,scale));
 }
 
@@ -190,7 +190,7 @@ void Player::drawTargets(){
 	LHTarget.setTarget(&LH);
 	LHTarget.node->setPosition(LH.node->getPosition()); // set it's position to a temp spot
 	LHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-	LHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	//LHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	LHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	//}
 
@@ -202,7 +202,7 @@ void Player::drawTargets(){
 	RHTarget.setTarget(&RH);
 	RHTarget.node->setPosition(RH.node->getPosition());
 	RHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
-	RHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	//RHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	RHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	//}
 
@@ -214,7 +214,7 @@ void Player::drawTargets(){
 	LFTarget.setTarget(&LF);
 	LFTarget.node->setPosition(LF.node->getPosition());
 	LFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
-	LFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	//LFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	LFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	//}
 
@@ -226,14 +226,14 @@ void Player::drawTargets(){
 	RFTarget.setTarget(&RF);
 	RFTarget.node->setPosition(RF.node->getPosition());
 	RFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
-	RFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	//RFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	RFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 
 	RestartYes.init(smgr, 1);
 	RestartYes.setTarget(&LH);
 	RestartYes.node->setPosition(core::vector3df(-20, 10, 30));
 	RestartYes.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-	RestartYes.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	//RestartYes.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	RestartYes.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	RestartYes.node->setVisible(false);
 
@@ -241,7 +241,7 @@ void Player::drawTargets(){
 	RestartNo.setTarget(&RH);
 	RestartNo.node->setPosition(core::vector3df(20,10,30));
 	RestartNo.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
-	RestartNo.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	//RestartNo.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	RestartNo.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	RestartNo.node->setVisible(false);
 
@@ -249,7 +249,7 @@ void Player::drawTargets(){
 	NewGame.setTarget(&LH);
 	NewGame.node->setPosition(core::vector3df(-10, 10, 30));
 	NewGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-	NewGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	//NewGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	NewGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	NewGame.node->setVisible(false);
 
@@ -257,7 +257,7 @@ void Player::drawTargets(){
 	ResumeGame.setTarget(&LH);
 	ResumeGame.node->setPosition(core::vector3df(-10, 13, 30));
 	ResumeGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-	ResumeGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	//ResumeGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	ResumeGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	ResumeGame.node->setVisible(false);
 
@@ -265,7 +265,7 @@ void Player::drawTargets(){
 	ExitGame.setTarget(&LH);
 	ExitGame.node->setPosition(core::vector3df(-10, 8, 30));
 	ExitGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-	ExitGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	//ExitGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	ExitGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	ExitGame.node->setVisible(false);
 
@@ -273,7 +273,7 @@ void Player::drawTargets(){
 	Select.setTarget(&RH);
 	Select.node->setPosition(core::vector3df(0,10,30));
 	Select.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
-	Select.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	//Select.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	Select.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	Select.node->setVisible(false);
 }
@@ -329,7 +329,7 @@ bool Player::collide (CircleNode node){
 	if(nodeLocation.getDistanceFrom(targetLocation) > collideDist){
 		//did not collide so make sure it is the normal texture and transparent
 		node.node->setMaterialTexture(0, node.node->getMaterial(0).getTexture(0));
-		node.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+		//node.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		return false;
 	}
 	node.node->setMaterialTexture(0, driver->getTexture("../assets/particlewhite.bmp"));
@@ -476,6 +476,7 @@ int Player::pauseCollide(){
 }
 
 bool Player::jump(){
+	//printf("ground = %d, LF = %d, RF = %d\n",ground,LF.getPosition().Y,RF.getPosition().Y);
 	if(LF.getPosition().Y + 1 > ground && RF.getPosition().Y + 1 > ground)
 		return true;
 
@@ -496,6 +497,7 @@ void Player::updateBody(){
 
 	//make sure the body exists already
 	if(body){
+		body->setPosition(vector3df((RF.getPosition().X - LF.getPosition().X)/2 + LF.getPosition().X, body->getPosition().Y, body->getPosition().Z));
 		if(LH.getPosition().X < initLoc[0].X)
 			body->setRotation(vector3df(0,0, 3 * (initLoc[0].X - LH.getPosition().X)));
 		if(RH.getPosition().X > initLoc[1].X)
