@@ -6,6 +6,7 @@ Class for the player object
 Player::Player(IVideoDriver * d, ISceneManager * s){
 	driver = d;
 	smgr = s;
+	body = 0;
 }
 Player::~Player(void){}
 /*
@@ -27,6 +28,7 @@ This method will detect where the persons body is and the relative shape of the 
 uses the first 4 locations stored in initLoc[] and sets the last 5
 */
 void Player::initializePosition(){
+	printf("start initialize\n");
 	vector3df LShoulder;
 	vector3df RShoulder;
 	vector3df LHip;
@@ -55,6 +57,31 @@ void Player::initializePosition(){
 	initLoc[6] = LHip;
 	initLoc[7] = RHip;
 	initLoc[8] = centerBody;
+
+	//add the body
+
+
+	IMesh* mesh = smgr->getMesh("../assets/circle-stick.3ds");
+	if (!mesh)
+	{
+		printf("mesh did not work\n");
+		exit(-1);
+		//device->drop();
+		//return 1;
+	}
+		printf("mesh worked\n");
+	body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+	if (body)
+	{
+		body->setMaterialFlag(EMF_LIGHTING, false);
+			printf("body worked\n");	
+	}
+	else{
+		printf("body did not work\n");
+		exit(-1);
+	}
+	int scale = (LShoulder.Y - LArm)/4;
+	body->setScale(vector3df(scale,scale,scale));
 }
 
 
@@ -351,4 +378,15 @@ method to add a camera scene node that is centered on the player
 */
 void Player::addCameraScene(){
 	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
+}
+
+void Player::updateBody(){
+
+	//make sure the body exists already
+	if(body){
+		if(LH.getPosition().X < initLoc[0].X)
+			body->setRotation(vector3df(0,0, 3 * (initLoc[0].X - LH.getPosition().X)));
+		if(RH.getPosition().X > initLoc[1].X)
+			body->setRotation(vector3df(0,0, 3 * (initLoc[1].X - RH.getPosition().X)));
+	}
 }

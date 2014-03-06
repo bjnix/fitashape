@@ -50,7 +50,7 @@ int Game::run(bool local){
 	
 	// create reciever and device
 	device = createDevice(driverType,
-			core::dimension2d<u32>(1280, 1024), 16, false, false, false, &receiver);
+			core::dimension2d<u32>((1920*6)/12, (1080*4)/12), 16, false, false, false, &receiver);
 	if (device == 0)
 		return 1; // could not create selected device.
 	
@@ -117,6 +117,9 @@ int Game::run(bool local){
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
 
+	ITexture* background = driver->getTexture("../assets/Background(Fitashape).png");
+	//background
+
 	while(device->run())
 	{
 
@@ -131,6 +134,7 @@ int Game::run(bool local){
 
 		//puts the stuff on the screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll(); // draw the 3d scene
 		driver->endScene();
 		//end the game correctly
@@ -175,6 +179,8 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 		nodePosition.X += .5;
 
 	p1->currentNode()->setPosition(nodePosition);
+
+	p1->updateBody();
 }
 
 
@@ -196,7 +202,7 @@ void Game::motionTracking(){
 			//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
 			if(!Output.Occluded)
 		    	{ 
-				std::cout<<names[i]<<" NOT occluded!"<< std::endl;
+				//std::cout<<names[i]<<" NOT occluded!"<< std::endl;
 				/*std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
 							  <<Output.Translation[1]<<", "
 							  <<Output.Translation[2]<<") " 
@@ -206,7 +212,7 @@ void Game::motionTracking(){
 			}
 			else
 			{ 
-				std::cout<<names[i]<<" occluded!"<< std::endl; 
+				//std::cout<<names[i]<<" occluded!"<< std::endl; 
 				OccludedMarker = true;
 				break;
 			}
@@ -214,6 +220,7 @@ void Game::motionTracking(){
 	}
 	p1->setPositions(temp);
 
+	p1->updateBody();
 }
 
 /*
@@ -354,7 +361,6 @@ void Game::startLocation(){
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
 		if(temp != 0 && 0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
-			printf("CHECK 1\n");
 			LHpos1 = p1->LH.node->getPosition();
 			RHpos1 = p1->RH.node->getPosition();
 			LFpos1 = p1->LF.node->getPosition();
@@ -436,6 +442,7 @@ int Game::viconInit()
     // Connect to a server
     std::cout << "Connecting to " << hostname.c_str() << " ..." << std::flush;
 	int attemptConnectCount = 0;
+
 	const int MAX_CONNECT_ATTEMPTS=2;
     while( !MyClient.IsConnected().Connected && attemptConnectCount < MAX_CONNECT_ATTEMPTS)
     {

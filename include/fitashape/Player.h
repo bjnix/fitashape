@@ -59,6 +59,7 @@ private:
 	f32 RLeg; //estimated length of right leg
 	f32 ground; //estimated height of the ground
 
+	IMeshSceneNode* body;
 
 public:
 	scene::ISceneNode * currentNode();
@@ -82,7 +83,7 @@ public:
 	void setPositions(vector3df pos[4]);
 	void localInitPos();	
 	void addCameraScene();
-
+	void updateBody();
 
 };
 
