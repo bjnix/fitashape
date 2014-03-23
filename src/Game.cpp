@@ -55,7 +55,7 @@ int Game::run(){
 	
 	// create reciever and device
 	device = createDevice(driverType,
-			core::dimension2d<u32>(1280, 1024), 16, false, false, false, &receiver);
+			core::dimension2d<u32>(1440, 540), 16, false, false, false, &receiver);
 	if (device == 0)
 		return 1; // could not create selected device.
 	
@@ -70,7 +70,7 @@ int Game::run(){
 
 	//creates the clock.
 	createClock();
-
+	printf("lolz\n");
 	zenBar = driver->getTexture("../assets/ScoreScroll.png");
 
 	std::cout << "creating the player object \n"<< std::flush;
