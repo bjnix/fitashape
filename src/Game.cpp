@@ -253,7 +253,9 @@ void Game::createClock(){
 	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,25,30));
 }
 
-
+/*
+void retryMenu - I think this is depreciated in favor of pauseMenu, and no longer is needed - Will most likely delete later
+*/
 void Game::retryMenu(){
 	switch(p1->restartCollide()){
 		//if yes is selected, reinitialize the variables
@@ -272,15 +274,18 @@ void Game::retryMenu(){
 	}
 }
 
+/*
+void pauseMenu - setup the pause menu and interactions, buttons, etc
+*/
 void Game::pauseMenu(){
-	wchar_t tmp[100];
+	wchar_t tmp[100]; //buffer to set display text as
 	p1->setMenu();
-	switch(p1->pauseCollide()){
-		case 1:
+	switch(p1->pauseCollide()){ //figure out which selection is pressed
+		case 1: //resume game if paused
 			pause = false;
 			p1->setTargetVisible(true, gameOver);
 			break;
-		case 2:
+		case 2: //create new game
 			p1->setMenuInvis();
 			if(!local){
 				swprintf(tmp, 100, L"Assume The Position!");
@@ -298,22 +303,22 @@ void Game::pauseMenu(){
 			p1->randomTargets();
 			break;
 		
-		case 3:
+		case 3://exit the game
 			toExit = true;
 			break;
-		case 4:
+		case 4://display text for resume
 			swprintf(tmp, 100, L"Resume Game");
 			text->setText(tmp);
 			break;
-		case 5:
+		case 5://display text for new
 			swprintf(tmp, 100, L"New Game");
 			text->setText(tmp);
 			break;
-		case 6:
+		case 6: // display text for exit
 			swprintf(tmp, 100, L"Exit Game");
 			text->setText(tmp);
 			break;
-		default:
+		default://display text for menu help
 			swprintf(tmp, 100, L"Hover Over With Left Hand To Choose Option");
 			text->setText(tmp);
 			break;

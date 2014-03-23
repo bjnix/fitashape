@@ -401,6 +401,11 @@ void Player::addCameraScene(){
 	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 }
 
+/*
+void setTargetVisible - detirmine whether the game targets or menu targets are visible.
+bool visibility - true for targets vis, menu invis. false for inverse
+bool resume - whether or not a game is currently running, allowing for the resume game option to be shown.
+*/
 void Player::setTargetVisible(bool visibility, bool resume){
 	RFTarget.node->setVisible(visibility);
 	LFTarget.node->setVisible(visibility);
@@ -412,6 +417,9 @@ void Player::setTargetVisible(bool visibility, bool resume){
 	Select.node->setVisible(!visibility);
 }
 
+/*
+void setMenuInvis - make the menu nodes all invisible
+*/
 void Player::setMenuInvis(){
 	NewGame.node->setVisible(false);
 	ResumeGame.node->setVisible(false);
@@ -429,27 +437,38 @@ int Player::restartCollide(){
 		return 0;
 }
 
+/*
+int pauseCollide - return which combination of buttons is pressed for the menu
+returns:
+	1 - resume and select button pressed
+	2 - newgame and select pressed
+	3 - exit game and select pressed
+	4 - only resume selected
+	5 - only newgame selected
+	6 - only exit selected
+*/
 int Player::pauseCollide(){
-	if(ResumeGame.node->isVisible() && collide(ResumeGame)){
+	int ret = 0;
+	if(ResumeGame.node->isVisible() && collide(ResumeGame)){ // only count resume if visible
 		if(collide(Select))
-			return 1;
+			ret = 1;
 		else
-			return 4;
+			ret = 4;
 	} 
 		
-	else if(collide(NewGame)){
+	if(collide(NewGame)){
 		if(collide(Select))
-			return 2;
+			ret = 2;
 		else
-			return 5;
+			ret = 5;
 	}
-	else if(collide (ExitGame)){
+	if(collide (ExitGame)){
 		if(collide(Select))
-			return 3;
+			ret = 3;
 		else
-			return 6;
+			ret = 6;
 	}
-	return 0;
+	return ret;
 }
 
 bool Player::jump(){
@@ -459,6 +478,9 @@ bool Player::jump(){
 	return false;
 }
 
+/*
+void setmenu - sets the menu buttons to relativly follow the left foot node.
+*/
 void Player::setMenu(){
 	f32 px, py;
 	px = LF.getPosition().X;
