@@ -71,7 +71,7 @@ int Game::run(){
 	//creates the clock.
 	createClock();
 	printf("lolz\n");
-	zenBar = driver->getTexture("../assets/ScoreScroll.png");
+	zenBar = driver->getTexture("../assets/Scroll.png");
 
 	std::cout << "creating the player object \n"<< std::flush;
 	//create player and draw the limbs
