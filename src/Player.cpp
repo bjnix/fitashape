@@ -305,7 +305,7 @@ bool Player::collide (CircleNode node){
 	//check to see of the distance between the two nodes is less than the required distance
 	if(nodeLocation.getDistanceFrom(targetLocation) > collideDist){
 		//did not collide so make sure it is the normal texture and transparent
-		node.node->setMaterialTexture(0, node.node->getMaterial(0).getTexture(0));
+		node.node->setMaterialTexture(0, node.target()->node->getMaterial(0).getTexture(0));
 		node.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		return false;
 	}
