@@ -110,7 +110,8 @@ public:
 	scene::ITextSceneNode * text;
 	MyEventReceiver receiver;
 
-	Game(bool);
+	Game(bool,char*);
+	Game(bool,double,double,double,double,int,int);
 	~Game();
 	
 	int run();

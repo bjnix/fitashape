@@ -5,9 +5,20 @@ Class for the Game object
 #include "fitashape/Game.h"
 
 
-
+#ifdef DGR_Master
+char * RELAY_IP;
 std::string hostname = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
 ViconDataStreamSDK::CPP::Client MyClient;
+
+
+
+#else
+double frustum_left,frustum_right,frustum_bottom,frustum_top;
+int screen_width,screen_height;
+int framesPassed = 0;
+
+#endif
+DGR_framework * myDGR;
 
 
 template<typename T, size_t N>
@@ -22,8 +33,10 @@ const char *nameList[] = {
 	};
 
 std::vector<std::string> names(nameList,end(nameList));
+#ifdef DGR_Master
+Game::Game(bool isLocal, char* relay_ip){
+	myDGR = new DGR_framework(relay_ip);
 
-Game::Game(bool isLocal){
 	gameOver = true;
 	zen = 50;
 	timesUp = 10;
@@ -33,6 +46,31 @@ Game::Game(bool isLocal){
 	local = isLocal;
 	run();
 }
+#else
+Game::Game(
+	bool isLocal, 
+	double f_left, double f_right, double f_bottom, double f_top,   //frustum
+	int s_width, int s_height)										//dimentions
+{
+
+	frustum_left = f_left;
+	frustum_right = f_right;
+	frustum_bottom = f_bottom;
+	frustum_top = f_top;
+
+	screen_width = s_width;
+	screen_height = s_height;
+
+	gameOver = true;
+	zen = 50;
+	timesUp = 10;
+	score = 0;
+	toExit = false;
+	pause = true;
+	local = isLocal;
+	run();
+}
+#endif
 
 Game::~Game(void){
 	delete p1;
@@ -78,12 +116,13 @@ int Game::run(){
 
 	if(!local){
 		//using the tracking system
-	
+		#ifdef DGR_Master //master
 		std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
 		if(viconInit() != 0)
 		{ gameOver = true;}
-
+		#else //slave
+		#endif
 
 		//sets up the player's body and stuff - Now done in the menu 
 		//startLocation();	
@@ -91,6 +130,8 @@ int Game::run(){
 		p1->localInitPos();
 		//then sets up the body, arms, and legs
 		p1->initializePosition();
+		myDGR->addNode<
+
 
 		std::cout << "Just finished Method Calls \n"<< std::flush;
 	}else{
