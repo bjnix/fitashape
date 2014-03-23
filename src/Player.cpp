@@ -24,9 +24,6 @@ void Player::setCurrent(CircleNode& node){
 	current = node;
 }
 
-double Player::mid(double a, double b){
-	return (a/2 + b/2);
-}
 
 /*
 This method will detect where the persons body is and the relative shape of the arms and legs.
@@ -427,6 +424,16 @@ void Player::localInitPos(){
 method to add a camera scene node that is centered on the player
 */
 void Player::addCameraScene(){
+
+	//ICameraSceneNode *myCamera;
+	//irr::core::matrix4 MyMatrix;
+	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
+	//myCamera = smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
+	//myCamera = smgr->addCameraSceneNode(0,irr::core::vector3df(-14.0f,14.0f,-14.0f),irr::core::vector3df(0,0,0));
+	//myCamera->setProjectionMatrix(MyMatrix);
+
+
+
 	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 }
 
@@ -505,17 +512,22 @@ void Player::updateBody(){
 
 		body->setPosition(vector3df(mid(RF.getPosition().X,LF.getPosition().X), body->getPosition().Y, body->getPosition().Z));
 
-		printf("POS: RF = %f, LF = %f, Mid = %f\n", RF.getPosition().X, LF.getPosition().X,body->getPosition().X);
+		//printf("POS: RF = %f, LF = %f, Mid = %f\n", RF.getPosition().X, LF.getPosition().X,body->getPosition().X);
+		//printf("ROTATION: LH.X = %f LH Bound = %f, value = %f\n",LH.getPosition().X, body->getPosition().X - abs(initLoc[0].X - initLoc[8].X),
+		//	 abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X));
+		//printf("ROTATION: RH.X = %f RH Bound = %f, value = %f\n",RH.getPosition().X, body->getPosition().X + abs(initLoc[1].X - initLoc[8].X),
+		//	 abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X));
 
-		printf("ROTATION: LH.X = %f LH Bound = %f \n",LH.getPosition().X, (abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X));
-		printf("ROTATION: RH.X = %f RH Bound = %f \n",RH.getPosition().X, (abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X));
+		if(LH.getPosition().X < (body->getPosition().X - abs(initLoc[0].X - initLoc[8].X)))
+			body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X)));
 
-		if(LH.getPosition().X < (abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X))
-			body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) - LH.getPosition().X)));
-
-		if(RH.getPosition().X > (abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X))
+		if(RH.getPosition().X > (body->getPosition().X + abs(initLoc[1].X - initLoc[8].X)))
 			body->setRotation(vector3df(0,0, -3 * abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X)));
 	}
+}
+
+double Player::mid(double a, double b){
+	return (a/2 + b/2);
 }
 
 double Player::abs(double number){

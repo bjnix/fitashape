@@ -65,9 +65,19 @@ int Game::run(){
 	
 	std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::flush;
 
-	//adds a camera scene node 
+
+
+	//ICameraSceneNode *myCamera;
+	//irr::core::matrix4 MyMatrix;
+	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
+	//myCamera = smgr->addCameraSceneNode(0,irr::core::vector3df(-14.0f,14.0f,-14.0f),irr::core::vector3df(0,0,0));
+	//myCamera = smgr->addCameraSceneNode();
+	//myCamera->setProjectionMatrix(MyMatrix);
+
 	smgr->addCameraSceneNode();
 
+
+	
 	//creates the clock.
 	createClock();
 
@@ -131,7 +141,6 @@ int Game::run(){
 
 	while(device->run() && !toExit)
 	{
-		printf("CLOCK - %d  speed - %d\n",myClock->isStopped(), myClock->getSpeed());//move the clock
 		//move the orbs around
 		if(local)
 			moveKeyboard(receiver);
@@ -525,7 +534,7 @@ void Game::startLocation(){
 			printf("Found all three\n");
 			//check to see if the player is close to staying still
 			double close = .5; //number to define how close is enough
-			double min = 1;
+			//double min = 1;
 			if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
 				RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
 				LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
