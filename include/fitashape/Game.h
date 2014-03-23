@@ -52,6 +52,7 @@ private:
 	bool toExit;
 	bool pause;
 	bool local;
+	ITexture zenBar;
 	
 
 
@@ -121,6 +122,7 @@ public:
 	void startLocation();
 	void retryMenu(); //delete this later
 	void pauseMenu();
+	void drawObjects();
 	
 	int viconInit();
 	void viconExit();

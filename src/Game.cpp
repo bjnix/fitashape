@@ -71,6 +71,8 @@ int Game::run(){
 	//creates the clock.
 	createClock();
 
+	zenBar = driver->getTexture("../assets/ScoreScroll.png");
+
 	std::cout << "creating the player object \n"<< std::flush;
 	//create player and draw the limbs
 	p1 = new Player(driver,smgr);
@@ -126,6 +128,7 @@ int Game::run(){
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
 	p1->setTargetVisible(false, gameOver);
+
 	while(device->run() && !toExit)
 	{
 
@@ -152,9 +155,7 @@ int Game::run(){
 		}
 
 		//puts the stuff on the screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		smgr->drawAll(); // draw the 3d scene
-		driver->endScene();
+		drawObjects();
 		//end the current session, asking if want to play again.
 		
 			
@@ -457,9 +458,7 @@ void Game::startLocation(){
 		printf("Finding body... Stand still!\n");		
 
 		//make stuff appear on screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		smgr->drawAll(); 
-		driver->endScene();
+		drawObjects();
 
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
@@ -473,9 +472,7 @@ void Game::startLocation(){
 		}
 
 		//make stuff appear on screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		smgr->drawAll();
-		driver->endScene();
+		drawObjects();
 	
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
@@ -489,9 +486,7 @@ void Game::startLocation(){
 		}
 		
 		//make stuff appear on screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		smgr->drawAll();
-		driver->endScene();
+		drawObjects();
 
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
@@ -505,9 +500,7 @@ void Game::startLocation(){
 		}
 
 		//make stuff appear on screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		smgr->drawAll();
-		driver->endScene();
+		drawObjects();
 		
 		//check to see if the player is close to staying still
 		double close = .5; //number to define how close is enough
@@ -626,3 +619,10 @@ void exitCallback()
 	return;
 }
 */
+
+void Game::drawObjects(){
+	driver->beginScene(true, true, video::SColor(255,113,113,133));
+	driver->draw2DImage(zenBar,position2d<s32>(0.0f,0.0f));
+	smgr->drawAll(); // draw the 3d scene
+	driver->endScene();
+}
