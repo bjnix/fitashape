@@ -52,7 +52,7 @@ private:
 	bool toExit;
 	bool pause;
 	bool local;
-	ITexture zenBar;
+	ITexture * zenBar;
 	
 
 
