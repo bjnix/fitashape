@@ -54,8 +54,8 @@ int Game::run(){
 	std::cout << "creating the event reciever for KB \n"<< std::flush;
 	
 	// create reciever and device
-	device = createDevice(driverType,
-			core::dimension2d<u32>(1920, 1080), 16, false, false, false, &receiver);
+	//device = createDevice(driverType,core::dimension2d<u32>(1920*6, 1080*4), 16, false, false, false, &receiver);
+	device = createDevice(driverType,core::dimension2d<u32>(1440, 540), 16, false, false, false, &receiver);
 	if (device == 0)
 		return 1; // could not create selected device.
 	
@@ -131,18 +131,19 @@ int Game::run(){
 
 	while(device->run() && !toExit)
 	{
-
+		printf("CLOCK - %d  speed - %d\n",myClock->isStopped(), myClock->getSpeed());//move the clock
 		//move the orbs around
 		if(local)
 			moveKeyboard(receiver);
-
 		else
 			motionTracking();
 
-		/*if(p1->jump()){
+		if(p1->jump() && !gameOver && !pause){
+			printf("JUMPED\n");
+			myClock->stop();
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
-		}*/
+		}
 		//normal scoring while the game runs
 		if(!pause){
 			//update the clock and check for win/lose
@@ -287,6 +288,7 @@ void Game::pauseMenu(){
 	switch(p1->pauseCollide()){
 		case 1:
 			pause = false;
+			myClock->start();
 			p1->setTargetVisible(true, gameOver);
 			break;
 		case 2:
@@ -451,13 +453,16 @@ void Game::startLocation(){
 	ITexture* background = driver->getTexture("../assets/Calibration(small).png");
 
 
-	int temp = -1;// keeps track of which group we are going to update
+	//int temp = 0;// keeps track of which group we are going to update
+	bool one = false;
+	bool two = false;
+	bool three = false;
 	myClock->start();// start a clock to keep track of time
 
 	//loop to keep checking the locations of the nodes till they come close to stopping
 	while(moving){
 		myClock->tick();//move the clock
-		printf("Finding body... Stand still!\n");		
+		printf("Finding body... Stand still! at time %d\n", (myClock->getTime() / 500) % 60);		
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
@@ -467,13 +472,13 @@ void Game::startLocation(){
 
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
-		if(temp != 0 && 0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
+		if(0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
 			printf("CHECK 1\n");
 			LHpos1 = p1->LH.node->getPosition();
 			RHpos1 = p1->RH.node->getPosition();
 			LFpos1 = p1->LF.node->getPosition();
 			RFpos1 = p1->RF.node->getPosition();
-			temp = 0;
+			one = true;
 		}
 
 		//make stuff appear on screen
@@ -484,13 +489,13 @@ void Game::startLocation(){
 	
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
-		if(temp != 1 && 1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+		if(1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 2\n");
 			LHpos2 = p1->LH.node->getPosition();
 			RHpos2 = p1->RH.node->getPosition();
 			LFpos2 = p1->LF.node->getPosition();
 			RFpos2 = p1->RF.node->getPosition();
-			temp = 1;
+			two = true;
 		}
 		
 		//make stuff appear on screen
@@ -501,13 +506,13 @@ void Game::startLocation(){
 
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
-		if(temp != 2 && 2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+		if(2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 3\n");
 			LHpos3 = p1->LH.node->getPosition();
 			RHpos3 = p1->RH.node->getPosition();
 			LFpos3 = p1->LF.node->getPosition();
 			RFpos3 = p1->RF.node->getPosition();
-			temp = 2;
+			three = true;
 		}
 
 		//make stuff appear on screen
@@ -516,26 +521,29 @@ void Game::startLocation(){
 		smgr->drawAll();
 		driver->endScene();
 		
-		//check to see if the player is close to staying still
-		double close = .5; //number to define how close is enough
-		double min = 1;
-		if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
-			RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
-			LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
-			RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
-				std::cout<<"stood still!"<<std::endl;
-				//check to see if they look like they are in the right possition
-				//TODO add more restrictions if necessary
-				//check to see that they are an actual size, not just a dot
-				//if(LHpos3.getDistanceFrom(LFpos3) > min && RHpos3.getDistanceFrom(RFpos3) > min && LHpos3.getDistanceFrom(LHpos3) > min){
-					//std::cout<<"real size person!"<<std::endl;
-					//makes sure the arms are at about the same hight and  that the arms are about the same length
-					if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
-						&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5)){
-							moving = false; //they have stopped moving!
-						std::cout<<"T position"<<std::endl;
-					}
-				//}
+		if(one && two && three){
+			printf("Found all three\n");
+			//check to see if the player is close to staying still
+			double close = .5; //number to define how close is enough
+			double min = 1;
+			if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
+				RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
+				LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
+				RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
+					std::cout<<"stood still!"<<std::endl;
+					//check to see if they look like they are in the right possition
+					//TODO add more restrictions if necessary
+					//check to see that they are an actual size, not just a dot
+					//if(LHpos3.getDistanceFrom(LFpos3) > min && RHpos3.getDistanceFrom(RFpos3) > min && LHpos3.getDistanceFrom(LHpos3) > min){
+						//std::cout<<"real size person!"<<std::endl;
+						//makes sure the arms are at about the same hight and  that the arms are about the same length
+						if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
+							&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5)){
+								moving = false; //they have stopped moving!
+							std::cout<<"T position"<<std::endl;
+						}
+					//}
+			}
 		}
 	}
 	//store this position for later use

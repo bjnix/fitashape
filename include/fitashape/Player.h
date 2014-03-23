@@ -54,7 +54,8 @@ private:
 	CircleNode ExitGame;
 	CircleNode Select;
 
-	
+	double mid(double a,double b);
+	double abs(double number);
 
 	//0=LeftHand, 1=RightHand, 2=LeftFoot 3=RightFoot
 	//4=LeftShoulder, 5=RightShoulder 6=LeftHip

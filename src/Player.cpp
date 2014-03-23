@@ -6,8 +6,10 @@ Class for the player object
 Player::Player(IVideoDriver * d, ISceneManager * s){
 	driver = d;
 	smgr = s;
+	ground = 0;
 }
 Player::~Player(void){}
+
 /*
 get the current node
 */
@@ -22,6 +24,10 @@ void Player::setCurrent(CircleNode& node){
 	current = node;
 }
 
+double Player::mid(double a, double b){
+	return (a/2 + b/2);
+}
+
 /*
 This method will detect where the persons body is and the relative shape of the arms and legs.
 uses the first 4 locations stored in initLoc[] and sets the last 5
@@ -33,7 +39,7 @@ void Player::initializePosition(){
 	vector3df RHip;
 	vector3df centerBody;
 
-	ground = (initLoc[3].Y + initLoc[2].Y)/2; //sets ground to how the average height of the feet are
+	ground = mid(initLoc[2].Y,initLoc[3].Y); //sets ground to how the average height of the feet are
 
 	LShoulder = core::vector3df(initLoc[2].X,initLoc[0].Y,initLoc[0].Z);//(leftfoot.x,lefthand.y,lefthand.x)
 	RShoulder = core::vector3df(initLoc[3].X,initLoc[1].Y,initLoc[1].Z);//(rightfoot.x,righthand.y,righthand.x)
@@ -48,7 +54,7 @@ void Player::initializePosition(){
 	LLeg = initLoc[2].getDistanceFrom(LHip);//left foot to left hip
 	RLeg = initLoc[3].getDistanceFrom(RHip);//right foot to right hip
 
-	centerBody = core::vector3df((LHip.X+RHip.X)/2,(LHip.Y + LShoulder.Y)/2,LHip.Z);
+	centerBody = core::vector3df(mid(LHip.X,RHip.X),mid(LHip.Y,LShoulder.Y),LHip.Z);
 	
 	initLoc[4] = LShoulder;
 	initLoc[5] = RShoulder;
@@ -476,8 +482,8 @@ int Player::pauseCollide(){
 }
 
 bool Player::jump(){
-	//printf("ground = %d, LF = %d, RF = %d\n",ground,LF.getPosition().Y,RF.getPosition().Y);
-	if(LF.getPosition().Y + 1 > ground && RF.getPosition().Y + 1 > ground)
+	printf("ground = %f, LF = %f, RF = %f\n",ground,LF.getPosition().Y,RF.getPosition().Y);
+	if(LF.getPosition().Y > ground + .75 && RF.getPosition().Y > ground + .75)
 		return true;
 
 	return false;
@@ -494,14 +500,26 @@ void Player::setMenu(){
 }
 
 void Player::updateBody(){
-
 	//make sure the body exists already
 	if(body){
-		body->setPosition(vector3df((RF.getPosition().X - LF.getPosition().X)/2 + LF.getPosition().X, body->getPosition().Y, body->getPosition().Z));
-		if(LH.getPosition().X < initLoc[0].X)
-			body->setRotation(vector3df(0,0, 3 * (initLoc[0].X - LH.getPosition().X)));
-		if(RH.getPosition().X > initLoc[1].X)
-			body->setRotation(vector3df(0,0, 3 * (initLoc[1].X - RH.getPosition().X)));
+
+		body->setPosition(vector3df(mid(RF.getPosition().X,LF.getPosition().X), body->getPosition().Y, body->getPosition().Z));
+
+		printf("POS: RF = %f, LF = %f, Mid = %f\n", RF.getPosition().X, LF.getPosition().X,body->getPosition().X);
+
+		printf("ROTATION: LH.X = %f LH Bound = %f \n",LH.getPosition().X, (abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X));
+		printf("ROTATION: RH.X = %f RH Bound = %f \n",RH.getPosition().X, (abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X));
+
+		if(LH.getPosition().X < (abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X))
+			body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) - LH.getPosition().X)));
+
+		if(RH.getPosition().X > (abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X))
+			body->setRotation(vector3df(0,0, -3 * abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X)));
 	}
 }
 
+double Player::abs(double number){
+	if(number < 0)
+		return number * -1;
+	return number;
+}
