@@ -136,7 +136,8 @@ int Game::run(){
 		else
 			motionTracking();
 
-		if(p1->jump()){
+		if(p1->jump() && !gameOver && !pause){
+			myClock->stop();
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
 		}//*/
@@ -284,6 +285,7 @@ void Game::pauseMenu(){
 		case 1: //resume game if paused
 			pause = false;
 			p1->setTargetVisible(true, gameOver);
+			myClock->start();
 			break;
 		case 2: //create new game
 			p1->setMenuInvis();
