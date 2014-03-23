@@ -136,7 +136,7 @@ int Game::run(){
 		else
 			motionTracking();
 
-		/*if(p1->jump()){
+		if(p1->jump()){
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
 		}//*/

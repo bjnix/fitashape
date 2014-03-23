@@ -472,7 +472,8 @@ int Player::pauseCollide(){
 }
 
 bool Player::jump(){
-	if(LF.getPosition().Y + 1 > ground && RF.getPosition().Y + 1 > ground)
+	printf("mid: %f, left: %f, right: %f\n", ground, LF.getPosition().Y, RF.getPosition().Y);
+	if(LF.getPosition().Y > ground + .5 && RF.getPosition().Y > ground + .5)
 		return true;
 
 	return false;
