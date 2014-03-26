@@ -3,7 +3,7 @@ set -e # exit script if any command returns a non-zero exit code.
 
 # The hostname that we expect to be running on:
 EXPECT_HOSTNAME="ccsr.ee.mtu.edu"
-USER_NAME =`whoami`
+USER_NAME=`whoami`
 if [[ ${HOSTNAME} != ${EXPECT_HOSTNAME} ]]; then
     echo "This script ($0) is intended to work only on $EXPECT_HOSTNAME. You are running it from $HOSTNAME."
 	echo "If you are in the IVS lab and running this script from your laptop, press Enter."
