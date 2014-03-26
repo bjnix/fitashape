@@ -5,11 +5,12 @@
 #include <stdio.h>
 #include <iostream>
 #include "time.h"
-
 #include "irrlicht/irrlicht.h"
 #include "irrlicht/vector3d.h"
 #include "vicon/ViconClient.h"
 #include "fitashape/Player.h"
+#include "dgr_framework/DGR_framework.h"
+
 
 using namespace irr;
 using namespace core;
@@ -111,7 +112,7 @@ public:
 	MyEventReceiver receiver;
 
 	Game(bool,char*);
-	Game(bool,double,double,double,double,int,int);
+	Game(bool,char*,char*,char*,char*,char*,char*);
 	~Game();
 	
 	int run();
