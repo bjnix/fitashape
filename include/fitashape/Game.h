@@ -124,8 +124,8 @@ public:
 	void retryMenu(); //delete this later
 	void pauseMenu();
 	
-	int viconInit();
-	void viconExit();
+	// int viconInit();
+	// void viconExit();
 
 };
 

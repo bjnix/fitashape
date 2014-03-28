@@ -29,12 +29,12 @@ echo "You may have to enter your password multiple times..."
 ssh bjnix@${IVS_HOSTNAME} mkdir -p $DEST_DIR
 # recursively copy files over.
 #scp -r * "bjnix@${IVS_HOSTNAME}:$DEST_DIR"
-cd ../
-rsync -ah -e ssh --exclude=.svn --exclude=.git --checksum --partial --no-whole-file --inplace --progress . ${IVS_HOSTNAME}:$DEST_DIR
-cd ./bin
+#cd ../
+#rsync -ah -e ssh --exclude=.svn --exclude=.git --exclude=libIrrlicht.a --checksum --partial --no-whole-file --inplace --progress . ${IVS_HOSTNAME}:$DEST_DIR
+#cd ./bin
 
 # recompile for safety's sake
-    ssh bjnix@${IVS_HOSTNAME} "cd ${DEST_DIR}/bin && make"
+#    ssh bjnix@${IVS_HOSTNAME} "cd ${DEST_DIR}/bin && make"
 	
 make
 # Run the relay on ivs.research.mtu.edu. Relay broadcasts data on infiniband network.

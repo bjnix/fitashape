@@ -1,3 +1,4 @@
+
 /**
 Class for the player object
 **/
@@ -336,11 +337,11 @@ Medthod to get the position of all if the limbs. returns a vector of vector3df's
 with left hand, right hand, left foot, right foot.
 */
 std::vector<vector3df> Player::getPosition(){
-	std::vector<vector3df> position = {
-		LH.node->getPosition(),
-		RH.node->getPosition(),
-		LF.node->getPosition(),
-		RF.node->getPosition() };
+	std::vector<vector3df> position;
+		position.push_back(LH.node->getPosition());
+		position.push_back(RH.node->getPosition());
+		position.push_back(LF.node->getPosition());
+		position.push_back(RF.node->getPosition());
 	return position;
 }
 

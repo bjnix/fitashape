@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream>
+//#include <iostream>
 #include <vector>
 
 #include "irrlicht/irrlicht.h"

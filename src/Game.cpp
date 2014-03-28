@@ -115,7 +115,7 @@ int viconInit()
 			  << _Output_GetVersion.Point << std::endl;
 	return 0;
 }
-void viconExit()
+void viconExit(void)
 {
     MyClient.DisableSegmentData();
 //    MyClient.DisableMarkerData();
@@ -173,6 +173,7 @@ Game::Game(
 
 Game::~Game(void){
 	delete p1;
+	delete myDGR;
 }
 
 /*
@@ -215,11 +216,11 @@ int Game::run(){
 
 	if(!local){
 		//using the tracking system
-		#ifdef DGR_Master //master
+		#ifdef DGR_MASTER//master
 		std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
 		if(viconInit() != 0)
-		{ gameOver = true;}
+			{ gameOver = true;}
 		atexit(viconExit);
 		#else //slave
 		#endif
@@ -276,10 +277,9 @@ int Game::run(){
 
 		else
 
-#ifdef DGR_Master
+
 			motionTracking();
-#else
-#endif
+
 
 		/*if(p1->jump()){
 			pause = true;
@@ -361,7 +361,7 @@ void Game::motionTracking(){
 			//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
 			if(!Output.Occluded)
 		    	{ 
-				std::cout<<names[i]<<" NOT occluded!"<< std::endl;
+				//std::cout<<names[i]<<" NOT occluded!"<< std::endl;
 				/*std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
 							  <<Output.Translation[1]<<", "
 							  <<Output.Translation[2]<<") " 
@@ -371,7 +371,7 @@ void Game::motionTracking(){
 			}
 			else
 			{ 
-				std::cout<<names[i]<<" occluded!"<< std::endl; 
+				std::cout<<names[i]<<" IS occluded!"<< std::endl; 
 				OccludedMarker = true;
 				break;
 			}
@@ -624,10 +624,8 @@ void Game::startLocation(){
 
 		
 		//call the motion tracking method to get up to date locaitons
-#ifdef DGR_Master
 		motionTracking();
-#else
-#endif
+
 		if(temp != 0 && 0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
 			printf("CHECK 1\n");
 			LHpos1 = p1->LH.node->getPosition();
@@ -644,10 +642,8 @@ void Game::startLocation(){
 	
 		
 		//call the motion tracking method to get up to date locaitons
-#ifdef DGR_Master
 		motionTracking();
-#else
-#endif
+
 		if(temp != 1 && 1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 2\n");
 			LHpos2 = p1->LH.node->getPosition();
@@ -664,10 +660,8 @@ void Game::startLocation(){
 
 		
 		//call the motion tracking method to get up to date locaitons
-#ifdef DGR_Master
 		motionTracking();
-#else
-#endif
+
 		if(temp != 2 && 2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 3\n");
 			LHpos3 = p1->LH.node->getPosition();

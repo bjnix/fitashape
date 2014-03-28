@@ -19,7 +19,6 @@ echo "Starting slaves..."
 ROCKS_BIN=/opt/rocks/bin/rocks
 DGR_BIN='./strace -o /dev/null ./fitashape_S'
 DIR=`pwd`
-echo ${DIR}
 
 ${ROCKS_BIN} run host tile-0-0 command="cd $DIR && DISPLAY=tile-0-0:0.0 ${DGR_BIN} -3.09 0 0.28   .86  5760 1080" &
 ${ROCKS_BIN} run host tile-0-1 command="cd $DIR && DISPLAY=tile-0-1:0.0 ${DGR_BIN} -3.09 0 .86  1.44     5760 1080" &
@@ -32,6 +31,5 @@ ${ROCKS_BIN} run host tile-0-6 command="cd $DIR && DISPLAY=tile-0-6:0.0 ${DGR_BI
 ${ROCKS_BIN} run host tile-0-7 command="cd $DIR && DISPLAY=tile-0-7:0.0 ${DGR_BIN} 0 3.09  2.02  2.6    5760 1080" &
 
 echo "Starting relay..."
-echo "__"`pwd`"__"
 ./strace -o /dev/null ./fitashape_R 10.2.255.255 &
 

@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream>
+//#include <iostream>
 
 #include "fitashape/Game.h"
 #include "dgr_framework/DGR_framework.h"
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	{	
 		local = true;
 	}
-
+	local = false;
 	#ifdef DGR_MASTER
 	
 	if( (local && (argc < 3)) || (!local && (argc < 2)))

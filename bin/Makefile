@@ -17,7 +17,7 @@ X11_INC = -I/usr/X11R6/include
 
 # general compiler settings
 CPPFLAGS = $(X11_INC) $(FIT_INC)
-CXXFLAGS = -std=c++0x -O3 -ffast-math -g -Wall -fpermissive
+CXXFLAGS = -O3 -ffast-math -g -Wall -fpermissive
 
 #default target is Linux
 
