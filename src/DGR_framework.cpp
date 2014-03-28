@@ -1,6 +1,8 @@
 //DGR_framework.cpp
 #include "dgr_framework/DGR_framework.h"
 
+int framesPassed = 0;
+
 std::map<std::string,MapNodePtr *> InputMap;
 int s;
 int milliseconds;
@@ -11,10 +13,6 @@ int slen;
 bool receivedPacket;
 pthread_t senderThread, receiverThread;
 
-void exitCallback(void) 
-{
-    close(s);
-}
 void error(const char *msg) 
 {
     perror(msg);
@@ -24,12 +22,18 @@ void error(const char *msg)
 
 void sender(void) {
 
-    atexit(exitCallback);
+    int packet_length;
+    unsigned char packet_counter;
+    //current node properties
+    char * node_buf;
+    int node_length, node_counter;
+    bool first_node, last_node;
+
     while (true) 
     {
         
         //packet_buffer properties
-        char * packet_buffer = new char[BUFLEN];
+        char packet_buffer[BUFLEN];
         int packet_length = 0;
         unsigned char packet_counter = 0;
         //current node properties
@@ -41,7 +45,7 @@ void sender(void) {
         bool last_node = false;
 
 
-        for(auto it = InputMap.begin();it!= InputMap.end();it++)
+        for(std::map<std::string,MapNodePtr *>::iterator it = InputMap.begin();it!= InputMap.end();it++)
         {
 
             node_length = 0;
@@ -91,17 +95,18 @@ void sender(void) {
     
 void receiver(void){
 
-    atexit(exitCallback);
     char packet_buffer[BUFLEN];
 
     MapNodePtr * cur_node;
     std::string node_name;
     int node_data_length, packet_cursor;
 
+
     while (true){
         if (recvfrom(s, packet_buffer, BUFLEN, 0, (struct sockaddr*)&si_other,
           &slen) == -1) error("ERROR recvfrom()");
         receivedPacket = true;
+    	framesPassed = 0;
         packet_cursor = 0;
 
         while( (packet_buffer[packet_cursor] > 31) && (packet_cursor < BUFLEN) )
@@ -198,6 +203,16 @@ DGR_framework::DGR_framework(){
     }
 }
 
+DGR_framework::~DGR_framework(){
+    close(s);
+}
 
+// void DGR_framework::exitCallback(void) 
+// {
+// 	printf("closing socket\n");
+// 	    close(s);
+// 	printf("socket closed\n");
+	
+// }
 
 

@@ -22,7 +22,7 @@
 int main(int argc, char* argv[])
 {
 
-	std::cout << "Starting main \n"<< std::flush;
+	printf("Starting main \n");
 
 	bool local = false;
 	//check to see if we are testing on local or with tracking system

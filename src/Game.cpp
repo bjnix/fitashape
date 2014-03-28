@@ -36,7 +36,6 @@ ViconDataStreamSDK::CPP::Client MyClient;
 
 double frustum_left,frustum_right,frustum_bottom,frustum_top;
 int screen_width,screen_height;
-int framesPassed = 0;
 
 DGR_framework * myDGR;
 
@@ -346,6 +345,7 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 void Game::motionTracking(){
 	vector3df temp[4];
 	bool OccludedMarker = true;	
+#ifdef DGR_MASTER
 	while(OccludedMarker){
 		OccludedMarker = false;
 		while(MyClient.GetFrame().Result != Result::Success) 
@@ -379,7 +379,29 @@ void Game::motionTracking(){
 	}
 
 	p1->setPosition(temp);
-
+#else
+	// The slave automatically shuts itself off if it hasn't received
+       	// any packets within a few seconds (it gives itself longer if it
+       	// hasn't received any packets at all yet)
+       	// Assumes a 60fps framerate
+    	framesPassed++;
+    	if (myDGR->recvPack[0]){
+       
+        	if (framesPassed > 180) {
+            		//printf("DGR has revieved a packet and is timing out\n");
+            		exit(EXIT_SUCCESS);
+        	}
+    	} 
+    	else{
+        
+        	if (framesPassed > 900){
+        					//printf("DGR has not revieved a packet and is timing out\n");
+        		exit(EXIT_SUCCESS); 	// If your program takes a very long time to initialize,
+                                                // you can increase this value so the slaves don't prematurely
+                                                // shut themselves off.
+        	}
+    	}
+#endif
 }
 
 
