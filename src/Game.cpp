@@ -4,12 +4,6 @@ Class for the Game object
 #include "fitashape/Game.h"
 
 
-<<<<<<< HEAD
-
-std::string hostname = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
-ViconDataStreamSDK::CPP::Client MyClient;
-
-=======
 template<>
 char * MapNode<Player>::getDataString(){
 	std::vector<vector3df> dataPos = data->getPosition();
@@ -45,8 +39,6 @@ int screen_width,screen_height;
 
 DGR_framework * myDGR;
 
->>>>>>> dgr_implementation
-
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
     return ra + N;
@@ -59,10 +51,6 @@ const char *nameList[] = {
 	};
 
 std::vector<std::string> names(nameList,end(nameList));
-
-<<<<<<< HEAD
-Game::Game(bool isLocal){
-=======
 
 int viconInit()
 {
@@ -256,16 +244,6 @@ int Game::run(){
 		myDGR->addNode<Player>("Player1",p1,sizeof(float)*12);
 
 
-<<<<<<< HEAD
-		//sets up the player's body and stuff - Now done in the menu 
-		//startLocation();	
-		//printf("Done calibrating\n");
-		p1->localInitPos();
-		//then sets up the body, arms, and legs
-		p1->initializePosition();
-
-=======
->>>>>>> dgr_implementation
 		std::cout << "Just finished Method Calls \n"<< std::flush;
 	}else{
 		//manually set the initial position of the limbs
@@ -296,12 +274,9 @@ int Game::run(){
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
 	p1->setTargetVisible(false, gameOver);
-<<<<<<< HEAD
 	
 	ITexture* background = driver->getTexture("../assets/Background(small).png");
 
-=======
->>>>>>> dgr_implementation
 	while(device->run() && !toExit)
 	{
 		//move the orbs around
@@ -312,20 +287,12 @@ int Game::run(){
 
 			motionTracking();
 
-<<<<<<< HEAD
 		if(p1->jump() && !gameOver && !pause){
 			printf("JUMPED\n");
 			myClock->stop();
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
 		}
-=======
-
-		/*if(p1->jump()){
-			pause = true;
-			p1->setTargetVisible(false, gameOver);
-		}//*/
->>>>>>> dgr_implementation
 		//normal scoring while the game runs
 		if(!pause){
 			//update the clock and check for win/lose
@@ -416,21 +383,14 @@ void Game::motionTracking(){
 			}
 			else
 			{ 
-<<<<<<< HEAD
-				//std::cout<<names[i]<<" occluded!"<< std::endl; 
-=======
 				std::cout<<names[i]<<" IS occluded!"<< std::endl; 
->>>>>>> dgr_implementation
 				OccludedMarker = true;
 				break;
 			}
 		}
 	}
 
-<<<<<<< HEAD
 	p1->updateBody();
-
-=======
 	p1->setPosition(temp);
 #else
 	// The slave automatically shuts itself off if it hasn't received
@@ -455,7 +415,6 @@ void Game::motionTracking(){
         	}
     	}
 #endif
->>>>>>> dgr_implementation
 }
 
 
@@ -482,11 +441,7 @@ void Game::retryMenu(){
 		case 1:
 			gameOver = false;
 			zen = 50;
-<<<<<<< HEAD
 			timesUp = 5;
-=======
-			timesUp = 10;
->>>>>>> dgr_implementation
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
@@ -504,10 +459,7 @@ void Game::pauseMenu(){
 	switch(p1->pauseCollide()){
 		case 1:
 			pause = false;
-<<<<<<< HEAD
 			myClock->start();
-=======
->>>>>>> dgr_implementation
 			p1->setTargetVisible(true, gameOver);
 			break;
 		case 2:
@@ -520,11 +472,7 @@ void Game::pauseMenu(){
 			}
 			gameOver = false;
 			zen = 50;
-<<<<<<< HEAD
 			timesUp = 5;
-=======
-			timesUp = 10;
->>>>>>> dgr_implementation
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
@@ -703,12 +651,7 @@ void Game::startLocation(){
 		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
-<<<<<<< HEAD
 		if(0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
-=======
-
-		if(temp != 0 && 0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
->>>>>>> dgr_implementation
 			printf("CHECK 1\n");
 			LHpos1 = p1->LH.node->getPosition();
 			RHpos1 = p1->RH.node->getPosition();
@@ -726,12 +669,7 @@ void Game::startLocation(){
 		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
-<<<<<<< HEAD
 		if(1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
-=======
-
-		if(temp != 1 && 1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
->>>>>>> dgr_implementation
 			printf("CHECK 2\n");
 			LHpos2 = p1->LH.node->getPosition();
 			RHpos2 = p1->RH.node->getPosition();
@@ -749,12 +687,7 @@ void Game::startLocation(){
 		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
-<<<<<<< HEAD
 		if(2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
-=======
-
-		if(temp != 2 && 2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
->>>>>>> dgr_implementation
 			printf("CHECK 3\n");
 			LHpos3 = p1->LH.node->getPosition();
 			RHpos3 = p1->RH.node->getPosition();

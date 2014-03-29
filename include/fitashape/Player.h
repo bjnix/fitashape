@@ -54,12 +54,8 @@ private:
 	CircleNode ExitGame;
 	CircleNode Select;
 
-<<<<<<< HEAD
 	double mid(double a,double b);
 	double abs(double number);
-=======
-	
->>>>>>> dgr_implementation
 
 	//0=LeftHand, 1=RightHand, 2=LeftFoot 3=RightFoot
 	//4=LeftShoulder, 5=RightShoulder 6=LeftHip
@@ -105,10 +101,7 @@ public:
 	int pauseCollide();
 	bool jump();
 	void setMenu();
-<<<<<<< HEAD
 	void updateBody();
-=======
->>>>>>> dgr_implementation
 
 
 };

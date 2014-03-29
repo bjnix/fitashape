@@ -111,12 +111,8 @@ public:
 	scene::ITextSceneNode * text;
 	MyEventReceiver receiver;
 
-<<<<<<< HEAD
-	Game(bool);
-=======
 	Game(bool,char*);
 	Game(bool,char*,char*,char*,char*,char*,char*);
->>>>>>> dgr_implementation
 	~Game();
 	
 	int run();
