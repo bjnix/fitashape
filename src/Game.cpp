@@ -74,6 +74,7 @@ int Game::run(){
 	//myCamera = smgr->addCameraSceneNode();
 	//myCamera->setProjectionMatrix(MyMatrix);
 
+	//create basic camera
 	smgr->addCameraSceneNode();
 
 
@@ -128,10 +129,6 @@ int Game::run(){
 	
 	std::cout << "just setCurrent\n"<< std::flush;
 
-	
-	//centers the camera on the players position	
-	p1->addCameraScene();
-	
 
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
@@ -438,6 +435,13 @@ void Game::updateClock(){
  	device->setWindowCaption(tmp);
 }
 
+
+/*
+	Method to determine where and when the person is 
+	standing when trying to get the initial locations.
+	Takes in instance every second and checks to see if the
+	play has stood still for the last three seconds
+*/
 void Game::startLocation(){
 
 	bool moving = true;// boolean for when they are still moving
@@ -563,6 +567,10 @@ void Game::startLocation(){
 	
 	//calls the method that determines what the body looks like
 	p1->initializePosition();
+	
+	//centers the camera on the players position	
+	p1->addCameraScene();
+
 	return;
 }
 int Game::viconInit()

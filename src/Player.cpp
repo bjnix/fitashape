@@ -65,15 +65,13 @@ void Player::initializePosition(){
 	{
 		printf("mesh did not work\n");
 		exit(-1);
-		//device->drop();
-		//return 1;
 	}
-		printf("mesh worked\n");
+	printf("mesh worked\n");
 	body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
 	if (body)
 	{
 		body->setMaterialFlag(EMF_LIGHTING, false);
-			printf("body worked\n");	
+		printf("body worked\n");	
 	}
 	else{
 		printf("body did not work\n");
@@ -82,15 +80,6 @@ void Player::initializePosition(){
 	int scale = (LShoulder.Y - LArm)/5;
 	body->setScale(vector3df(scale,scale,scale));
 }
-
-
-/*
-	Method to determine where and when the person is 
-	standing when trying to get the initial locations.
-	Takes in instance every second and checks to see if the
-	play has stood still for the last three seconds
-*/
-
 
 
 /*
@@ -489,7 +478,7 @@ int Player::pauseCollide(){
 }
 
 bool Player::jump(){
-	printf("ground = %f, LF = %f, RF = %f\n",ground,LF.getPosition().Y,RF.getPosition().Y);
+	//printf("ground = %f, LF = %f, RF = %f\n",ground,LF.getPosition().Y,RF.getPosition().Y);
 	if(LF.getPosition().Y > ground + .75 && RF.getPosition().Y > ground + .75)
 		return true;
 
@@ -506,18 +495,16 @@ void Player::setMenu(){
 	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
 }
 
+/*
+  update the location and rotation of the body object to make it look like it is accurate
+*/
 void Player::updateBody(){
 	//make sure the body exists already
 	if(body){
-
+		//set the position to the middle of the feet
 		body->setPosition(vector3df(mid(RF.getPosition().X,LF.getPosition().X), body->getPosition().Y, body->getPosition().Z));
 
-		//printf("POS: RF = %f, LF = %f, Mid = %f\n", RF.getPosition().X, LF.getPosition().X,body->getPosition().X);
-		//printf("ROTATION: LH.X = %f LH Bound = %f, value = %f\n",LH.getPosition().X, body->getPosition().X - abs(initLoc[0].X - initLoc[8].X),
-		//	 abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X));
-		//printf("ROTATION: RH.X = %f RH Bound = %f, value = %f\n",RH.getPosition().X, body->getPosition().X + abs(initLoc[1].X - initLoc[8].X),
-		//	 abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X));
-
+		//set the rotation based off of the hands
 		if(LH.getPosition().X < (body->getPosition().X - abs(initLoc[0].X - initLoc[8].X)))
 			body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X)));
 
@@ -526,10 +513,16 @@ void Player::updateBody(){
 	}
 }
 
+/*
+   helper to find the middle of 2 numbers
+*/
 double Player::mid(double a, double b){
 	return (a/2 + b/2);
 }
 
+/*
+   helper to find the absolute value of a number
+*/
 double Player::abs(double number){
 	if(number < 0)
 		return number * -1;
