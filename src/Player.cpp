@@ -1,4 +1,3 @@
-
 /**
 Class for the player object
 **/
@@ -10,7 +9,6 @@ Player::Player(IVideoDriver * d, ISceneManager * s){
 	ground = 0;
 }
 Player::~Player(void){}
-
 /*
 get the current node
 */
@@ -24,7 +22,6 @@ set the current node
 void Player::setCurrent(CircleNode& node){
 	current = node;
 }
-
 
 /*
 This method will detect where the persons body is and the relative shape of the arms and legs.
@@ -183,7 +180,7 @@ void Player::drawTargets(){
 	LHTarget.setTarget(&LH);
 	LHTarget.node->setPosition(LH.node->getPosition()); // set it's position to a temp spot
 	LHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-	//LHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	LHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	LHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	//}
 
@@ -195,7 +192,7 @@ void Player::drawTargets(){
 	RHTarget.setTarget(&RH);
 	RHTarget.node->setPosition(RH.node->getPosition());
 	RHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
-	//RHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	RHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	RHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	//}
 
@@ -207,7 +204,7 @@ void Player::drawTargets(){
 	LFTarget.setTarget(&LF);
 	LFTarget.node->setPosition(LF.node->getPosition());
 	LFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
-	//LFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	LFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	LFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	//}
 
@@ -219,7 +216,7 @@ void Player::drawTargets(){
 	RFTarget.setTarget(&RF);
 	RFTarget.node->setPosition(RF.node->getPosition());
 	RFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
-	//RFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	RFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	RFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 
 	RestartYes.init(smgr, 1);
@@ -258,6 +255,7 @@ void Player::drawTargets(){
 	ExitGame.setTarget(&LH);
 	ExitGame.node->setPosition(core::vector3df(-10, 8, 30));
 	ExitGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+	ExitGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	ExitGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	ExitGame.node->setVisible(false);
 
@@ -320,8 +318,8 @@ bool Player::collide (CircleNode node){
 	//check to see of the distance between the two nodes is less than the required distance
 	if(nodeLocation.getDistanceFrom(targetLocation) > collideDist){
 		//did not collide so make sure it is the normal texture and transparent
-		node.node->setMaterialTexture(0, node.node->getMaterial(0).getTexture(0));
-		//node.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+		node.node->setMaterialTexture(0, node.target()->node->getMaterial(0).getTexture(0));
+		node.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		return false;
 	}
 	node.node->setMaterialTexture(0, driver->getTexture("../assets/particlewhite.bmp"));
@@ -435,6 +433,11 @@ void Player::addCameraScene(){
 	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 }
 
+/*
+void setTargetVisible - detirmine whether the game targets or menu targets are visible.
+bool visibility - true for targets vis, menu invis. false for inverse
+bool resume - whether or not a game is currently running, allowing for the resume game option to be shown.
+*/
 void Player::setTargetVisible(bool visibility, bool resume){
 	RFTarget.node->setVisible(visibility);
 	LFTarget.node->setVisible(visibility);
@@ -446,6 +449,9 @@ void Player::setTargetVisible(bool visibility, bool resume){
 	Select.node->setVisible(!visibility);
 }
 
+/*
+void setMenuInvis - make the menu nodes all invisible
+*/
 void Player::setMenuInvis(){
 	NewGame.node->setVisible(false);
 	ResumeGame.node->setVisible(false);
@@ -463,37 +469,51 @@ int Player::restartCollide(){
 		return 0;
 }
 
+/*
+int pauseCollide - return which combination of buttons is pressed for the menu
+returns:
+	1 - resume and select button pressed
+	2 - newgame and select pressed
+	3 - exit game and select pressed
+	4 - only resume selected
+	5 - only newgame selected
+	6 - only exit selected
+*/
 int Player::pauseCollide(){
-	if(ResumeGame.node->isVisible() && collide(ResumeGame)){
+	int ret = 0;
+	if(ResumeGame.node->isVisible() && collide(ResumeGame)){ // only count resume if visible
 		if(collide(Select))
-			return 1;
+			ret = 1;
 		else
-			return 4;
+			ret = 4;
 	} 
 		
-	else if(collide(NewGame)){
+	if(collide(NewGame)){
 		if(collide(Select))
-			return 2;
+			ret = 2;
 		else
-			return 5;
+			ret = 5;
 	}
-	else if(collide (ExitGame)){
+	if(collide (ExitGame)){
 		if(collide(Select))
-			return 3;
+			ret = 3;
 		else
-			return 6;
+			ret = 6;
 	}
-	return 0;
+	return ret;
 }
 
 bool Player::jump(){
-	//printf("ground = %f, LF = %f, RF = %f\n",ground,LF.getPosition().Y,RF.getPosition().Y);
-	if(LF.getPosition().Y > ground + .75 && RF.getPosition().Y > ground + .75)
+	printf("mid: %f, left: %f, right: %f\n", ground, LF.getPosition().Y, RF.getPosition().Y);
+	if(LF.getPosition().Y > ground + .5 && RF.getPosition().Y > ground + .5)
 		return true;
 
 	return false;
 }
 
+/*
+void setmenu - sets the menu buttons to relativly follow the left foot node.
+*/
 void Player::setMenu(){
 	f32 px, py;
 	px = LF.getPosition().X;

@@ -202,8 +202,6 @@ int Game::run(){
 	
 	std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::flush;
 
-
-
 	//ICameraSceneNode *myCamera;
 	//irr::core::matrix4 MyMatrix;
 	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
@@ -214,10 +212,10 @@ int Game::run(){
 	//create basic camera
 	smgr->addCameraSceneNode();
 
-
-	
 	//creates the clock.
 	createClock();
+	printf("lolz\n");
+	zenBar = driver->getTexture("../assets/Scroll.png");
 
 	std::cout << "creating the player object \n"<< std::flush;
 	//create player and draw the limbs
@@ -283,8 +281,6 @@ int Game::run(){
 		if(local)
 			moveKeyboard(receiver);
 		else
-
-
 			motionTracking();
 
 		if(p1->jump() && !gameOver && !pause){
@@ -304,10 +300,7 @@ int Game::run(){
 		}
 
 		//puts the stuff on the screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
-		smgr->drawAll(); // draw the 3d scene
-		driver->endScene();
+		drawObjects();
 		//end the current session, asking if want to play again.
 		
 			
@@ -349,7 +342,6 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 		nodePosition.X += .5;
 
 	p1->currentNode()->setPosition(nodePosition);
-	
 	p1->updateBody();
 
 }
@@ -434,7 +426,9 @@ void Game::createClock(){
 	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,25,30));
 }
 
-
+/*
+void retryMenu - I think this is depreciated in favor of pauseMenu, and no longer is needed - Will most likely delete later
+*/
 void Game::retryMenu(){
 	switch(p1->restartCollide()){
 		//if yes is selected, reinitialize the variables
@@ -453,16 +447,19 @@ void Game::retryMenu(){
 	}
 }
 
+/*
+void pauseMenu - setup the pause menu and interactions, buttons, etc
+*/
 void Game::pauseMenu(){
-	wchar_t tmp[100];
+	wchar_t tmp[100]; //buffer to set display text as
 	p1->setMenu();
-	switch(p1->pauseCollide()){
-		case 1:
+	switch(p1->pauseCollide()){ //figure out which selection is pressed
+		case 1: //resume game if paused
 			pause = false;
-			myClock->start();
 			p1->setTargetVisible(true, gameOver);
+			myClock->start();
 			break;
-		case 2:
+		case 2: //create new game
 			p1->setMenuInvis();
 			if(!local){
 				swprintf(tmp, 100, L"Assume The Position!");
@@ -480,22 +477,22 @@ void Game::pauseMenu(){
 			p1->randomTargets();
 			break;
 		
-		case 3:
+		case 3://exit the game
 			toExit = true;
 			break;
-		case 4:
+		case 4://display text for resume
 			swprintf(tmp, 100, L"Resume Game");
 			text->setText(tmp);
 			break;
-		case 5:
+		case 5://display text for new
 			swprintf(tmp, 100, L"New Game");
 			text->setText(tmp);
 			break;
-		case 6:
+		case 6: // display text for exit
 			swprintf(tmp, 100, L"Exit Game");
 			text->setText(tmp);
 			break;
-		default:
+		default://display text for menu help
 			swprintf(tmp, 100, L"Hover Over With Left Hand To Choose Option");
 			text->setText(tmp);
 			break;
@@ -643,12 +640,8 @@ void Game::startLocation(){
 		printf("Finding body... Stand still! at time %d\n", (myClock->getTime() / 500) % 60);		
 
 		//make stuff appear on screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
-		smgr->drawAll(); 
-		driver->endScene();
+		drawObjects();
 
-		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
 		if(0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
@@ -661,12 +654,8 @@ void Game::startLocation(){
 		}
 
 		//make stuff appear on screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
-		smgr->drawAll();
-		driver->endScene();
+		drawObjects();
 	
-		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
 		if(1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
@@ -679,12 +668,8 @@ void Game::startLocation(){
 		}
 		
 		//make stuff appear on screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
-		smgr->drawAll();
-		driver->endScene();
+		drawObjects();
 
-		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
 		if(2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
@@ -697,10 +682,7 @@ void Game::startLocation(){
 		}
 
 		//make stuff appear on screen
-		driver->beginScene(true, true, video::SColor(255,113,113,133));
-		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
-		smgr->drawAll();
-		driver->endScene();
+		drawObjects();
 		
 		if(one && two && three){
 			printf("Found all three\n");
@@ -735,7 +717,7 @@ void Game::startLocation(){
 	
 	//calls the method that determines what the body looks like
 	p1->initializePosition();
-	
+	return;
 	//centers the camera on the players position	
 	p1->addCameraScene();
 
@@ -750,3 +732,10 @@ void exitCallback()
 	return;
 }
 */
+
+void Game::drawObjects(){
+	driver->beginScene(true, true, video::SColor(255,113,113,133));
+	//driver->draw2DImage(zenBar,position2d<s32>(0.0f,0.0f));
+	smgr->drawAll(); // draw the 3d scene
+	driver->endScene();
+}

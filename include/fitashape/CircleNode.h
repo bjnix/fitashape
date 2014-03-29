@@ -1,4 +1,3 @@
-
 //Class header for Circle Node
 
 #ifndef CIRCLENODE_H
