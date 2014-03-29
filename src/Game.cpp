@@ -622,7 +622,7 @@ void exitCallback()
 
 void Game::drawObjects(){
 	driver->beginScene(true, true, video::SColor(255,113,113,133));
-	driver->draw2DImage(zenBar,position2d<s32>(0.0f,0.0f));
+	//driver->draw2DImage(zenBar,position2d<s32>(0.0f,0.0f));
 	smgr->drawAll(); // draw the 3d scene
 	driver->endScene();
 }
