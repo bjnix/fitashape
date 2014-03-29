@@ -6,6 +6,7 @@ Class for the player object
 Player::Player(IVideoDriver * d, ISceneManager * s){
 	driver = d;
 	smgr = s;
+	ground = 0;
 }
 Player::~Player(void){}
 /*
@@ -33,7 +34,7 @@ void Player::initializePosition(){
 	vector3df RHip;
 	vector3df centerBody;
 
-	ground = (initLoc[3].Y + initLoc[2].Y) / 2; //sets ground to how the average height of the feet are
+	ground = mid(initLoc[2].Y,initLoc[3].Y); //sets ground to how the average height of the feet are
 
 	LShoulder = core::vector3df(initLoc[2].X,initLoc[0].Y,initLoc[0].Z);//(leftfoot.x,lefthand.y,lefthand.x)
 	RShoulder = core::vector3df(initLoc[3].X,initLoc[1].Y,initLoc[1].Z);//(rightfoot.x,righthand.y,righthand.x)
@@ -48,23 +49,35 @@ void Player::initializePosition(){
 	LLeg = initLoc[2].getDistanceFrom(LHip);//left foot to left hip
 	RLeg = initLoc[3].getDistanceFrom(RHip);//right foot to right hip
 
-	centerBody = core::vector3df((LHip.X+RHip.X)/2,(LHip.Y + LShoulder.Y)/2,LHip.Z);
+	centerBody = core::vector3df(mid(LHip.X,RHip.X),mid(LHip.Y,LShoulder.Y),LHip.Z);
 	
 	initLoc[4] = LShoulder;
 	initLoc[5] = RShoulder;
 	initLoc[6] = LHip;
 	initLoc[7] = RHip;
 	initLoc[8] = centerBody;
+	
+	//add the body
+	IMesh* mesh = smgr->getMesh("../assets/circle-stick.3ds");
+	if (!mesh)
+	{
+		printf("mesh did not work\n");
+		exit(-1);
+	}
+	printf("mesh worked\n");
+	body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+	if (body)
+	{
+		body->setMaterialFlag(EMF_LIGHTING, false);
+		printf("body worked\n");	
+	}
+	else{
+		printf("body did not work\n");
+		exit(-1);
+	}
+	int scale = (LShoulder.Y - LArm)/5;
+	body->setScale(vector3df(scale,scale,scale));
 }
-
-
-/*
-	Method to determine where and when the person is 
-	standing when trying to get the initial locations.
-	Takes in instance every second and checks to see if the
-	play has stood still for the last three seconds
-*/
-
 
 
 /*
@@ -325,6 +338,24 @@ void Player::setPosition(std::vector<vector3df> vec){
 	LF.node->setPosition(vec[2]);
 	RF.node->setPosition(vec[3]);
 }
+void Player::setPosition(vector3df pos[4]){
+	LH.setPosition(pos[0]);
+	RH.setPosition(pos[1]);
+	LF.setPosition(pos[2]);
+	RF.setPosition(pos[3]);
+}
+/*
+Medthod to get the position of all if the limbs. returns a vector of vector3df's
+with left hand, right hand, left foot, right foot.
+*/
+std::vector<vector3df> Player::getPosition(){
+	std::vector<vector3df> position;
+		position.push_back(LH.node->getPosition());
+		position.push_back(RH.node->getPosition());
+		position.push_back(LF.node->getPosition());
+		position.push_back(RF.node->getPosition());
+	return position;
+}
 
 /*
 method to update/check if all the orbs are touching their targets
@@ -373,16 +404,7 @@ void Player::setCurrentRF(){
 	current = RF;
 }
 
-/*
-method to set the the positions of all the nodes. Pass an array of the positions with 
-0 = LH, 1 = RH, 2 = LF, 3 = RF
-*/
-void Player::setPositions(vector3df pos[4]){
-	LH.setPosition(pos[0]);
-	RH.setPosition(pos[1]);
-	LF.setPosition(pos[2]);
-	RF.setPosition(pos[3]);
-}
+
 
 /*
 method to store the initial positions into the array for local use
@@ -398,6 +420,16 @@ void Player::localInitPos(){
 method to add a camera scene node that is centered on the player
 */
 void Player::addCameraScene(){
+
+	//ICameraSceneNode *myCamera;
+	//irr::core::matrix4 MyMatrix;
+	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
+	//myCamera = smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
+	//myCamera = smgr->addCameraSceneNode(0,irr::core::vector3df(-14.0f,14.0f,-14.0f),irr::core::vector3df(0,0,0));
+	//myCamera->setProjectionMatrix(MyMatrix);
+
+
+
 	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 }
 
@@ -492,3 +524,36 @@ void Player::setMenu(){
 	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
 }
 
+/*
+  update the location and rotation of the body object to make it look like it is accurate
+*/
+void Player::updateBody(){
+	//make sure the body exists already
+	if(body){
+		//set the position to the middle of the feet
+		body->setPosition(vector3df(mid(RF.getPosition().X,LF.getPosition().X), body->getPosition().Y, body->getPosition().Z));
+
+		//set the rotation based off of the hands
+		if(LH.getPosition().X < (body->getPosition().X - abs(initLoc[0].X - initLoc[8].X)))
+			body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X)));
+
+		if(RH.getPosition().X > (body->getPosition().X + abs(initLoc[1].X - initLoc[8].X)))
+			body->setRotation(vector3df(0,0, -3 * abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X)));
+	}
+}
+
+/*
+   helper to find the middle of 2 numbers
+*/
+double Player::mid(double a, double b){
+	return (a/2 + b/2);
+}
+
+/*
+   helper to find the absolute value of a number
+*/
+double Player::abs(double number){
+	if(number < 0)
+		return number * -1;
+	return number;
+}
