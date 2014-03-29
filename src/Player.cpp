@@ -75,7 +75,7 @@ void Player::initializePosition(){
 		printf("body did not work\n");
 		exit(-1);
 	}
-	int scale = (LShoulder.Y - LArm)/5;
+	double scale = (LShoulder.Y - LArm)/5.0;
 	body->setScale(vector3df(scale,scale,scale));
 }
 
@@ -164,11 +164,11 @@ void Player::randomTargets(){
 	RHTarget.setPosition(vector3df(RHTarget.getPosition().X,RHTarget.getPosition().Y + shift,RHTarget.getPosition().Z));
 	LFTarget.setPosition(vector3df(LFTarget.getPosition().X,LFTarget.getPosition().Y + shift,LFTarget.getPosition().Z));
 	RFTarget.setPosition(vector3df(RFTarget.getPosition().X,RFTarget.getPosition().Y + shift,RFTarget.getPosition().Z));
-	LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
-	RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
-	LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
-	RHip = vector3df(RHip.X,RHip.Y + shift, RHip.Z);
-	centerBody = vector3df(centerBody.X,centerBody.Y + shift, centerBody.Z);
+	//LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
+	//RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
+	//LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
+	//RHip = vector3df(RHip.X,RHip.Y + shift, RHip.Z);
+	//centerBody = vector3df(centerBody.X,centerBody.Y + shift, centerBody.Z);
 }
 
 /*
@@ -504,7 +504,7 @@ int Player::pauseCollide(){
 }
 
 bool Player::jump(){
-	printf("mid: %f, left: %f, right: %f\n", ground, LF.getPosition().Y, RF.getPosition().Y);
+	//printf("mid: %f, left: %f, right: %f\n", ground, LF.getPosition().Y, RF.getPosition().Y);
 	if(LF.getPosition().Y > ground + .5 && RF.getPosition().Y > ground + .5)
 		return true;
 

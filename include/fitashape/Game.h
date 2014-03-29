@@ -111,6 +111,7 @@ public:
 	int timesUp;
 	scene::ITextSceneNode * text;
 	MyEventReceiver receiver;
+	ITexture* background;
 
 	Game(bool,char*);
 	Game(bool,char*,char*,char*,char*,char*,char*);

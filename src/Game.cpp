@@ -157,7 +157,7 @@ Game::Game(
 	screen_width = atof(s_width);
 	screen_height = atof(s_height);
 
->>>>>>> dgr_implementation
+
 	gameOver = true;
 	zen = 50;
 	timesUp = 5;
@@ -206,7 +206,6 @@ int Game::run(){
 	//irr::core::matrix4 MyMatrix;
 	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
 	//myCamera = smgr->addCameraSceneNode(0,irr::core::vector3df(-14.0f,14.0f,-14.0f),irr::core::vector3df(0,0,0));
-	//myCamera = smgr->addCameraSceneNode();
 	//myCamera->setProjectionMatrix(MyMatrix);
 
 	//create basic camera
@@ -273,7 +272,7 @@ int Game::run(){
 	myClock->setTime(0);
 	p1->setTargetVisible(false, gameOver);
 	
-	ITexture* background = driver->getTexture("../assets/Background(small).png");
+	background = driver->getTexture("../assets/Background(small).png");
 
 	while(device->run() && !toExit)
 	{
@@ -347,9 +346,11 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 }
 
 void Game::motionTracking(){
-	vector3df temp[4];
-	bool OccludedMarker = true;	
+	
 #ifdef DGR_MASTER
+	vector3df temp[4];
+	bool OccludedMarker = true;
+
 	while(OccludedMarker){
 		OccludedMarker = false;
 		while(MyClient.GetFrame().Result != Result::Success) 
@@ -375,7 +376,7 @@ void Game::motionTracking(){
 			}
 			else
 			{ 
-				std::cout<<names[i]<<" IS occluded!"<< std::endl; 
+				//std::cout<<names[i]<<" IS occluded!"<< std::endl; 
 				OccludedMarker = true;
 				break;
 			}
@@ -625,66 +626,81 @@ void Game::startLocation(){
 	vector3df LFpos3;
 	vector3df RFpos3;
 
-	ITexture* background = driver->getTexture("../assets/Calibration(small).png");
+	background = driver->getTexture("../assets/Calibration(small).png");
 
 
-	//int temp = 0;// keeps track of which group we are going to update
+	// keeps track of which group we are going to update, and when to move on
 	bool one = false;
 	bool two = false;
 	bool three = false;
+	int next = 0;
+	int last = 0;
+
 	myClock->start();// start a clock to keep track of time
 
 	//loop to keep checking the locations of the nodes till they come close to stopping
 	while(moving){
 		myClock->tick();//move the clock
-		printf("Finding body... Stand still! at time %d\n", (myClock->getTime() / 500) % 60);		
+		//printf("Finding body... Stand still! at time %d\n", ((myClock->getTime() / 500) % 60) % 3);		
 
 		//make stuff appear on screen
 		drawObjects();
 
-		//call the motion tracking method to get up to date locaitons
+		//update the signal to the current time
+		next = ((myClock->getTime() / 500) % 10) % 3;
+
+		//call the motion tracking method to get up-to-date locaitons
 		motionTracking();
-		if(0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
+
+		if(!one && last != next){ //check if we want to store this pos
 			printf("CHECK 1\n");
 			LHpos1 = p1->LH.node->getPosition();
 			RHpos1 = p1->RH.node->getPosition();
 			LFpos1 = p1->LF.node->getPosition();
 			RFpos1 = p1->RF.node->getPosition();
 			one = true;
+			last = next;
 		}
 
 		//make stuff appear on screen
 		drawObjects();
 	
-		//call the motion tracking method to get up to date locaitons
+		//call the motion tracking method to get up-to-date locaitons
 		motionTracking();
-		if(1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+
+		if(!two && last != next){ //check if we want to store this pos
 			printf("CHECK 2\n");
 			LHpos2 = p1->LH.node->getPosition();
 			RHpos2 = p1->RH.node->getPosition();
 			LFpos2 = p1->LF.node->getPosition();
 			RFpos2 = p1->RF.node->getPosition();
 			two = true;
+			last = next;
 		}
 		
 		//make stuff appear on screen
 		drawObjects();
 
-		//call the motion tracking method to get up to date locaitons
+		//call the motion tracking method to get up-to-date locaitons
 		motionTracking();
-		if(2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+
+		if(!three && last != next){ //check if we want to store this pos
 			printf("CHECK 3\n");
 			LHpos3 = p1->LH.node->getPosition();
 			RHpos3 = p1->RH.node->getPosition();
 			LFpos3 = p1->LF.node->getPosition();
 			RFpos3 = p1->RF.node->getPosition();
 			three = true;
+			last = next;
 		}
 
 		//make stuff appear on screen
 		drawObjects();
 		
 		if(one && two && three){
+			one = false;
+			two = false;
+			three = false;
 			printf("Found all three\n");
 			//check to see if the player is close to staying still
 			double close = .5; //number to define how close is enough
@@ -703,10 +719,12 @@ void Game::startLocation(){
 						if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
 							&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5)){
 								moving = false; //they have stopped moving!
-							std::cout<<"T position"<<std::endl;
+							std::cout<<"good position"<<std::endl;
 						}
+						else{std::cout<<"level out hands and feet"<<std::endl;}
 					//}
 			}
+			else{printf("Stand still...\n");}
 		}
 	}
 	//store this position for later use
@@ -717,9 +735,11 @@ void Game::startLocation(){
 	
 	//calls the method that determines what the body looks like
 	p1->initializePosition();
-	return;
+
 	//centers the camera on the players position	
 	p1->addCameraScene();
+
+	background = driver->getTexture("../assets/Background(small).png");
 
 	return;
 }
@@ -735,7 +755,8 @@ void exitCallback()
 
 void Game::drawObjects(){
 	driver->beginScene(true, true, video::SColor(255,113,113,133));
-	//driver->draw2DImage(zenBar,position2d<s32>(0.0f,0.0f));
+	//draw the background
+	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 	smgr->drawAll(); // draw the 3d scene
 	driver->endScene();
 }

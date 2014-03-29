@@ -32,3 +32,7 @@ out
 libIrrlicht.a
 
 bin/fitashape
+
+*_S
+*_M
+*_R
