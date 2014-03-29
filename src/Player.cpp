@@ -7,8 +7,10 @@ Class for the player object
 Player::Player(IVideoDriver * d, ISceneManager * s){
 	driver = d;
 	smgr = s;
+	ground = 0;
 }
 Player::~Player(void){}
+
 /*
 get the current node
 */
@@ -23,6 +25,7 @@ void Player::setCurrent(CircleNode& node){
 	current = node;
 }
 
+
 /*
 This method will detect where the persons body is and the relative shape of the arms and legs.
 uses the first 4 locations stored in initLoc[] and sets the last 5
@@ -34,7 +37,7 @@ void Player::initializePosition(){
 	vector3df RHip;
 	vector3df centerBody;
 
-	ground = (initLoc[3].Y + initLoc[2].Y) / 2; //sets ground to how the average height of the feet are
+	ground = mid(initLoc[2].Y,initLoc[3].Y); //sets ground to how the average height of the feet are
 
 	LShoulder = core::vector3df(initLoc[2].X,initLoc[0].Y,initLoc[0].Z);//(leftfoot.x,lefthand.y,lefthand.x)
 	RShoulder = core::vector3df(initLoc[3].X,initLoc[1].Y,initLoc[1].Z);//(rightfoot.x,righthand.y,righthand.x)
@@ -49,23 +52,35 @@ void Player::initializePosition(){
 	LLeg = initLoc[2].getDistanceFrom(LHip);//left foot to left hip
 	RLeg = initLoc[3].getDistanceFrom(RHip);//right foot to right hip
 
-	centerBody = core::vector3df((LHip.X+RHip.X)/2,(LHip.Y + LShoulder.Y)/2,LHip.Z);
+	centerBody = core::vector3df(mid(LHip.X,RHip.X),mid(LHip.Y,LShoulder.Y),LHip.Z);
 	
 	initLoc[4] = LShoulder;
 	initLoc[5] = RShoulder;
 	initLoc[6] = LHip;
 	initLoc[7] = RHip;
 	initLoc[8] = centerBody;
+	
+	//add the body
+	IMesh* mesh = smgr->getMesh("../assets/circle-stick.3ds");
+	if (!mesh)
+	{
+		printf("mesh did not work\n");
+		exit(-1);
+	}
+	printf("mesh worked\n");
+	body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+	if (body)
+	{
+		body->setMaterialFlag(EMF_LIGHTING, false);
+		printf("body worked\n");	
+	}
+	else{
+		printf("body did not work\n");
+		exit(-1);
+	}
+	int scale = (LShoulder.Y - LArm)/5;
+	body->setScale(vector3df(scale,scale,scale));
 }
-
-
-/*
-	Method to determine where and when the person is 
-	standing when trying to get the initial locations.
-	Takes in instance every second and checks to see if the
-	play has stood still for the last three seconds
-*/
-
 
 
 /*
@@ -168,7 +183,7 @@ void Player::drawTargets(){
 	LHTarget.setTarget(&LH);
 	LHTarget.node->setPosition(LH.node->getPosition()); // set it's position to a temp spot
 	LHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-	LHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+	//LHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	LHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	//}
 
@@ -180,7 +195,7 @@ void Player::drawTargets(){
 	RHTarget.setTarget(&RH);
 	RHTarget.node->setPosition(RH.node->getPosition());
 	RHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
-	RHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	//RHTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	RHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	//}
 
@@ -192,7 +207,7 @@ void Player::drawTargets(){
 	LFTarget.setTarget(&LF);
 	LFTarget.node->setPosition(LF.node->getPosition());
 	LFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
-	LFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	//LFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	LFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	//}
 
@@ -204,7 +219,7 @@ void Player::drawTargets(){
 	RFTarget.setTarget(&RF);
 	RFTarget.node->setPosition(RF.node->getPosition());
 	RFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
-	RFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+	//RFTarget.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	RFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 
 	RestartYes.init(smgr, 1);
@@ -243,7 +258,6 @@ void Player::drawTargets(){
 	ExitGame.setTarget(&LH);
 	ExitGame.node->setPosition(core::vector3df(-10, 8, 30));
 	ExitGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
-	ExitGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 	ExitGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	ExitGame.node->setVisible(false);
 
@@ -307,7 +321,7 @@ bool Player::collide (CircleNode node){
 	if(nodeLocation.getDistanceFrom(targetLocation) > collideDist){
 		//did not collide so make sure it is the normal texture and transparent
 		node.node->setMaterialTexture(0, node.node->getMaterial(0).getTexture(0));
-		node.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+		//node.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 		return false;
 	}
 	node.node->setMaterialTexture(0, driver->getTexture("../assets/particlewhite.bmp"));
@@ -408,6 +422,16 @@ void Player::localInitPos(){
 method to add a camera scene node that is centered on the player
 */
 void Player::addCameraScene(){
+
+	//ICameraSceneNode *myCamera;
+	//irr::core::matrix4 MyMatrix;
+	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
+	//myCamera = smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
+	//myCamera = smgr->addCameraSceneNode(0,irr::core::vector3df(-14.0f,14.0f,-14.0f),irr::core::vector3df(0,0,0));
+	//myCamera->setProjectionMatrix(MyMatrix);
+
+
+
 	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 }
 
@@ -463,7 +487,8 @@ int Player::pauseCollide(){
 }
 
 bool Player::jump(){
-	if(LF.getPosition().Y + 1 > ground && RF.getPosition().Y + 1 > ground)
+	//printf("ground = %f, LF = %f, RF = %f\n",ground,LF.getPosition().Y,RF.getPosition().Y);
+	if(LF.getPosition().Y > ground + .75 && RF.getPosition().Y > ground + .75)
 		return true;
 
 	return false;
@@ -479,3 +504,36 @@ void Player::setMenu(){
 	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
 }
 
+/*
+  update the location and rotation of the body object to make it look like it is accurate
+*/
+void Player::updateBody(){
+	//make sure the body exists already
+	if(body){
+		//set the position to the middle of the feet
+		body->setPosition(vector3df(mid(RF.getPosition().X,LF.getPosition().X), body->getPosition().Y, body->getPosition().Z));
+
+		//set the rotation based off of the hands
+		if(LH.getPosition().X < (body->getPosition().X - abs(initLoc[0].X - initLoc[8].X)))
+			body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X)));
+
+		if(RH.getPosition().X > (body->getPosition().X + abs(initLoc[1].X - initLoc[8].X)))
+			body->setRotation(vector3df(0,0, -3 * abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X)));
+	}
+}
+
+/*
+   helper to find the middle of 2 numbers
+*/
+double Player::mid(double a, double b){
+	return (a/2 + b/2);
+}
+
+/*
+   helper to find the absolute value of a number
+*/
+double Player::abs(double number){
+	if(number < 0)
+		return number * -1;
+	return number;
+}

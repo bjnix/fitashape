@@ -54,7 +54,8 @@ private:
 	CircleNode ExitGame;
 	CircleNode Select;
 
-	
+	double mid(double a,double b);
+	double abs(double number);
 
 	//0=LeftHand, 1=RightHand, 2=LeftFoot 3=RightFoot
 	//4=LeftShoulder, 5=RightShoulder 6=LeftHip
@@ -67,6 +68,7 @@ private:
 	f32 RLeg; //estimated length of right leg
 	f32 ground; //estimated height of the ground
 
+	IMeshSceneNode* body;
 
 public:
 	scene::ISceneNode * currentNode();
@@ -99,6 +101,7 @@ public:
 	int pauseCollide();
 	bool jump();
 	void setMenu();
+	void updateBody();
 
 
 };

@@ -39,7 +39,6 @@ int screen_width,screen_height;
 
 DGR_framework * myDGR;
 
-
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
     return ra + N;
@@ -52,7 +51,6 @@ const char *nameList[] = {
 	};
 
 std::vector<std::string> names(nameList,end(nameList));
-
 
 int viconInit()
 {
@@ -159,9 +157,10 @@ Game::Game(
 	screen_width = atof(s_width);
 	screen_height = atof(s_height);
 
+>>>>>>> dgr_implementation
 	gameOver = true;
 	zen = 50;
-	timesUp = 10;
+	timesUp = 5;
 	score = 0;
 	toExit = false;
 	pause = true;
@@ -192,8 +191,8 @@ int Game::run(){
 	std::cout << "creating the event reciever for KB \n"<< std::flush;
 	
 	// create reciever and device
-	device = createDevice(driverType,
-			core::dimension2d<u32>(1280, 1024), 16, false, false, false, &receiver);
+	//device = createDevice(driverType,core::dimension2d<u32>(1920*6, 1080*4), 16, false, false, false, &receiver);
+	device = createDevice(driverType,core::dimension2d<u32>(1440, 540), 16, false, false, false, &receiver);
 	if (device == 0)
 		return 1; // could not create selected device.
 	
@@ -203,9 +202,20 @@ int Game::run(){
 	
 	std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::flush;
 
-	//adds a camera scene node 
+
+
+	//ICameraSceneNode *myCamera;
+	//irr::core::matrix4 MyMatrix;
+	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
+	//myCamera = smgr->addCameraSceneNode(0,irr::core::vector3df(-14.0f,14.0f,-14.0f),irr::core::vector3df(0,0,0));
+	//myCamera = smgr->addCameraSceneNode();
+	//myCamera->setProjectionMatrix(MyMatrix);
+
+	//create basic camera
 	smgr->addCameraSceneNode();
 
+
+	
 	//creates the clock.
 	createClock();
 
@@ -260,31 +270,29 @@ int Game::run(){
 	
 	std::cout << "just setCurrent\n"<< std::flush;
 
-	
-	//centers the camera on the players position	
-	p1->addCameraScene();
-	
 
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
 	p1->setTargetVisible(false, gameOver);
+	
+	ITexture* background = driver->getTexture("../assets/Background(small).png");
+
 	while(device->run() && !toExit)
 	{
-
 		//move the orbs around
 		if(local)
 			moveKeyboard(receiver);
-
 		else
 
 
 			motionTracking();
 
-
-		/*if(p1->jump()){
+		if(p1->jump() && !gameOver && !pause){
+			printf("JUMPED\n");
+			myClock->stop();
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
-		}//*/
+		}
 		//normal scoring while the game runs
 		if(!pause){
 			//update the clock and check for win/lose
@@ -297,6 +305,7 @@ int Game::run(){
 
 		//puts the stuff on the screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll(); // draw the 3d scene
 		driver->endScene();
 		//end the current session, asking if want to play again.
@@ -340,6 +349,9 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 		nodePosition.X += .5;
 
 	p1->currentNode()->setPosition(nodePosition);
+	
+	p1->updateBody();
+
 }
 
 void Game::motionTracking(){
@@ -378,6 +390,7 @@ void Game::motionTracking(){
 		}
 	}
 
+	p1->updateBody();
 	p1->setPosition(temp);
 #else
 	// The slave automatically shuts itself off if it hasn't received
@@ -428,7 +441,7 @@ void Game::retryMenu(){
 		case 1:
 			gameOver = false;
 			zen = 50;
-			timesUp = 10;
+			timesUp = 5;
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
@@ -446,6 +459,7 @@ void Game::pauseMenu(){
 	switch(p1->pauseCollide()){
 		case 1:
 			pause = false;
+			myClock->start();
 			p1->setTargetVisible(true, gameOver);
 			break;
 		case 2:
@@ -458,7 +472,7 @@ void Game::pauseMenu(){
 			}
 			gameOver = false;
 			zen = 50;
-			timesUp = 10;
+			timesUp = 5;
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
@@ -586,6 +600,13 @@ void Game::updateClock(){
  	device->setWindowCaption(tmp);
 }
 
+
+/*
+	Method to determine where and when the person is 
+	standing when trying to get the initial locations.
+	Takes in instance every second and checks to see if the
+	play has stood still for the last three seconds
+*/
 void Game::startLocation(){
 
 	bool moving = true;// boolean for when they are still moving
@@ -607,95 +628,103 @@ void Game::startLocation(){
 	vector3df LFpos3;
 	vector3df RFpos3;
 
-	
+	ITexture* background = driver->getTexture("../assets/Calibration(small).png");
 
-	int temp = -1;// keeps track of which group we are going to update
+
+	//int temp = 0;// keeps track of which group we are going to update
+	bool one = false;
+	bool two = false;
+	bool three = false;
 	myClock->start();// start a clock to keep track of time
 
 	//loop to keep checking the locations of the nodes till they come close to stopping
 	while(moving){
 		myClock->tick();//move the clock
-		printf("Finding body... Stand still!\n");		
+		printf("Finding body... Stand still! at time %d\n", (myClock->getTime() / 500) % 60);		
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll(); 
 		driver->endScene();
 
 		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
-
-		if(temp != 0 && 0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
+		if(0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
 			printf("CHECK 1\n");
 			LHpos1 = p1->LH.node->getPosition();
 			RHpos1 = p1->RH.node->getPosition();
 			LFpos1 = p1->LF.node->getPosition();
 			RFpos1 = p1->RF.node->getPosition();
-			temp = 0;
+			one = true;
 		}
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll();
 		driver->endScene();
 	
 		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
-
-		if(temp != 1 && 1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+		if(1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 2\n");
 			LHpos2 = p1->LH.node->getPosition();
 			RHpos2 = p1->RH.node->getPosition();
 			LFpos2 = p1->LF.node->getPosition();
 			RFpos2 = p1->RF.node->getPosition();
-			temp = 1;
+			two = true;
 		}
 		
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll();
 		driver->endScene();
 
 		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
-
-		if(temp != 2 && 2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+		if(2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
 			printf("CHECK 3\n");
 			LHpos3 = p1->LH.node->getPosition();
 			RHpos3 = p1->RH.node->getPosition();
 			LFpos3 = p1->LF.node->getPosition();
 			RFpos3 = p1->RF.node->getPosition();
-			temp = 2;
+			three = true;
 		}
 
 		//make stuff appear on screen
 		driver->beginScene(true, true, video::SColor(255,113,113,133));
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 		smgr->drawAll();
 		driver->endScene();
 		
-		//check to see if the player is close to staying still
-		double close = .5; //number to define how close is enough
-		double min = 1;
-		if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
-			RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
-			LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
-			RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
-				std::cout<<"stood still!"<<std::endl;
-				//check to see if they look like they are in the right possition
-				//TODO add more restrictions if necessary
-				//check to see that they are an actual size, not just a dot
-				//if(LHpos3.getDistanceFrom(LFpos3) > min && RHpos3.getDistanceFrom(RFpos3) > min && LHpos3.getDistanceFrom(LHpos3) > min){
-					//std::cout<<"real size person!"<<std::endl;
-					//makes sure the arms are at about the same hight and  that the arms are about the same length
-					if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
-						&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5)){
-							moving = false; //they have stopped moving!
-						std::cout<<"T position"<<std::endl;
-					}
-				//}
+		if(one && two && three){
+			printf("Found all three\n");
+			//check to see if the player is close to staying still
+			double close = .5; //number to define how close is enough
+			//double min = 1;
+			if(LHpos1.getDistanceFrom(LHpos2) < close && LHpos2.getDistanceFrom(LHpos3) < close && LHpos3.getDistanceFrom(LHpos1) < close &&
+				RHpos1.getDistanceFrom(RHpos2) < close && RHpos2.getDistanceFrom(RHpos3) < close && RHpos3.getDistanceFrom(RHpos1) < close &&
+				LFpos1.getDistanceFrom(LFpos2) < close && LFpos2.getDistanceFrom(LFpos3) < close && LFpos3.getDistanceFrom(LFpos1) < close &&
+				RFpos1.getDistanceFrom(RFpos2) < close && RFpos2.getDistanceFrom(RFpos3) < close && RFpos3.getDistanceFrom(RFpos1) < close){
+					std::cout<<"stood still!"<<std::endl;
+					//check to see if they look like they are in the right possition
+					//TODO add more restrictions if necessary
+					//check to see that they are an actual size, not just a dot
+					//if(LHpos3.getDistanceFrom(LFpos3) > min && RHpos3.getDistanceFrom(RFpos3) > min && LHpos3.getDistanceFrom(LHpos3) > min){
+						//std::cout<<"real size person!"<<std::endl;
+						//makes sure the arms are at about the same hight and  that the arms are about the same length
+						if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
+							&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5)){
+								moving = false; //they have stopped moving!
+							std::cout<<"T position"<<std::endl;
+						}
+					//}
+			}
 		}
 	}
 	//store this position for later use
@@ -706,6 +735,10 @@ void Game::startLocation(){
 	
 	//calls the method that determines what the body looks like
 	p1->initializePosition();
+	
+	//centers the camera on the players position	
+	p1->addCameraScene();
+
 	return;
 }
 
