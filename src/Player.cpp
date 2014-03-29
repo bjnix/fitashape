@@ -1,3 +1,4 @@
+
 /**
 Class for the player object
 **/
@@ -325,6 +326,24 @@ void Player::setPosition(std::vector<vector3df> vec){
 	LF.node->setPosition(vec[2]);
 	RF.node->setPosition(vec[3]);
 }
+void Player::setPosition(vector3df pos[4]){
+	LH.setPosition(pos[0]);
+	RH.setPosition(pos[1]);
+	LF.setPosition(pos[2]);
+	RF.setPosition(pos[3]);
+}
+/*
+Medthod to get the position of all if the limbs. returns a vector of vector3df's
+with left hand, right hand, left foot, right foot.
+*/
+std::vector<vector3df> Player::getPosition(){
+	std::vector<vector3df> position;
+		position.push_back(LH.node->getPosition());
+		position.push_back(RH.node->getPosition());
+		position.push_back(LF.node->getPosition());
+		position.push_back(RF.node->getPosition());
+	return position;
+}
 
 /*
 method to update/check if all the orbs are touching their targets
@@ -373,16 +392,7 @@ void Player::setCurrentRF(){
 	current = RF;
 }
 
-/*
-method to set the the positions of all the nodes. Pass an array of the positions with 
-0 = LH, 1 = RH, 2 = LF, 3 = RF
-*/
-void Player::setPositions(vector3df pos[4]){
-	LH.setPosition(pos[0]);
-	RH.setPosition(pos[1]);
-	LF.setPosition(pos[2]);
-	RF.setPosition(pos[3]);
-}
+
 
 /*
 method to store the initial positions into the array for local use

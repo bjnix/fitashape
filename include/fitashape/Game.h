@@ -5,11 +5,12 @@
 #include <stdio.h>
 #include <iostream>
 #include "time.h"
-
 #include "irrlicht/irrlicht.h"
 #include "irrlicht/vector3d.h"
 #include "vicon/ViconClient.h"
 #include "fitashape/Player.h"
+#include "dgr_framework/DGR_framework.h"
+
 
 using namespace irr;
 using namespace core;
@@ -110,7 +111,8 @@ public:
 	scene::ITextSceneNode * text;
 	MyEventReceiver receiver;
 
-	Game(bool);
+	Game(bool,char*);
+	Game(bool,char*,char*,char*,char*,char*,char*);
 	~Game();
 	
 	int run();
@@ -122,8 +124,8 @@ public:
 	void retryMenu(); //delete this later
 	void pauseMenu();
 	
-	int viconInit();
-	void viconExit();
+	// int viconInit();
+	// void viconExit();
 
 };
 

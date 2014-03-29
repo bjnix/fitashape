@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream>
+//#include <iostream>
 #include <vector>
 
 #include "irrlicht/irrlicht.h"
@@ -81,13 +81,16 @@ public:
 	void drawTargets();
 	void drawLimbs();
 	bool collide (CircleNode node);
-	void setPosition(std::vector<vector3df> vec);
 	bool collideAll();
+
 	void setCurrentLH();
 	void setCurrentRH();
 	void setCurrentLF();
 	void setCurrentRF();
-	void setPositions(vector3df pos[4]);
+	void setPosition(std::vector<vector3df> vec);
+	void setPosition(vector3df pos[4]);
+	std::vector<vector3df> getPosition();
+	
 	void localInitPos();	
 	void addCameraScene();
 	void setTargetVisible(bool, bool);
