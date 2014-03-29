@@ -1,14 +1,51 @@
 /**
 Class for the Game object
 */
-
 #include "fitashape/Game.h"
 
 
+<<<<<<< HEAD
 
 std::string hostname = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
 ViconDataStreamSDK::CPP::Client MyClient;
 
+=======
+template<>
+char * MapNode<Player>::getDataString(){
+	std::vector<vector3df> dataPos = data->getPosition();
+
+	float float_array[12];
+	dataPos[0].getAs3Values( &( float_array[0] ) );
+	dataPos[1].getAs3Values( &( float_array[3] ) );
+	dataPos[2].getAs3Values( &( float_array[6] ) );
+	dataPos[3].getAs3Values( &( float_array[9] ) );
+
+    char * data_array = new char[dataLength];
+    memcpy(data_array, float_array, dataLength);        
+    return data_array;
+}
+template<>
+void MapNode<Player>::setData(char * data_array){
+	float float_array[12];
+    memcpy(float_array, data_array, dataLength);
+    std::vector<vector3df> dataPos;
+    dataPos.push_back(vector3df(float_array[0],float_array[1],float_array[2]));
+    dataPos.push_back(vector3df(float_array[3],float_array[4],float_array[5]));
+    dataPos.push_back(vector3df(float_array[6],float_array[7],float_array[8]));
+    dataPos.push_back(vector3df(float_array[9],float_array[10],float_array[11]));
+    data->setPosition(dataPos);
+}
+
+char * RELAY_IP;
+std::string hostname = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
+ViconDataStreamSDK::CPP::Client MyClient;
+
+double frustum_left,frustum_right,frustum_bottom,frustum_top;
+int screen_width,screen_height;
+
+DGR_framework * myDGR;
+
+>>>>>>> dgr_implementation
 
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
@@ -23,7 +60,116 @@ const char *nameList[] = {
 
 std::vector<std::string> names(nameList,end(nameList));
 
+<<<<<<< HEAD
 Game::Game(bool isLocal){
+=======
+
+int viconInit()
+{
+    // Connect to a server
+    std::cout << "Connecting to " << hostname.c_str() << " ..." << std::flush;
+	int attemptConnectCount = 0;
+	const int MAX_CONNECT_ATTEMPTS=2;
+    while( !MyClient.IsConnected().Connected && attemptConnectCount < MAX_CONNECT_ATTEMPTS)
+    {
+		attemptConnectCount++;
+		bool ok = false;
+		ok =( MyClient.Connect( hostname ).Result == Result::Success );
+		if(!ok)
+			std::cout << "Warning - connect failed..." << std::endl;
+		std::cout << ".";
+		sleep(1);
+    }
+	if(attemptConnectCount == MAX_CONNECT_ATTEMPTS)
+	{
+		printf("Giving up making connection to Vicon system\n");
+		return 1;
+	}
+    std::cout << std::endl;
+/* TODO: bjnix at mtu dot edu | 11.13.2013
+	add enumeration for input, so as to let user input what types of data to enable
+*/
+    // Enable some different data types
+    MyClient.EnableSegmentData();
+    //MyClient.EnableMarkerData();
+    //MyClient.EnableUnlabeledMarkerData();
+    //MyClient.EnableDeviceData();
+
+    std::cout << "Segment Data Enabled: "          << Adapt( MyClient.IsSegmentDataEnabled().Enabled )         << std::endl;
+    std::cout << "Marker Data Enabled: "           << Adapt( MyClient.IsMarkerDataEnabled().Enabled )          << std::endl;
+    std::cout << "Unlabeled Marker Data Enabled: " << Adapt( MyClient.IsUnlabeledMarkerDataEnabled().Enabled ) << std::endl;
+    std::cout << "Device Data Enabled: "           << Adapt( MyClient.IsDeviceDataEnabled().Enabled )          << std::endl;
+
+    // Set the streaming mode
+    //MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPull );
+    // MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPullPreFetch );
+    MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ServerPush );
+
+    // Set the global up axis
+    MyClient.SetAxisMapping( Direction::Forward, 
+                             Direction::Left, 
+                             Direction::Up ); // Z-up
+    // MyClient.SetGlobalUpAxis( Direction::Forward, 
+    //                           Direction::Up, 
+    //                           Direction::Right ); // Y-up
+
+    Output_GetAxisMapping _Output_GetAxisMapping = MyClient.GetAxisMapping();
+    std::cout << "Axis Mapping: X-" << Adapt( _Output_GetAxisMapping.XAxis ) 
+			  << " Y-" << Adapt( _Output_GetAxisMapping.YAxis ) 
+			  << " Z-" << Adapt( _Output_GetAxisMapping.ZAxis ) << std::endl;
+
+    // Discover the version number
+    Output_GetVersion _Output_GetVersion = MyClient.GetVersion();
+    std::cout << "Version: " << _Output_GetVersion.Major << "." 
+			  << _Output_GetVersion.Minor << "." 
+			  << _Output_GetVersion.Point << std::endl;
+	return 0;
+}
+void viconExit(void)
+{
+    MyClient.DisableSegmentData();
+//    MyClient.DisableMarkerData();
+//    MyClient.DisableUnlabeledMarkerData();
+//    MyClient.DisableDeviceData();
+
+	// TODO: Disconnect seems to cause a hang. -Scott Kuhl
+    // Disconnect and dispose
+    int t = clock();
+    std::cout << " Disconnecting..." << std::endl;
+    MyClient.Disconnect();
+    int dt = clock() - t;
+    double secs = (double) (dt)/(double)CLOCKS_PER_SEC;
+    std::cout << " Disconnect time = " << secs << " secs" << std::endl;
+}
+
+Game::Game(bool isLocal, char* relay_ip){
+	myDGR = new DGR_framework(relay_ip);
+
+	gameOver = true;
+	zen = 50;
+	timesUp = 10;
+	score = 0;
+	toExit = false;
+	pause = true;
+	local = isLocal;
+	run();
+}
+
+Game::Game(
+	bool isLocal, 
+	char* f_left, char* f_right, char* f_bottom, char* f_top,   //frustum
+	char* s_width, char* s_height)  							//dimentions
+{
+	myDGR = new DGR_framework();
+	frustum_left = atof(f_left);
+	frustum_right = atof(f_right);
+	frustum_bottom = atof(f_bottom);
+	frustum_top = atof(f_top);
+
+	screen_width = atof(s_width);
+	screen_height = atof(s_height);
+
+>>>>>>> dgr_implementation
 	gameOver = true;
 	zen = 50;
 	timesUp = 5;
@@ -34,8 +180,11 @@ Game::Game(bool isLocal){
 	run();
 }
 
+
+
 Game::~Game(void){
 	delete p1;
+	delete myDGR;
 }
 
 /*
@@ -89,12 +238,14 @@ int Game::run(){
 
 	if(!local){
 		//using the tracking system
-	
+		#ifdef DGR_MASTER//master
 		std::cout << "calling viconInit() \n"<< std::flush;
 		//get the initial setup for the player if using tracking system
 		if(viconInit() != 0)
-		{ gameOver = true;}
-
+			{ gameOver = true;}
+		atexit(viconExit);
+		#else //slave
+		#endif
 
 		//sets up the player's body and stuff - Now done in the menu 
 		//startLocation();	
@@ -102,7 +253,19 @@ int Game::run(){
 		p1->localInitPos();
 		//then sets up the body, arms, and legs
 		p1->initializePosition();
+		myDGR->addNode<Player>("Player1",p1,sizeof(float)*12);
 
+
+<<<<<<< HEAD
+		//sets up the player's body and stuff - Now done in the menu 
+		//startLocation();	
+		//printf("Done calibrating\n");
+		p1->localInitPos();
+		//then sets up the body, arms, and legs
+		p1->initializePosition();
+
+=======
+>>>>>>> dgr_implementation
 		std::cout << "Just finished Method Calls \n"<< std::flush;
 	}else{
 		//manually set the initial position of the limbs
@@ -133,23 +296,36 @@ int Game::run(){
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
 	p1->setTargetVisible(false, gameOver);
+<<<<<<< HEAD
 	
 	ITexture* background = driver->getTexture("../assets/Background(small).png");
 
+=======
+>>>>>>> dgr_implementation
 	while(device->run() && !toExit)
 	{
 		//move the orbs around
 		if(local)
 			moveKeyboard(receiver);
 		else
+
+
 			motionTracking();
 
+<<<<<<< HEAD
 		if(p1->jump() && !gameOver && !pause){
 			printf("JUMPED\n");
 			myClock->stop();
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
 		}
+=======
+
+		/*if(p1->jump()){
+			pause = true;
+			p1->setTargetVisible(false, gameOver);
+		}//*/
+>>>>>>> dgr_implementation
 		//normal scoring while the game runs
 		if(!pause){
 			//update the clock and check for win/lose
@@ -174,7 +350,6 @@ int Game::run(){
 	/*
 	In the end, delete the Irrlicht device.
 	*/
-	viconExit();
 	device->drop();
 	return 0;
 }
@@ -212,10 +387,10 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 
 }
 
-
 void Game::motionTracking(){
 	vector3df temp[4];
 	bool OccludedMarker = true;	
+#ifdef DGR_MASTER
 	while(OccludedMarker){
 		OccludedMarker = false;
 		while(MyClient.GetFrame().Result != Result::Success) 
@@ -241,17 +416,48 @@ void Game::motionTracking(){
 			}
 			else
 			{ 
+<<<<<<< HEAD
 				//std::cout<<names[i]<<" occluded!"<< std::endl; 
+=======
+				std::cout<<names[i]<<" IS occluded!"<< std::endl; 
+>>>>>>> dgr_implementation
 				OccludedMarker = true;
 				break;
 			}
 		}
 	}
-	p1->setPositions(temp);
 
+<<<<<<< HEAD
 	p1->updateBody();
 
+=======
+	p1->setPosition(temp);
+#else
+	// The slave automatically shuts itself off if it hasn't received
+       	// any packets within a few seconds (it gives itself longer if it
+       	// hasn't received any packets at all yet)
+       	// Assumes a 60fps framerate
+    	framesPassed++;
+    	if (myDGR->recvPack[0]){
+       
+        	if (framesPassed > 180) {
+            		//printf("DGR has revieved a packet and is timing out\n");
+            		exit(EXIT_SUCCESS);
+        	}
+    	} 
+    	else{
+        
+        	if (framesPassed > 900){
+        					//printf("DGR has not revieved a packet and is timing out\n");
+        		exit(EXIT_SUCCESS); 	// If your program takes a very long time to initialize,
+                                                // you can increase this value so the slaves don't prematurely
+                                                // shut themselves off.
+        	}
+    	}
+#endif
+>>>>>>> dgr_implementation
 }
+
 
 /*
 This method creates our clock object and displays it in the title bar
@@ -276,7 +482,11 @@ void Game::retryMenu(){
 		case 1:
 			gameOver = false;
 			zen = 50;
+<<<<<<< HEAD
 			timesUp = 5;
+=======
+			timesUp = 10;
+>>>>>>> dgr_implementation
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
@@ -294,7 +504,10 @@ void Game::pauseMenu(){
 	switch(p1->pauseCollide()){
 		case 1:
 			pause = false;
+<<<<<<< HEAD
 			myClock->start();
+=======
+>>>>>>> dgr_implementation
 			p1->setTargetVisible(true, gameOver);
 			break;
 		case 2:
@@ -307,7 +520,11 @@ void Game::pauseMenu(){
 			}
 			gameOver = false;
 			zen = 50;
+<<<<<<< HEAD
 			timesUp = 5;
+=======
+			timesUp = 10;
+>>>>>>> dgr_implementation
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
@@ -483,9 +700,15 @@ void Game::startLocation(){
 		smgr->drawAll(); 
 		driver->endScene();
 
+		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
+<<<<<<< HEAD
 		if(0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
+=======
+
+		if(temp != 0 && 0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
+>>>>>>> dgr_implementation
 			printf("CHECK 1\n");
 			LHpos1 = p1->LH.node->getPosition();
 			RHpos1 = p1->RH.node->getPosition();
@@ -500,9 +723,15 @@ void Game::startLocation(){
 		smgr->drawAll();
 		driver->endScene();
 	
+		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
+<<<<<<< HEAD
 		if(1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+=======
+
+		if(temp != 1 && 1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+>>>>>>> dgr_implementation
 			printf("CHECK 2\n");
 			LHpos2 = p1->LH.node->getPosition();
 			RHpos2 = p1->RH.node->getPosition();
@@ -517,9 +746,15 @@ void Game::startLocation(){
 		smgr->drawAll();
 		driver->endScene();
 
+		
 		//call the motion tracking method to get up to date locaitons
 		motionTracking();
+<<<<<<< HEAD
 		if(2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+=======
+
+		if(temp != 2 && 2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+>>>>>>> dgr_implementation
 			printf("CHECK 3\n");
 			LHpos3 = p1->LH.node->getPosition();
 			RHpos3 = p1->RH.node->getPosition();
@@ -573,83 +808,7 @@ void Game::startLocation(){
 
 	return;
 }
-int Game::viconInit()
-{
-    // Connect to a server
-    std::cout << "Connecting to " << hostname.c_str() << " ..." << std::flush;
-	int attemptConnectCount = 0;
-	const int MAX_CONNECT_ATTEMPTS=2;
-    while( !MyClient.IsConnected().Connected && attemptConnectCount < MAX_CONNECT_ATTEMPTS)
-    {
-		attemptConnectCount++;
-		bool ok = false;
-		ok =( MyClient.Connect( hostname ).Result == Result::Success );
-		if(!ok)
-			std::cout << "Warning - connect failed..." << std::endl;
-		std::cout << ".";
-		sleep(1);
-    }
-	if(attemptConnectCount == MAX_CONNECT_ATTEMPTS)
-	{
-		printf("Giving up making connection to Vicon system\n");
-		return 1;
-	}
-    std::cout << std::endl;
-/* TODO: bjnix at mtu dot edu | 11.13.2013
-	add enumeration for input, so as to let user input what types of data to enable
-*/
-    // Enable some different data types
-    MyClient.EnableSegmentData();
-    //MyClient.EnableMarkerData();
-    //MyClient.EnableUnlabeledMarkerData();
-    //MyClient.EnableDeviceData();
 
-    std::cout << "Segment Data Enabled: "          << Adapt( MyClient.IsSegmentDataEnabled().Enabled )         << std::endl;
-    std::cout << "Marker Data Enabled: "           << Adapt( MyClient.IsMarkerDataEnabled().Enabled )          << std::endl;
-    std::cout << "Unlabeled Marker Data Enabled: " << Adapt( MyClient.IsUnlabeledMarkerDataEnabled().Enabled ) << std::endl;
-    std::cout << "Device Data Enabled: "           << Adapt( MyClient.IsDeviceDataEnabled().Enabled )          << std::endl;
-
-    // Set the streaming mode
-    //MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPull );
-    // MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ClientPullPreFetch );
-    MyClient.SetStreamMode( ViconDataStreamSDK::CPP::StreamMode::ServerPush );
-
-    // Set the global up axis
-    MyClient.SetAxisMapping( Direction::Forward, 
-                             Direction::Left, 
-                             Direction::Up ); // Z-up
-    // MyClient.SetGlobalUpAxis( Direction::Forward, 
-    //                           Direction::Up, 
-    //                           Direction::Right ); // Y-up
-
-    Output_GetAxisMapping _Output_GetAxisMapping = MyClient.GetAxisMapping();
-    std::cout << "Axis Mapping: X-" << Adapt( _Output_GetAxisMapping.XAxis ) 
-			  << " Y-" << Adapt( _Output_GetAxisMapping.YAxis ) 
-			  << " Z-" << Adapt( _Output_GetAxisMapping.ZAxis ) << std::endl;
-
-    // Discover the version number
-    Output_GetVersion _Output_GetVersion = MyClient.GetVersion();
-    std::cout << "Version: " << _Output_GetVersion.Major << "." 
-			  << _Output_GetVersion.Minor << "." 
-			  << _Output_GetVersion.Point << std::endl;
-	return 0;
-}
-void Game::viconExit()
-{
-    MyClient.DisableSegmentData();
-//    MyClient.DisableMarkerData();
-//    MyClient.DisableUnlabeledMarkerData();
-//    MyClient.DisableDeviceData();
-
-	// TODO: Disconnect seems to cause a hang. -Scott Kuhl
-    // Disconnect and dispose
-    int t = clock();
-    std::cout << " Disconnecting..." << std::endl;
-    MyClient.Disconnect();
-    int dt = clock() - t;
-    double secs = (double) (dt)/(double)CLOCKS_PER_SEC;
-    std::cout << " Disconnect time = " << secs << " secs" << std::endl;
-}
 /*
 // an atexit() callback:
 void exitCallback()

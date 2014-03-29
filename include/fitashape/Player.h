@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream>
+//#include <iostream>
 #include <vector>
 
 #include "irrlicht/irrlicht.h"
@@ -54,8 +54,12 @@ private:
 	CircleNode ExitGame;
 	CircleNode Select;
 
+<<<<<<< HEAD
 	double mid(double a,double b);
 	double abs(double number);
+=======
+	
+>>>>>>> dgr_implementation
 
 	//0=LeftHand, 1=RightHand, 2=LeftFoot 3=RightFoot
 	//4=LeftShoulder, 5=RightShoulder 6=LeftHip
@@ -83,13 +87,16 @@ public:
 	void drawTargets();
 	void drawLimbs();
 	bool collide (CircleNode node);
-	void setPosition(std::vector<vector3df> vec);
 	bool collideAll();
+
 	void setCurrentLH();
 	void setCurrentRH();
 	void setCurrentLF();
 	void setCurrentRF();
-	void setPositions(vector3df pos[4]);
+	void setPosition(std::vector<vector3df> vec);
+	void setPosition(vector3df pos[4]);
+	std::vector<vector3df> getPosition();
+	
 	void localInitPos();	
 	void addCameraScene();
 	void setTargetVisible(bool, bool);
@@ -98,7 +105,10 @@ public:
 	int pauseCollide();
 	bool jump();
 	void setMenu();
+<<<<<<< HEAD
 	void updateBody();
+=======
+>>>>>>> dgr_implementation
 
 
 };

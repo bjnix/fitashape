@@ -1,3 +1,4 @@
+
 /**
 Class for the player object
 **/
@@ -225,7 +226,11 @@ void Player::drawTargets(){
 	RestartYes.setTarget(&LH);
 	RestartYes.node->setPosition(core::vector3df(-20, 10, 30));
 	RestartYes.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+<<<<<<< HEAD
 	//RestartYes.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+=======
+	RestartYes.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+>>>>>>> dgr_implementation
 	RestartYes.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	RestartYes.node->setVisible(false);
 
@@ -233,7 +238,11 @@ void Player::drawTargets(){
 	RestartNo.setTarget(&RH);
 	RestartNo.node->setPosition(core::vector3df(20,10,30));
 	RestartNo.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
+<<<<<<< HEAD
 	//RestartNo.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+=======
+	RestartNo.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+>>>>>>> dgr_implementation
 	RestartNo.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	RestartNo.node->setVisible(false);
 
@@ -241,7 +250,11 @@ void Player::drawTargets(){
 	NewGame.setTarget(&LH);
 	NewGame.node->setPosition(core::vector3df(-10, 10, 30));
 	NewGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+<<<<<<< HEAD
 	//NewGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+=======
+	NewGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+>>>>>>> dgr_implementation
 	NewGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	NewGame.node->setVisible(false);
 
@@ -249,7 +262,11 @@ void Player::drawTargets(){
 	ResumeGame.setTarget(&LH);
 	ResumeGame.node->setPosition(core::vector3df(-10, 13, 30));
 	ResumeGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+<<<<<<< HEAD
 	//ResumeGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+=======
+	ResumeGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+>>>>>>> dgr_implementation
 	ResumeGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	ResumeGame.node->setVisible(false);
 
@@ -257,7 +274,11 @@ void Player::drawTargets(){
 	ExitGame.setTarget(&LH);
 	ExitGame.node->setPosition(core::vector3df(-10, 8, 30));
 	ExitGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
+<<<<<<< HEAD
 	//ExitGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+=======
+	ExitGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
+>>>>>>> dgr_implementation
 	ExitGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	ExitGame.node->setVisible(false);
 
@@ -265,7 +286,11 @@ void Player::drawTargets(){
 	Select.setTarget(&RH);
 	Select.node->setPosition(core::vector3df(0,10,30));
 	Select.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
+<<<<<<< HEAD
 	//Select.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+=======
+	Select.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+>>>>>>> dgr_implementation
 	Select.node->setMaterialFlag(video::EMF_LIGHTING, false);
 	Select.node->setVisible(false);
 }
@@ -340,6 +365,24 @@ void Player::setPosition(std::vector<vector3df> vec){
 	LF.node->setPosition(vec[2]);
 	RF.node->setPosition(vec[3]);
 }
+void Player::setPosition(vector3df pos[4]){
+	LH.setPosition(pos[0]);
+	RH.setPosition(pos[1]);
+	LF.setPosition(pos[2]);
+	RF.setPosition(pos[3]);
+}
+/*
+Medthod to get the position of all if the limbs. returns a vector of vector3df's
+with left hand, right hand, left foot, right foot.
+*/
+std::vector<vector3df> Player::getPosition(){
+	std::vector<vector3df> position;
+		position.push_back(LH.node->getPosition());
+		position.push_back(RH.node->getPosition());
+		position.push_back(LF.node->getPosition());
+		position.push_back(RF.node->getPosition());
+	return position;
+}
 
 /*
 method to update/check if all the orbs are touching their targets
@@ -388,16 +431,7 @@ void Player::setCurrentRF(){
 	current = RF;
 }
 
-/*
-method to set the the positions of all the nodes. Pass an array of the positions with 
-0 = LH, 1 = RH, 2 = LF, 3 = RF
-*/
-void Player::setPositions(vector3df pos[4]){
-	LH.setPosition(pos[0]);
-	RH.setPosition(pos[1]);
-	LF.setPosition(pos[2]);
-	RF.setPosition(pos[3]);
-}
+
 
 /*
 method to store the initial positions into the array for local use
@@ -478,8 +512,12 @@ int Player::pauseCollide(){
 }
 
 bool Player::jump(){
+<<<<<<< HEAD
 	//printf("ground = %f, LF = %f, RF = %f\n",ground,LF.getPosition().Y,RF.getPosition().Y);
 	if(LF.getPosition().Y > ground + .75 && RF.getPosition().Y > ground + .75)
+=======
+	if(LF.getPosition().Y + 1 > ground && RF.getPosition().Y + 1 > ground)
+>>>>>>> dgr_implementation
 		return true;
 
 	return false;
@@ -495,6 +533,7 @@ void Player::setMenu(){
 	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
 }
 
+<<<<<<< HEAD
 /*
   update the location and rotation of the body object to make it look like it is accurate
 */
@@ -528,3 +567,5 @@ double Player::abs(double number){
 		return number * -1;
 	return number;
 }
+=======
+>>>>>>> dgr_implementation
