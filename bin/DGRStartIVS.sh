@@ -18,6 +18,7 @@ ls
 echo
 DEST_DIR=/research/bjnix/temp-fitashape-dgr
 DEST_BIN=/research/bjnix/temp-fitashape-dgr/bin
+IRR_LIB=/research/bjnix/libIrrlicht.a
 
 echo "I will recursively copy the above files into:"
 echo "bjnix@${IVS_HOSTNAME}:${DEST_DIR}"
@@ -26,15 +27,17 @@ read
 
 echo "You may have to enter your password multiple times..."
 # make directory in case it doesn't exist
-ssh bjnix@${IVS_HOSTNAME} mkdir -p $DEST_DIR
+ssh bjnix@${IVS_HOSTNAME} mkdir -p ${DEST_DIR}
 # recursively copy files over.
 #scp -r * "bjnix@${IVS_HOSTNAME}:$DEST_DIR"
-#cd ../
-#rsync -ah -e ssh --exclude=.svn --exclude=.git --exclude=libIrrlicht.a --checksum --partial --no-whole-file --inplace --progress . ${IVS_HOSTNAME}:$DEST_DIR
-#cd ./bin
+cd ../
+rsync -ah -e ssh --exclude=.svn --exclude=.git --exclude --exclude./lib/irrlicht/libIrrlicht.a --exclude=fitashape_* --checksum --partial --no-whole-file --inplace --progress . ${IVS_HOSTNAME}:{$DEST_DIR}
+cd /bin
+#copy fitashape/lib/irrlicht/libIrrlicht.a
+ssh bjnix@${IVS_HOSTNAME} "rsync -ah -e ssh --checksum --partial --no-whole-file --inplace --progress ${IRR_LIB} ${DEST_DIR}/lib/irrlicht/"
 
 # recompile for safety's sake
-#    ssh bjnix@${IVS_HOSTNAME} "cd ${DEST_DIR}/bin && make"
+   ssh bjnix@${IVS_HOSTNAME} "cd ${DEST_DIR}/bin && make"
 	
 make
 # Run the relay on ivs.research.mtu.edu. Relay broadcasts data on infiniband network.
