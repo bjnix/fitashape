@@ -429,7 +429,7 @@ void Player::addCameraScene(){
 	//myCamera->setProjectionMatrix(MyMatrix);
 
 
-
+	printf("initLoc[8] (%f,%f,%f)",initLoc[8].X,initLoc[8].Y,initLoc[8].Z);
 	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 }
 

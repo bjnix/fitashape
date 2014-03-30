@@ -191,8 +191,12 @@ int Game::run(){
 	std::cout << "creating the event reciever for KB \n"<< std::flush;
 	
 	// create reciever and device
-	//device = createDevice(driverType,core::dimension2d<u32>(1920*6, 1080*4), 16, false, false, false, &receiver);
+	#ifdef DGR_MASTER
 	device = createDevice(driverType,core::dimension2d<u32>(1440, 540), 16, false, false, false, &receiver);
+	#else
+	device = createDevice(driverType,core::dimension2d<u32>(11520, 4320), 16, false, false, false, &receiver);
+	#endif
+
 	if (device == 0)
 		return 1; // could not create selected device.
 	
@@ -209,11 +213,19 @@ int Game::run(){
 	//myCamera->setProjectionMatrix(MyMatrix);
 
 	//create basic camera
-	smgr->addCameraSceneNode();
+	float x = 0;
+	float y = 0;
+	float z = 1.5;
 
+	ICameraSceneNode *myCamera;
+	irr::core::CMatrix4<float> MyMatrix;
+	#ifdef DGR_MASTER
+	myCamera = smgr->addCameraSceneNode();
+	#else
+	myCamera = smgr->addCameraSceneNode(/*0,vector3df(screen_width, screen_height, 0),vector3df(screen_width, screen_height, 30)*/);
+	#endif
 	//creates the clock.
 	createClock();
-	printf("lolz\n");
 	zenBar = driver->getTexture("../assets/Scroll.png");
 
 	std::cout << "creating the player object \n"<< std::flush;
@@ -272,7 +284,11 @@ int Game::run(){
 	myClock->setTime(0);
 	p1->setTargetVisible(false, gameOver);
 	
+	#ifdef DGR_MASTER
 	background = driver->getTexture("../assets/Background(small).png");
+	#else
+	background = driver->getTexture("../assets/Background(Fitashape).png");
+	#endif
 
 	while(device->run() && !toExit)
 	{
@@ -756,7 +772,11 @@ void exitCallback()
 void Game::drawObjects(){
 	driver->beginScene(true, true, video::SColor(255,113,113,133));
 	//draw the background
+	#ifdef DGR_MASTER
 	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+	#else
+	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+	#endif
 	smgr->drawAll(); // draw the 3d scene
 	driver->endScene();
 }

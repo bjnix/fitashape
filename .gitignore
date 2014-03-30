@@ -29,9 +29,7 @@ out
 .fuse_hidden*
 
 # Specific files
-libIrrlicht.a
-
-bin/fitashape
+lib/irrlicht/libIrrlicht.a
 
 *_S
 *_M
