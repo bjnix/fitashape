@@ -54,8 +54,8 @@ private:
 	bool pause;
 	bool local;
 	ITexture * zenBar;
-	
-
+	//vector<ITexture*> zenBackgrounds;
+	ITexture* * zenBackgrounds;
 
 public:
 
