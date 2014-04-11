@@ -57,26 +57,7 @@ void Player::initializePosition(){
 	initLoc[7] = RHip;
 	initLoc[8] = centerBody;
 	
-	//add the body
-	IMesh* mesh = smgr->getMesh("../assets/circle-stick.3ds");
-	if (!mesh)
-	{
-		printf("mesh did not work\n");
-		exit(-1);
-	}
-	printf("mesh worked\n");
-	body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
-	if (body)
-	{
-		body->setMaterialFlag(EMF_LIGHTING, false);
-		printf("body worked\n");	
-	}
-	else{
-		printf("body did not work\n");
-		exit(-1);
-	}
-	double scale = (LShoulder.Y - LArm)/5.0;
-	body->setScale(vector3df(scale,scale,scale));
+
 }
 
 
@@ -447,6 +428,8 @@ void Player::setTargetVisible(bool visibility, bool resume){
 	ResumeGame.node->setVisible(!visibility && !resume);
 	ExitGame.node->setVisible(!visibility);
 	Select.node->setVisible(!visibility);
+
+	body->setVisible(visibility);
 }
 
 /*
@@ -556,4 +539,33 @@ double Player::abs(double number){
 	if(number < 0)
 		return number * -1;
 	return number;
+}
+
+void Player::createBody(){
+	//add the body
+	IMesh* mesh = smgr->getMesh("../assets/circle-stick.3ds");
+	if (!mesh)
+	{
+		printf("mesh did not work\n");
+		exit(-1);
+	}
+	printf("mesh worked\n");
+	body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+	if (body)
+	{
+		body->setMaterialFlag(EMF_LIGHTING, false);
+		printf("body worked\n");	
+	}
+	else{
+		printf("body did not work\n");
+		exit(-1);
+	}
+}
+
+void Player::bodyScale(){
+	if (body){
+		body->setPosition(vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+		double scale = (initLoc[4].Y - initLoc[0].getDistanceFrom(initLoc[4]))/5.0;
+		body->setScale(vector3df(scale,scale,scale));
+	}
 }

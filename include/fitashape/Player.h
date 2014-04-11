@@ -101,8 +101,9 @@ public:
 	int pauseCollide();
 	bool jump();
 	void setMenu();
+	void createBody();
 	void updateBody();
-
+	void bodyScale();
 
 };
 
