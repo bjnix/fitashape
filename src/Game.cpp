@@ -135,6 +135,7 @@ Game::Game(bool isLocal, char* relay_ip){
 
 	gameOver = true;
 	zen = 50;
+	zenBarSize = 50;
 	timesUp = 10;
 	score = 0;
 	toExit = false;
@@ -160,6 +161,7 @@ Game::Game(
 
 	gameOver = true;
 	zen = 50;
+	zenBarSize = 50;
 	timesUp = 5;
 	score = 0;
 	toExit = false;
@@ -486,6 +488,7 @@ void Game::pauseMenu(){
 			}
 			gameOver = false;
 			zen = 50;
+			zenBarSize = 50;
 			timesUp = 5;
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
@@ -790,13 +793,31 @@ void exitCallback()
 */
 
 void Game::drawObjects(){
+	
 	driver->beginScene(true, true, video::SColor(255,113,113,133));
+	
+	int x1 = 520, y1 = 0, x2 = 920, y2 = 70;
+	int color;
+	
 	//draw the background
 	#ifdef DGR_MASTER
 	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 	#else
 	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 	#endif
+	
 	smgr->drawAll(); // draw the 3d scene
+	
+
+	//driver->enableMaterial2D();
+	if(!gameOver){//zen bar stuff
+		if(zenBarSize < zen - 1)
+			zenBarSize++;
+		else if(zenBarSize > zen)
+			zenBarSize--;
+		driver->draw2DImage(zenBar, rect<s32>(x1, y1, x2, y2), rect<s32>(0, 0, 1780, 300), NULL, NULL, true);
+		color = 255 - (zenBarSize * 2.55);
+		driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+37, y1+22, x1 +37 + (zenBarSize * 3.3), y2-27), NULL);
+	}
 	driver->endScene();
 }

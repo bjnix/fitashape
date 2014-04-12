@@ -49,6 +49,7 @@ namespace
 class Game
 {
 private:
+	int zenBarSize;
 	bool gameOver;
 	bool toExit;
 	bool pause;

@@ -32,7 +32,8 @@ int main(int argc, char* argv[])
 	{	
 		local = true;
 	}
-	local = false;
+	else
+		local = false;
 	#ifdef DGR_MASTER
 	
 	if( (local && (argc < 3)) || (!local && (argc < 2)))
