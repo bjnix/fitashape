@@ -503,6 +503,7 @@ void Player::setMenu(){
 	py = LF.getPosition().Y;
 	Select.setPosition(vector3df(px + 3, py + 12, 30));
 	NewGame.setPosition(vector3df(px -5, py + 12, 30));
+	bNewGame->setPosition(vector3df(px -5, py + 11, 29));
 	ResumeGame.setPosition(vector3df(px - 5, py + 15, 30));
 	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
 }
@@ -569,6 +570,7 @@ void Player::createButtons(){
 	IMesh* mesh = smgr->getMesh("../assets/New.3ds");
 	bNewGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(NewGame.getPosition().X, NewGame.getPosition().Y, 31));
 	bNewGame->setMaterialFlag(EMF_LIGHTING, false);
+	bNewGame->setScale(vector3df(2, 2, 2));
 
 	/*Select.setPosition(vector3df(px + 3, py + 12, 30));
 	NewGame.setPosition(vector3df(px -5, py + 12, 30));

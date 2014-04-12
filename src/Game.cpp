@@ -448,7 +448,7 @@ void Game::createClock(){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
-	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/font.xml"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,35));
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/font.xml"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,29));
 }
 
 /*
