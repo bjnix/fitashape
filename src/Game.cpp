@@ -235,12 +235,12 @@ int Game::run(){
 	myCamera = smgr->addCameraSceneNode();
 	#else
 	myCamera = smgr->addCameraSceneNode();
-	printf("*****view port 1: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
+	//printf("*****view port 1: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
 	//myCamera = smgr->addCameraSceneNode(0, core::vector3df(25,0,0), core::vector3df(25,0,30));
-	int width = 11520;
-	int height = 4320;
-	driver->setViewPort(rect<s32>(-width/2,0,width,height/2));
-	printf("*****view port 2: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
+	//int width = 11520;
+	//int height = 4320;
+	//driver->setViewPort(rect<s32>(-width/2,0,width,height/2));
+	//printf("*****view port 2: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
 
 	//myCamera = smgr->addCameraSceneNode(/*0,vector3df(screen_width, screen_height, 0),vector3df(screen_width, screen_height, 30)*/);
 	#endif
