@@ -210,12 +210,14 @@ int Game::run(){
 	std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::flush;
 
 	zenBackgrounds = new ITexture*[6]();
-	zenBackgrounds[0] = driver->getTexture("../assets/Zen-lvl-1.png");
-	zenBackgrounds[1] = driver->getTexture("../assets/Zen-lvl-2.png");
-	zenBackgrounds[2] = driver->getTexture("../assets/Zen-lvl-3.png");
-	zenBackgrounds[3] = driver->getTexture("../assets/Zen-lvl-4.png");
-	zenBackgrounds[4] = driver->getTexture("../assets/Zen-lvl-5.png");
-	zenBackgrounds[5] = driver->getTexture("../assets/Zen-lvl-6.png");
+	if(!local){
+		zenBackgrounds[0] = driver->getTexture("../assets/Zen-lvl-1.png");
+		zenBackgrounds[1] = driver->getTexture("../assets/Zen-lvl-2.png");
+		zenBackgrounds[2] = driver->getTexture("../assets/Zen-lvl-3.png");
+		zenBackgrounds[3] = driver->getTexture("../assets/Zen-lvl-4.png");
+		zenBackgrounds[4] = driver->getTexture("../assets/Zen-lvl-5.png");
+		zenBackgrounds[5] = driver->getTexture("../assets/Zen-lvl-6.png");
+	}
 
 
 	//ICameraSceneNode *myCamera;
@@ -305,11 +307,13 @@ int Game::run(){
 	myClock->setTime(0);
 	p1->setTargetVisible(false, gameOver);
 	
-	#ifdef DGR_MASTER
-	background = driver->getTexture("../assets/Background(small).png");
-	#else
-	background = driver->getTexture("../assets/Background(Fitashape).png");
-	#endif
+	if(!local){
+		#ifdef DGR_MASTER
+		background = driver->getTexture("../assets/Background(small).png");
+		#else
+		background = driver->getTexture("../assets/Background(Fitashape).png");
+		#endif
+	}
 
 	while(device->run() && !toExit)
 	{
@@ -442,7 +446,7 @@ void Game::createClock(){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
-	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,25,30));
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,35));
 }
 
 /*
@@ -506,6 +510,7 @@ void Game::pauseMenu(){
 			break;
 		case 5://display text for new
 			swprintf(tmp, 100, L"New Game");
+			printf("new game shoudl be here\n");
 			text->setText(tmp);
 			break;
 		case 6: // display text for exit
@@ -594,18 +599,20 @@ void Game::updateClock(){
 		}
 
 		//update background
-		if(zen <= 16){
-			background = zenBackgrounds[0];
-		}else if(zen >= 17 && zen <= 33){
-			background = zenBackgrounds[1];
-		}else if(zen >= 33 && zen <= 50){
-			background = zenBackgrounds[2];
-		}else if(zen >= 50 && zen <= 66){
-			background = zenBackgrounds[3];
-		}else if(zen >= 67 && zen <= 83){
-			background = zenBackgrounds[4];
-		}else if(zen >= 84){
-			background = zenBackgrounds[5];
+		if(!local){
+			if(zen <= 16){
+				background = zenBackgrounds[0];
+			}else if(zen >= 17 && zen <= 33){
+				background = zenBackgrounds[1];
+			}else if(zen >= 33 && zen <= 50){
+				background = zenBackgrounds[2];
+			}else if(zen >= 50 && zen <= 66){
+				background = zenBackgrounds[3];
+			}else if(zen >= 67 && zen <= 83){
+				background = zenBackgrounds[4];
+			}else if(zen >= 84){
+				background = zenBackgrounds[5];
+			}
 		}
 
 
@@ -663,7 +670,8 @@ void Game::startLocation(){
 	vector3df LFpos3;
 	vector3df RFpos3;
 
-	background = driver->getTexture("../assets/Calibration.png");
+	if(!local)
+		background = driver->getTexture("../assets/Calibration.png");
 
 
 	// keeps track of which group we are going to update, and when to move on
@@ -778,7 +786,8 @@ void Game::startLocation(){
 
 	p1->bodyScale();
 
-	background = zenBackgrounds[0];
+	if(!local)
+		background = zenBackgrounds[0];
 
 	return;
 }
@@ -800,13 +809,15 @@ void Game::drawObjects(){
 	int color;
 	
 	//draw the background
-	#ifdef DGR_MASTER
-	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
-	#else
-	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
-	#endif
+	if(!local){
+		#ifdef DGR_MASTER
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+		#else
+		driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+		#endif
+	}
 	
-	smgr->drawAll(); // draw the 3d scene
+	
 	
 
 	//driver->enableMaterial2D();
@@ -819,5 +830,6 @@ void Game::drawObjects(){
 		color = 255 - (zenBarSize * 2.55);
 		driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+37, y1+22, x1 +37 + (zenBarSize * 3.3), y2-27), NULL);
 	}
+	smgr->drawAll(); // draw the 3d scene
 	driver->endScene();
 }
