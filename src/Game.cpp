@@ -446,7 +446,9 @@ void Game::createClock(){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
+	printf("loading font...\n");
 	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,35));
+	printf("font loaded!\n");
 }
 
 /*
