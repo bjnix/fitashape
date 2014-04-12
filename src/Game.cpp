@@ -287,6 +287,8 @@ int Game::run(){
 
 	//set up the target
 	p1->drawTargets();
+
+	p1->createButtons();
 		
 
 	std::cout << "calling randomTargets\n"<< std::flush;
@@ -510,7 +512,6 @@ void Game::pauseMenu(){
 			break;
 		case 5://display text for new
 			swprintf(tmp, 100, L"New Game");
-			printf("new game shoudl be here\n");
 			text->setText(tmp);
 			break;
 		case 6: // display text for exit

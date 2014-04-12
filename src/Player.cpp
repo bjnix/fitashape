@@ -562,6 +562,20 @@ void Player::createBody(){
 	}
 }
 
+void Player::createButtons(){
+	f32 px, py;
+	px = LF.getPosition().X;
+	py = LF.getPosition().Y;
+	IMesh* mesh = smgr->getMesh("../assets/New.3ds");
+	bNewGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(NewGame.getPosition().X, NewGame.getPosition().Y, 31));
+	bNewGame->setMaterialFlag(EMF_LIGHTING, false);
+
+	/*Select.setPosition(vector3df(px + 3, py + 12, 30));
+	NewGame.setPosition(vector3df(px -5, py + 12, 30));
+	ResumeGame.setPosition(vector3df(px - 5, py + 15, 30));
+	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));*/
+}
+
 void Player::bodyScale(){
 	if (body){
 		body->setPosition(vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));

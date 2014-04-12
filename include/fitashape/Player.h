@@ -69,6 +69,7 @@ private:
 	f32 ground; //estimated height of the ground
 
 	IMeshSceneNode* body;
+	IMeshSceneNode* bNewGame, *bResumeGame, *bExitGame, *bSelect;
 
 public:
 	scene::ISceneNode * currentNode();
@@ -104,6 +105,7 @@ public:
 	void createBody();
 	void updateBody();
 	void bodyScale();
+	void createButtons();
 
 };
 
