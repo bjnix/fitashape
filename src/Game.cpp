@@ -778,7 +778,7 @@ void Game::startLocation(){
 
 	p1->bodyScale();
 
-	background = driver->getTexture("../assets/Background(small).png");
+	background = zenBackgrounds[0];
 
 	return;
 }
