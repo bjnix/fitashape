@@ -6,7 +6,7 @@ SLAVEXEC = fitashape_S
 RELYEXEC = fitashape_R
 SRCDIR =../src
 
-RLYSOURCE = $(SRCDIR)/DGRRelay.cpp
+RLYSOURCE = $(SRCDIR)/DGR_relay.cpp
 Sources = Main.cpp Player.cpp Game.cpp CircleNode.cpp DGR_framework.cpp
 
 
