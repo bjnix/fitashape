@@ -193,8 +193,13 @@ int Game::run(){
 	std::cout << "creating the event reciever for KB \n"<< std::flush;
 	
 	// create reciever and device
-	//device = createDevice(driverType,core::dimension2d<u32>(1920*6, 1080*4), 16, false, false, false, &receiver);
+	#ifdef DGR_MASTER
 	device = createDevice(driverType,core::dimension2d<u32>(1440, 540), 16, false, false, false, &receiver);
+	#else
+	device = createDevice(driverType,core::dimension2d<u32>(11520,4320), 16, false, false, false, &receiver);
+	//device = createDevice(driverType,core::dimension2d<u32>(5760,1080), 16, false, false, false, &receiver);
+	#endif
+
 	if (device == 0)
 		return 1; // could not create selected device.
 	
@@ -204,19 +209,43 @@ int Game::run(){
 	
 	std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::flush;
 
+	zenBackgrounds = new ITexture*[6]();
+	zenBackgrounds[0] = driver->getTexture("../assets/Zen-lvl-1.png");
+	zenBackgrounds[1] = driver->getTexture("../assets/Zen-lvl-2.png");
+	zenBackgrounds[2] = driver->getTexture("../assets/Zen-lvl-3.png");
+	zenBackgrounds[3] = driver->getTexture("../assets/Zen-lvl-4.png");
+	zenBackgrounds[4] = driver->getTexture("../assets/Zen-lvl-5.png");
+	zenBackgrounds[5] = driver->getTexture("../assets/Zen-lvl-6.png");
+
+
 	//ICameraSceneNode *myCamera;
 	//irr::core::matrix4 MyMatrix;
 	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
 	//myCamera = smgr->addCameraSceneNode(0,irr::core::vector3df(-14.0f,14.0f,-14.0f),irr::core::vector3df(0,0,0));
-	//myCamera = smgr->addCameraSceneNode();
 	//myCamera->setProjectionMatrix(MyMatrix);
 
 	//create basic camera
-	smgr->addCameraSceneNode();
+	float x = 0;
+	float y = 0;
+	float z = 1.5;
 
+	ICameraSceneNode *myCamera;
+	irr::core::CMatrix4<float> MyMatrix;
+	#ifdef DGR_MASTER
+	myCamera = smgr->addCameraSceneNode();
+	#else
+	myCamera = smgr->addCameraSceneNode();
+	printf("*****view port 1: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
+	//myCamera = smgr->addCameraSceneNode(0, core::vector3df(25,0,0), core::vector3df(25,0,30));
+	int width = 11520;
+	int height = 4320;
+	driver->setViewPort(rect<s32>(-width/2,0,width,height/2));
+	printf("*****view port 2: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
+
+	//myCamera = smgr->addCameraSceneNode(/*0,vector3df(screen_width, screen_height, 0),vector3df(screen_width, screen_height, 30)*/);
+	#endif
 	//creates the clock.
 	createClock();
-	printf("lolz\n");
 	zenBar = driver->getTexture("../assets/Scroll.png");
 
 	std::cout << "creating the player object \n"<< std::flush;
@@ -270,15 +299,23 @@ int Game::run(){
 	
 	std::cout << "just setCurrent\n"<< std::flush;
 
+	p1->createBody();
 
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
 	p1->setTargetVisible(false, gameOver);
 	
-	ITexture* background = driver->getTexture("../assets/Background(small).png");
+	#ifdef DGR_MASTER
+	background = driver->getTexture("../assets/Background(small).png");
+	#else
+	background = driver->getTexture("../assets/Background(Fitashape).png");
+	#endif
 
 	while(device->run() && !toExit)
 	{
+
+		//printf("(x,y,z): (%f,%f,%f)\n",p1->LH.node->getPosition().X,p1->LH.node->getPosition().Y,p1->LH.node->getPosition().Z);
+
 		//move the orbs around
 		if(local)
 			moveKeyboard(receiver);
@@ -349,9 +386,11 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 }
 
 void Game::motionTracking(){
-	vector3df temp[4];
-	bool OccludedMarker = true;	
+	
 #ifdef DGR_MASTER
+	vector3df temp[4];
+	bool OccludedMarker = true;
+
 	while(OccludedMarker){
 		OccludedMarker = false;
 		while(MyClient.GetFrame().Result != Result::Success) 
@@ -377,7 +416,7 @@ void Game::motionTracking(){
 			}
 			else
 			{ 
-				std::cout<<names[i]<<" IS occluded!"<< std::endl; 
+				//std::cout<<names[i]<<" IS occluded!"<< std::endl; 
 				OccludedMarker = true;
 				break;
 			}
@@ -386,28 +425,6 @@ void Game::motionTracking(){
 
 	p1->updateBody();
 	p1->setPosition(temp);
-#else
-	// The slave automatically shuts itself off if it hasn't received
-       	// any packets within a few seconds (it gives itself longer if it
-       	// hasn't received any packets at all yet)
-       	// Assumes a 60fps framerate
-    	framesPassed++;
-    	if (myDGR->recvPack[0]){
-       
-        	if (framesPassed > 180) {
-            		//printf("DGR has revieved a packet and is timing out\n");
-            		exit(EXIT_SUCCESS);
-        	}
-    	} 
-    	else{
-        
-        	if (framesPassed > 900){
-        					//printf("DGR has not revieved a packet and is timing out\n");
-        		exit(EXIT_SUCCESS); 	// If your program takes a very long time to initialize,
-                                                // you can increase this value so the slaves don't prematurely
-                                                // shut themselves off.
-        	}
-    	}
 #endif
 }
 
@@ -513,7 +530,7 @@ This method updates our clock in the title bar
 and also checks to see if we have won depending on the time
 */
 void Game::updateClock(){ 
-	
+
 	wchar_t tmp[255] = {}; //string to display in the tital bar
 	int seconds = (myClock->getTime() / 1000) % 60; //current time
 
@@ -525,6 +542,7 @@ void Game::updateClock(){
 	
 	//check to see if we have ran out of time
 	if(seconds >= timesUp){ 
+	printf("time is up\n");
 		//checks to see if all the nodes match their targets
 		//bool win = p1->collideAll();
 		/*int match = p1->collideNum();
@@ -574,6 +592,23 @@ void Game::updateClock(){
 			default:
 				break;
 		}
+
+		//update background
+		if(zen <= 16){
+			background = zenBackgrounds[0];
+		}else if(zen >= 17 && zen <= 33){
+			background = zenBackgrounds[1];
+		}else if(zen >= 33 && zen <= 50){
+			background = zenBackgrounds[2];
+		}else if(zen >= 50 && zen <= 66){
+			background = zenBackgrounds[3];
+		}else if(zen >= 67 && zen <= 83){
+			background = zenBackgrounds[4];
+		}else if(zen >= 84){
+			background = zenBackgrounds[5];
+		}
+
+
 		if(zen > 100) // so zen cant get above 100%
 			zen = 100;
 		if(zen <= 0){ // if zen <= 0 player loses and game quits
@@ -581,7 +616,7 @@ void Game::updateClock(){
 			gameOver = true;
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
-			//p1->setTargetVisible(false);
+
 		} 
 		p1->randomTargets();
 		//reset the clock
@@ -628,66 +663,81 @@ void Game::startLocation(){
 	vector3df LFpos3;
 	vector3df RFpos3;
 
-	ITexture* background = driver->getTexture("../assets/Calibration(small).png");
+	background = driver->getTexture("../assets/Calibration.png");
 
 
-	//int temp = 0;// keeps track of which group we are going to update
+	// keeps track of which group we are going to update, and when to move on
 	bool one = false;
 	bool two = false;
 	bool three = false;
+	int next = 0;
+	int last = 0;
+
 	myClock->start();// start a clock to keep track of time
 
 	//loop to keep checking the locations of the nodes till they come close to stopping
 	while(moving){
 		myClock->tick();//move the clock
-		printf("Finding body... Stand still! at time %d\n", (myClock->getTime() / 500) % 60);		
+		//printf("Finding body... Stand still! at time %d\n", ((myClock->getTime() / 500) % 60) % 3);		
 
 		//make stuff appear on screen
 		drawObjects();
 
-		//call the motion tracking method to get up to date locaitons
+		//update the signal to the current time
+		next = ((myClock->getTime() / 500) % 10) % 3;
+
+		//call the motion tracking method to get up-to-date locaitons
 		motionTracking();
-		if(0 == ((myClock->getTime() / 500) % 60) % 3){ //check if we want to store this pos
+
+		if(!one && last != next){ //check if we want to store this pos
 			printf("CHECK 1\n");
 			LHpos1 = p1->LH.node->getPosition();
 			RHpos1 = p1->RH.node->getPosition();
 			LFpos1 = p1->LF.node->getPosition();
 			RFpos1 = p1->RF.node->getPosition();
 			one = true;
+			last = next;
 		}
 
 		//make stuff appear on screen
 		drawObjects();
 	
-		//call the motion tracking method to get up to date locaitons
+		//call the motion tracking method to get up-to-date locaitons
 		motionTracking();
-		if(1 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+
+		if(!two && last != next){ //check if we want to store this pos
 			printf("CHECK 2\n");
 			LHpos2 = p1->LH.node->getPosition();
 			RHpos2 = p1->RH.node->getPosition();
 			LFpos2 = p1->LF.node->getPosition();
 			RFpos2 = p1->RF.node->getPosition();
 			two = true;
+			last = next;
 		}
 		
 		//make stuff appear on screen
 		drawObjects();
 
-		//call the motion tracking method to get up to date locaitons
+		//call the motion tracking method to get up-to-date locaitons
 		motionTracking();
-		if(2 == ((myClock->getTime() / 500) % 60) % 3){//check if we want to store this pos
+
+		if(!three && last != next){ //check if we want to store this pos
 			printf("CHECK 3\n");
 			LHpos3 = p1->LH.node->getPosition();
 			RHpos3 = p1->RH.node->getPosition();
 			LFpos3 = p1->LF.node->getPosition();
 			RFpos3 = p1->RF.node->getPosition();
 			three = true;
+			last = next;
 		}
 
 		//make stuff appear on screen
 		drawObjects();
 		
 		if(one && two && three){
+			one = false;
+			two = false;
+			three = false;
 			printf("Found all three\n");
 			//check to see if the player is close to staying still
 			double close = .5; //number to define how close is enough
@@ -706,10 +756,12 @@ void Game::startLocation(){
 						if((LHpos3.Y-RHpos3.Y > -.5 && LHpos3.Y-RHpos3.Y < .5) 
 							&& ((LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) > -.5 && (LHpos3.Y-LFpos3.Y)-(RHpos3.Y-RFpos3.Y) < .5)){
 								moving = false; //they have stopped moving!
-							std::cout<<"T position"<<std::endl;
+							std::cout<<"good position"<<std::endl;
 						}
+						else{std::cout<<"level out hands and feet"<<std::endl;}
 					//}
 			}
+			else{printf("Stand still...\n");}
 		}
 	}
 	//store this position for later use
@@ -720,9 +772,13 @@ void Game::startLocation(){
 	
 	//calls the method that determines what the body looks like
 	p1->initializePosition();
-	return;
+
 	//centers the camera on the players position	
-	p1->addCameraScene();
+	//p1->addCameraScene();
+
+	p1->bodyScale();
+
+	background = driver->getTexture("../assets/Background(small).png");
 
 	return;
 }
@@ -737,9 +793,19 @@ void exitCallback()
 */
 
 void Game::drawObjects(){
+	
 	driver->beginScene(true, true, video::SColor(255,113,113,133));
+	
 	int x1 = 520, y1 = 0, x2 = 920, y2 = 70;
 	int color;
+	
+	//draw the background
+	#ifdef DGR_MASTER
+	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+	#else
+	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+	#endif
+	
 	smgr->drawAll(); // draw the 3d scene
 	
 

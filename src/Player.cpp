@@ -57,26 +57,7 @@ void Player::initializePosition(){
 	initLoc[7] = RHip;
 	initLoc[8] = centerBody;
 	
-	//add the body
-	IMesh* mesh = smgr->getMesh("../assets/circle-stick.3ds");
-	if (!mesh)
-	{
-		printf("mesh did not work\n");
-		exit(-1);
-	}
-	printf("mesh worked\n");
-	body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
-	if (body)
-	{
-		body->setMaterialFlag(EMF_LIGHTING, false);
-		printf("body worked\n");	
-	}
-	else{
-		printf("body did not work\n");
-		exit(-1);
-	}
-	int scale = (LShoulder.Y - LArm)/5;
-	body->setScale(vector3df(scale,scale,scale));
+
 }
 
 
@@ -164,11 +145,11 @@ void Player::randomTargets(){
 	RHTarget.setPosition(vector3df(RHTarget.getPosition().X,RHTarget.getPosition().Y + shift,RHTarget.getPosition().Z));
 	LFTarget.setPosition(vector3df(LFTarget.getPosition().X,LFTarget.getPosition().Y + shift,LFTarget.getPosition().Z));
 	RFTarget.setPosition(vector3df(RFTarget.getPosition().X,RFTarget.getPosition().Y + shift,RFTarget.getPosition().Z));
-	LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
-	RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
-	LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
-	RHip = vector3df(RHip.X,RHip.Y + shift, RHip.Z);
-	centerBody = vector3df(centerBody.X,centerBody.Y + shift, centerBody.Z);
+	//LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
+	//RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
+	//LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
+	//RHip = vector3df(RHip.X,RHip.Y + shift, RHip.Z);
+	//centerBody = vector3df(centerBody.X,centerBody.Y + shift, centerBody.Z);
 }
 
 /*
@@ -429,7 +410,7 @@ void Player::addCameraScene(){
 	//myCamera->setProjectionMatrix(MyMatrix);
 
 
-
+	printf("initLoc[8] (%f,%f,%f)",initLoc[8].X,initLoc[8].Y,initLoc[8].Z);
 	smgr->addCameraSceneNode(0, core::vector3df(initLoc[8].X,initLoc[8].Y+5,0), core::vector3df(initLoc[8].X,initLoc[8].Y+5,initLoc[8].Z));
 }
 
@@ -447,6 +428,8 @@ void Player::setTargetVisible(bool visibility, bool resume){
 	ResumeGame.node->setVisible(!visibility && !resume);
 	ExitGame.node->setVisible(!visibility);
 	Select.node->setVisible(!visibility);
+
+	body->setVisible(visibility);
 }
 
 /*
@@ -504,7 +487,7 @@ int Player::pauseCollide(){
 }
 
 bool Player::jump(){
-	printf("mid: %f, left: %f, right: %f\n", ground, LF.getPosition().Y, RF.getPosition().Y);
+	//printf("mid: %f, left: %f, right: %f\n", ground, LF.getPosition().Y, RF.getPosition().Y);
 	if(LF.getPosition().Y > ground + .5 && RF.getPosition().Y > ground + .5)
 		return true;
 
@@ -556,4 +539,33 @@ double Player::abs(double number){
 	if(number < 0)
 		return number * -1;
 	return number;
+}
+
+void Player::createBody(){
+	//add the body
+	IMesh* mesh = smgr->getMesh("../assets/circle-stick.3ds");
+	if (!mesh)
+	{
+		printf("mesh did not work\n");
+		exit(-1);
+	}
+	printf("mesh worked\n");
+	body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+	if (body)
+	{
+		body->setMaterialFlag(EMF_LIGHTING, false);
+		printf("body worked\n");	
+	}
+	else{
+		printf("body did not work\n");
+		exit(-1);
+	}
+}
+
+void Player::bodyScale(){
+	if (body){
+		body->setPosition(vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+		double scale = (initLoc[4].Y - initLoc[0].getDistanceFrom(initLoc[4]))/5.0;
+		body->setScale(vector3df(scale,scale,scale));
+	}
 }
