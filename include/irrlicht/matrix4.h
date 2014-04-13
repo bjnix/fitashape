@@ -1732,24 +1732,24 @@ namespace core
 		_IRR_DEBUG_BREAK_IF(widthOfViewVolume==0.f); //divide by zero
 		_IRR_DEBUG_BREAK_IF(heightOfViewVolume==0.f); //divide by zero
 		_IRR_DEBUG_BREAK_IF(zNear==zFar); //divide by zero
-		M[0] = (T)(2/widthOfViewVolume);
+		M[0] = (T)(2*zNear/widthOfViewVolume);
 		M[1] = 0;
 		M[2] = 0;
 		M[3] = 0;
 
 		M[4] = 0;
-		M[5] = (T)(2/heightOfViewVolume);
+		M[5] = (T)(2*zNear/heightOfViewVolume);
 		M[6] = 0;
 		M[7] = 0;
 
-		M[8] = 0;
-		M[9] = 0;
-		M[10] = (T)(1/(zFar-zNear));
+		M[8] = (T)((left+right)/(left-right));
+		M[9] = (T)((top+bottom)/(bottom-top));
+		M[10] = (T)(zFar/(zFar-zNear));
 		M[11] = 1;
 
 		M[12] = 0;
 		M[13] = 0;
-		M[14] = (T)(zNear/(zNear-zFar));
+		M[14] = (T)(zNear*zFar/(zNear-zFar));
 		M[15] = 0;
 
 		/*

@@ -34,10 +34,10 @@ char * RELAY_IP;
 std::string hostname = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
 ViconDataStreamSDK::CPP::Client MyClient;
 
-float frustum_left,frustum_right,frustum_bottom,frustum_top,frustum_near,frustum_far;
+f32 frustum_left,frustum_right,frustum_bottom,frustum_top,frustum_near,frustum_far;
 //int screen_width,screen_height;
 
-DGR_framework * myDGR;
+//DGR_framework * myDGR;
 
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
@@ -131,7 +131,7 @@ void viconExit(void)
 }
 
 Game::Game(bool isLocal, char* relay_ip){
-	myDGR = new DGR_framework(relay_ip);
+	//myDGR = new DGR_framework(relay_ip);
 
 	gameOver = true;
 	zen = 50;
@@ -148,11 +148,11 @@ Game::Game(
 	bool isLocal, 
 	char* f_left, char* f_right, char* f_bottom, char* f_top)   //frustum dimentions
 {
-	myDGR = new DGR_framework();
-	frustum_left = atof(f_left);
-	frustum_right = atof(f_right);
-	frustum_bottom = atof(f_bottom);
-	frustum_top = atof(f_top);
+	//myDGR = new DGR_framework();
+	frustum_left = f32(atof(f_left));
+	frustum_right = f32(atof(f_right));
+	frustum_bottom = f32(atof(f_bottom));
+	frustum_top = f32(atof(f_top));
 
 	
 
@@ -172,7 +172,7 @@ Game::Game(
 
 Game::~Game(void){
 	delete p1;
-	delete myDGR;
+	//delete myDGR;
 }
 
 /*
@@ -207,14 +207,14 @@ int Game::run(){
 	
 	std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::flush;
 
-	zenBackgrounds = new ITexture*[6]();
+	/*zenBackgrounds = new ITexture*[6]();
 	zenBackgrounds[0] = driver->getTexture("../assets/Zen-lvl-1.png");
 	zenBackgrounds[1] = driver->getTexture("../assets/Zen-lvl-2.png");
 	zenBackgrounds[2] = driver->getTexture("../assets/Zen-lvl-3.png");
 	zenBackgrounds[3] = driver->getTexture("../assets/Zen-lvl-4.png");
 	zenBackgrounds[4] = driver->getTexture("../assets/Zen-lvl-5.png");
 	zenBackgrounds[5] = driver->getTexture("../assets/Zen-lvl-6.png");
-
+*/
 
 	//ICameraSceneNode *myCamera;
 	//irr::core::matrix4 MyMatrix;
@@ -233,35 +233,57 @@ int Game::run(){
 	myCamera = smgr->addCameraSceneNode();
 	irr::core::matrix4 m = core::IdentityMatrix;
 	
-	frustum_near = 1;
-	frustum_far = 1000;
-	frustum_left = -103*4-x; 
-	frustum_right = 103*4-x; 
-	frustum_bottom = 28-z;
-	frustum_top = 260-z;
+	f32 frustum_near = 30;
+	f32 frustum_far = 400;
+	f32 frustum_left = 0-x; 
+	f32 frustum_right = 103*2-x; 
+	f32 frustum_bottom = 28-z;
+	f32 frustum_top = 260-z;
       // glFustum
-		float E = 2.f*frustum_near / (frustum_right - frustum_left);
-		float F = 2.f*frustum_near / (frustum_top - frustum_bottom);
+		float E = 2.f / (frustum_right - frustum_left);
+		float F = 2.f / (frustum_top - frustum_bottom);
 		float A = (frustum_right + frustum_left) / (frustum_right - frustum_left); 
 		float B = (frustum_top + frustum_bottom) / (frustum_top - frustum_bottom);
 		float C =-1.f*(frustum_far + frustum_near) / (frustum_far - frustum_near);  
 		float D = -2.f*frustum_near*frustum_far / (frustum_far - frustum_near); 
-        m(0,0) = -E;
-        m(1,1) = -F;
-        m(2,2) = -C;
+        m(0,0) = E;
+        m(1,1) = F;
+        m(2,2) = 1/(frustum_far-frustum_near);
         m(3,3) = 0.0f;
-        m(0,2) =  A;
-        m(1,2) =  B;
-        m(2,3) =  D;
-        m(3,2) = 1.f;
-    //myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixOrthoLH((frustum_right - frustum_left), (frustum_top-frustum_bottom), 0.1f,1000.0f));
-    myCamera->setProjectionMatrix(m);
+        m(0,2) =  0;
+        m(1,2) =  0;
+        m(2,3) =  0;
+        m(3,2) = -0.00010001f;
+    myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixFrustumLH(frustum_left , frustum_right, frustum_bottom, frustum_top, frustum_near,frustum_far));
+    //myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixPerspectiveFovLH(1.5,2.7,frustum_near,frustum_far));
+    //MyMatrix = myCamera->getProjectionMatrix();
+    //myCamera->setProjectionMatrix(MyMatrix);
+    //myCamera->setProjectionMatrix(m);
 	//std::cout << "viewFrustum!! MASTER: "<<myCamera->getNearValue()<< std::endl;
-	/*MyMatrix = myCamera->getProjectionMatrix();
-	for(int i = 0; i < 16; i++){
-		std::cout << i << " :" << MyMatrix[i] << " | ";
-	}*/
-	//std::cout << std::endl;
+	
+	std::cout << "orthoLH\n" << "0 :" << MyMatrix[0] << "\t | ";
+	for(int i = 1; i < 16; i++){
+		while((i+1)%4){
+		std::cout << i << " :" << MyMatrix[i] << "\t\t | ";
+		i++;
+		}
+		std::cout << i << " :" << m[i] << "\t\t | "<< std::endl;
+	}
+	std::cout << std::endl << std::endl<< "frustumLH\n";
+	std::cout << "0 :" << m[0] << "\t | ";
+	for(int i = 1; i < 16; i++){
+		while((i+1)%4){
+		std::cout << i << " :" << m[i] << "\t\t | ";
+		i++;
+		}
+		std::cout << i << " :" << m[i] << "\t\t | "<< std::endl;
+	}
+	std::cout << std::endl << std::endl;
+
+	std::cout << "0 diff: " << (MyMatrix[0]-m[0]) << std::endl;
+	std::cout << "5 diff: " << (MyMatrix[5]-m[5]) << std::endl;
+	std::cout << "10 diff: " << (MyMatrix[10]-m[10]) << std::endl;
+	std::cout << "14 diff: " << (MyMatrix[14]-m[14]) << std::endl;
 	#else
 	irr::core::matrix4 m = core::IdentityMatrix;
 	frustum_near = -0.1;
@@ -298,7 +320,7 @@ int Game::run(){
 	#endif
 	//creates the clock.
 	createClock();
-	zenBar = driver->getTexture("../assets/Scroll.png");
+	//zenBar = driver->getTexture("../assets/Scroll.png");
 
 	std::cout << "creating the player object \n"<< std::flush;
 	//create player and draw the limbs
@@ -322,7 +344,7 @@ int Game::run(){
 		p1->localInitPos();
 		//then sets up the body, arms, and legs
 		p1->initializePosition();
-		myDGR->addNode<Player>("Player1",p1,sizeof(float)*12);
+		//myDGR->addNode<Player>("Player1",p1,sizeof(float)*12);
 
 
 		std::cout << "Just finished Method Calls \n"<< std::flush;
@@ -358,9 +380,9 @@ int Game::run(){
 	p1->setTargetVisible(false, gameOver);
 	
 	#ifdef DGR_MASTER
-	background = driver->getTexture("../assets/Background(small).png");
+	//background = driver->getTexture("../assets/Background(small).png");
 	#else
-	background = driver->getTexture("../assets/Background(Fitashape).png");
+	//background = driver->getTexture("../assets/Background(Fitashape).png");
 	#endif
 	//float rotation_camera = 0;
 	//myDGR->addNode<float>("rotation_camera",&rotation_camera); 
@@ -651,7 +673,7 @@ void Game::updateClock(){
 				break;
 		}
 
-		//update background
+		/*//update background
 		if(zen <= 16){
 			background = zenBackgrounds[0];
 		}else if(zen >= 17 && zen <= 33){
@@ -665,7 +687,7 @@ void Game::updateClock(){
 		}else if(zen >= 84){
 			background = zenBackgrounds[5];
 		}
-
+*/
 
 		if(zen > 100) // so zen cant get above 100%
 			zen = 100;
@@ -721,7 +743,7 @@ void Game::startLocation(){
 	vector3df LFpos3;
 	vector3df RFpos3;
 
-	background = driver->getTexture("../assets/Calibration.png");
+	//background = driver->getTexture("../assets/Calibration.png");
 
 
 	// keeps track of which group we are going to update, and when to move on
@@ -836,7 +858,7 @@ void Game::startLocation(){
 
 	p1->bodyScale();
 
-	background = driver->getTexture("../assets/Background(small).png");
+	//background = driver->getTexture("../assets/Background(small).png");
 
 	return;
 }

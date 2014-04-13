@@ -6,6 +6,7 @@
 #include <iostream>
 #include "time.h"
 #include "irrlicht/irrlicht.h"
+#include "irrlicht/irrTypes.h"
 #include "irrlicht/vector3d.h"
 #include "vicon/ViconClient.h"
 #include "fitashape/Player.h"
