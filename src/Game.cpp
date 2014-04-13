@@ -207,20 +207,14 @@ int Game::run(){
 	
 	std::cout << "made a scene manager at location:"<<&smgr << "\n"<< std::flush;
 
-	/*zenBackgrounds = new ITexture*[6]();
+	zenBackgrounds = new ITexture*[6]();
 	zenBackgrounds[0] = driver->getTexture("../assets/Zen-lvl-1.png");
 	zenBackgrounds[1] = driver->getTexture("../assets/Zen-lvl-2.png");
 	zenBackgrounds[2] = driver->getTexture("../assets/Zen-lvl-3.png");
 	zenBackgrounds[3] = driver->getTexture("../assets/Zen-lvl-4.png");
 	zenBackgrounds[4] = driver->getTexture("../assets/Zen-lvl-5.png");
 	zenBackgrounds[5] = driver->getTexture("../assets/Zen-lvl-6.png");
-*/
 
-	//ICameraSceneNode *myCamera;
-	//irr::core::matrix4 MyMatrix;
-	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
-	//myCamera = smgr->addCameraSceneNode(0,irr::core::vector3df(-14.0f,14.0f,-14.0f),irr::core::vector3df(0,0,0));
-	//myCamera->setProjectionMatrix(MyMatrix);
 
 	//create basic camera
 	float x = 0;
@@ -229,98 +223,24 @@ int Game::run(){
 
 	ICameraSceneNode *myCamera;
 	irr::core::CMatrix4<float> MyMatrix;
-	#ifdef DGR_MASTER
 	myCamera = smgr->addCameraSceneNode();
-	irr::core::matrix4 m = core::IdentityMatrix;
-	
 	f32 frustum_near = 30;
 	f32 frustum_far = 400;
-	f32 frustum_left = 0-x; 
+
+	#ifdef DGR_MASTER
+	
+	f32 frustum_left = -103*2-x; 
 	f32 frustum_right = 103*2-x; 
 	f32 frustum_bottom = 28-z;
 	f32 frustum_top = 260-z;
-      // glFustum
-		float E = 2.f / (frustum_right - frustum_left);
-		float F = 2.f / (frustum_top - frustum_bottom);
-		float A = (frustum_right + frustum_left) / (frustum_right - frustum_left); 
-		float B = (frustum_top + frustum_bottom) / (frustum_top - frustum_bottom);
-		float C =-1.f*(frustum_far + frustum_near) / (frustum_far - frustum_near);  
-		float D = -2.f*frustum_near*frustum_far / (frustum_far - frustum_near); 
-        m(0,0) = E;
-        m(1,1) = F;
-        m(2,2) = 1/(frustum_far-frustum_near);
-        m(3,3) = 0.0f;
-        m(0,2) =  0;
-        m(1,2) =  0;
-        m(2,3) =  0;
-        m(3,2) = -0.00010001f;
-    myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixFrustumLH(frustum_left , frustum_right, frustum_bottom, frustum_top, frustum_near,frustum_far));
-    //myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixPerspectiveFovLH(1.5,2.7,frustum_near,frustum_far));
-    //MyMatrix = myCamera->getProjectionMatrix();
-    //myCamera->setProjectionMatrix(MyMatrix);
-    //myCamera->setProjectionMatrix(m);
-	//std::cout << "viewFrustum!! MASTER: "<<myCamera->getNearValue()<< std::endl;
-	
-	std::cout << "orthoLH\n" << "0 :" << MyMatrix[0] << "\t | ";
-	for(int i = 1; i < 16; i++){
-		while((i+1)%4){
-		std::cout << i << " :" << MyMatrix[i] << "\t\t | ";
-		i++;
-		}
-		std::cout << i << " :" << m[i] << "\t\t | "<< std::endl;
-	}
-	std::cout << std::endl << std::endl<< "frustumLH\n";
-	std::cout << "0 :" << m[0] << "\t | ";
-	for(int i = 1; i < 16; i++){
-		while((i+1)%4){
-		std::cout << i << " :" << m[i] << "\t\t | ";
-		i++;
-		}
-		std::cout << i << " :" << m[i] << "\t\t | "<< std::endl;
-	}
-	std::cout << std::endl << std::endl;
-
-	std::cout << "0 diff: " << (MyMatrix[0]-m[0]) << std::endl;
-	std::cout << "5 diff: " << (MyMatrix[5]-m[5]) << std::endl;
-	std::cout << "10 diff: " << (MyMatrix[10]-m[10]) << std::endl;
-	std::cout << "14 diff: " << (MyMatrix[14]-m[14]) << std::endl;
-	#else
-	irr::core::matrix4 m = core::IdentityMatrix;
-	frustum_near = -0.1;
-	frustum_far = -500;
-      // glFustum
-		float E = 2.f*frustum_near / (frustum_right - frustum_left);          // E
-		float F = 2.f*frustum_near / (frustum_top - frustum_bottom);
-		float A =(frustum_right + frustum_left) / (frustum_right - frustum_left); 
-		float B = (frustum_top + frustum_bottom) / (frustum_top - frustum_bottom);
-		float C =-1.f*(frustum_far + frustum_near) / (frustum_far - frustum_near);  // I.
-		float D = -2.f*frustum_near*frustum_far / (frustum_far - frustum_near); 
-        m(0,0) = -E;
-        m(1,1) = -F;
-        m(2,2) = -C;
-        m(3,3) = 0.0f;
-        m(0,2) =  A;
-        m(1,2) =  B;
-        m(2,3) =  -D;
-        m(3,2) = 1.f;
-    
-	myCamera = smgr->addCameraSceneNode();
-	//std::cout << "viewFrustum!! SLAVE before "<<myCamera->getNearValue()<< std::endl;
-	myCamera->setProjectionMatrix(m);
-	//std::cout << "viewFrustum!! SLAVE after "<<myCamera->getNearValue()<< std::endl;
-	//myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixOrthoLH((frustum_right - frustum_left), (frustum_top-frustum_bottom), 0.1f,1000.0f));
-	//printf("*****view port 1: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
-	//myCamera = smgr->addCameraSceneNode(0, core::vector3df(25,0,0), core::vector3df(25,0,30));
-	//int width = 11520;
-	//int height = 4320;
-	//driver->setViewPort(rect<s32>(-width/2,0,width,height/2));
-	//printf("*****view port 2: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
-
-	//myCamera = smgr->addCameraSceneNode(/*0,vector3df(screen_width, screen_height, 0),vector3df(screen_width, screen_height, 30)*/);
+      	
 	#endif
+	// glFustum
+    myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixFrustumLH(frustum_left , frustum_right, frustum_bottom, frustum_top, frustum_near,frustum_far));
+
 	//creates the clock.
 	createClock();
-	//zenBar = driver->getTexture("../assets/Scroll.png");
+	zenBar = driver->getTexture("../assets/Scroll.png");
 
 	std::cout << "creating the player object \n"<< std::flush;
 	//create player and draw the limbs
@@ -380,25 +300,14 @@ int Game::run(){
 	p1->setTargetVisible(false, gameOver);
 	
 	#ifdef DGR_MASTER
-	//background = driver->getTexture("../assets/Background(small).png");
+	background = driver->getTexture("../assets/Background(small).png");
 	#else
-	//background = driver->getTexture("../assets/Background(Fitashape).png");
+	background = driver->getTexture("../assets/Background(Fitashape).png");
 	#endif
-	//float rotation_camera = 0;
-	//myDGR->addNode<float>("rotation_camera",&rotation_camera); 
+
 	while(device->run() && !toExit)
 	{
 
-		
-	
-		#ifdef DGR_MASTER
-		//rotation_camera += 1;
-		//printf("(x,y,z): (%f,%f,%f)\n",p1->LH.node->getPosition().X,p1->LH.node->getPosition().Y,p1->LH.node->getPosition().Z);
-		//printf("rotation_camera: %f\n",rotation_camera);
-		#else
-		//printf("rotation_camera: %f\n",rotation_camera);
-		#endif
-		//myCamera->setRotation(core::vector3df(0,rotation_camera,0));
 		//move the orbs around
 		if(local)
 			moveKeyboard(receiver);
@@ -599,12 +508,6 @@ void Game::pauseMenu(){
 	}
 }
 
-
-
-
-
-
-
 /*
 This method updates our clock in the title bar 
 and also checks to see if we have won depending on the time
@@ -673,7 +576,7 @@ void Game::updateClock(){
 				break;
 		}
 
-		/*//update background
+		//update background
 		if(zen <= 16){
 			background = zenBackgrounds[0];
 		}else if(zen >= 17 && zen <= 33){
@@ -687,7 +590,6 @@ void Game::updateClock(){
 		}else if(zen >= 84){
 			background = zenBackgrounds[5];
 		}
-*/
 
 		if(zen > 100) // so zen cant get above 100%
 			zen = 100;
@@ -743,7 +645,7 @@ void Game::startLocation(){
 	vector3df LFpos3;
 	vector3df RFpos3;
 
-	//background = driver->getTexture("../assets/Calibration.png");
+	background = driver->getTexture("../assets/Calibration.png");
 
 
 	// keeps track of which group we are going to update, and when to move on
@@ -858,7 +760,7 @@ void Game::startLocation(){
 
 	p1->bodyScale();
 
-	//background = driver->getTexture("../assets/Background(small).png");
+	background = driver->getTexture("../assets/Background(small).png");
 
 	return;
 }
@@ -881,9 +783,9 @@ void Game::drawObjects(){
 	
 	//draw the background
 	#ifdef DGR_MASTER
-	//driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 	#else
-	//driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 	#endif
 	
 	

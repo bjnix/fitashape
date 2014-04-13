@@ -1675,37 +1675,38 @@ namespace core
 	}
 
 // Builds a right-handed glFrustum style projection matrix.
+	/*
+		2*zn/(r-l)   0            0                0
+		0            2*zn/(t-b)   0                0
+		(l+r)/(r-l)  (t+b)/(t-b)  zf/(zn-zf)      -1
+		0            0            zn*zf/(zn-zf)    0
+	*/
 	template <class T>
 	inline CMatrix4<T>& CMatrix4<T>::buildProjectionMatrixFrustumRH(
 			f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar)
 	{
-		f32 widthOfViewVolume = right - left;
-		f32 heightOfViewVolume = top - bottom;
-		f32 widthSum = right + left;
-		f32 heightSum = top + bottom;
-		f32 zNearx2 = 2*zNear;
-		f32 zDiff = zFar - zNear;
+
 		_IRR_DEBUG_BREAK_IF(widthOfViewVolume==0.f); //divide by zero
 		_IRR_DEBUG_BREAK_IF(heightOfViewVolume==0.f); //divide by zero
 		_IRR_DEBUG_BREAK_IF(zNear==zFar); //divide by zero
-		M[0] = (T)(zNearx2/widthOfViewVolume); //E
+		M[0] = (T)(2*zNear/right-left);
 		M[1] = 0;
-		M[2] = (T)(widthSum/widthOfViewVolume); //A
+		M[2] = (T)(widthSum/widthOfViewVolume); 
 		M[3] = 0;
 
 		M[4] = 0;
-		M[5] = (T)(zNearx2/heightOfViewVolume); //F
-		M[6] = (T)(heightSum/heightOfViewVolume); //B
+		M[5] = (T)(2*zNear/top-bottom);
+		M[6] = 0; 
 		M[7] = 0;
 
-		M[8] = 0;
-		M[9] = 0;
-		M[10] = (T)(-(zFar+zNear)/zDiff); //C
-		M[11] = (T)(-(zNearx2*zFar)/zDiff); //D
+		M[8] = (T)((left+right)/(right-left));
+		M[9] = (T)((top+bottom)/(top-bottom));
+		M[10] = (T)(zFar/(zFar-zNear));
+		M[11] = -1;
 
 		M[12] = 0;
 		M[13] = 0;
-		M[14] = -1;
+		M[14] = (T)(zNear*zFar/(zNear-zFar));
 		M[15] = 0;
 
 #if defined ( USE_MATRIX_TEST )
@@ -1715,30 +1716,27 @@ namespace core
 	}
 
 	// Builds a left-handed glFrustum style projection matrix.
+	/*	
+		2*zn/(r-l)   0            0              0
+		0            2*zn/(t-b)   0              0
+		(l+r)/(l-r)  (t+b)/(b-t)  zf/(zf-zn)     1
+		0            0            zn*zf/(zn-zf)  0
+	*/
 	template <class T>
 	inline CMatrix4<T>& CMatrix4<T>::buildProjectionMatrixFrustumLH(
 			f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar)
-	{
-		/*zNear = -zNear;
-		zFar = -zFar;*/
-
-		f32 widthOfViewVolume = right - left;
-		f32 heightOfViewVolume = top - bottom;
-		f32 widthSum = right + left;
-		f32 heightSum = top + bottom;
-		f32 zNearx2 = 2*zNear;
-		f32 zDiff = zFar - zNear;
+	{	
 
 		_IRR_DEBUG_BREAK_IF(widthOfViewVolume==0.f); //divide by zero
 		_IRR_DEBUG_BREAK_IF(heightOfViewVolume==0.f); //divide by zero
 		_IRR_DEBUG_BREAK_IF(zNear==zFar); //divide by zero
-		M[0] = (T)(2*zNear/widthOfViewVolume);
+		M[0] = (T)(2*zNear/right-left);
 		M[1] = 0;
 		M[2] = 0;
 		M[3] = 0;
 
 		M[4] = 0;
-		M[5] = (T)(2*zNear/heightOfViewVolume);
+		M[5] = (T)(2*zNear/top-bottom);
 		M[6] = 0;
 		M[7] = 0;
 
@@ -1752,27 +1750,6 @@ namespace core
 		M[14] = (T)(zNear*zFar/(zNear-zFar));
 		M[15] = 0;
 
-		/*
-		M[0] = (T)(-zNearx2/widthOfViewVolume); //E
-		M[1] = 0;
-		M[2] = 0;
-		M[3] = 0;
-
-		M[4] = 0;
-		M[5] = (T)(-zNearx2/heightOfViewVolume); //F
-		M[6] = 0;
-		M[7] = 0;
-
-		M[8] = (T)(widthSum/widthOfViewVolume); //A
-		M[9] = (T)(heightSum/heightOfViewVolume); //B
-		M[10] = (T)(-(zFar+zNear)/zDiff); //C
-		M[11] = -1;
-
-		M[12] = 0;
-		M[13] = 0;
-		M[14] = (T)(-(zNearx2*zFar)/zDiff); //D
-		M[15] = 0;
-*/
 #if defined ( USE_MATRIX_TEST )
 		definitelyIdentityMatrix=false;
 #endif
