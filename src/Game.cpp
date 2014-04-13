@@ -780,3 +780,209 @@ void Game::drawObjects(){
 	smgr->drawAll(); // draw the 3d scene
 	driver->endScene();
 }
+
+void Game::playSound(std::string soundEvent){
+    
+    using namespace irrKlangSceneNode;
+    
+    if (soundEvent == "pause"){
+        soundNodeAmbiance.pause();
+        soundNodeSpotEffect1.pause();
+        soundNodeSpotEffect2.pause();
+        soundNodeMusic.pause();
+        soundNodeClock.pause();
+    }
+    else if (soundEvent == "unpause"){
+        soundNodeAmbiance.unpause();
+        soundNodeSpotEffect1.unpause();
+        soundNodeSpotEffect2.unpause();
+        soundNodeMusic.unpause();
+        soundNodeClock.unpause();
+    }
+    else{
+        
+        switch (soundEvent) {
+                
+            case "gameStartDesert":
+                //Wind Ambiance
+                CIrrKlangSceneNode* soundNodeAmbiance =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                soundNodeAmbiance->setSoundFileName("DesertedWind.mp3");
+                soundNodeAmbiance->setMinMaxSoundDistance(30.0f);
+                soundNodeAmbiance->setLoopingStreamMode();
+                
+                //Distant Bird Sound
+                CIrrKlangSceneNode* soundNodeSpotEffect1 =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                soundNodeSpotEffect1->setSoundFileName("DistantBird.mp3")
+                //Set distance sound can be heard
+                soundNodeSpotEffect1->setMinMaxSoundDistance(30.0f);
+                //Set sound to play randomly with random interval
+                soundNodeSpotEffect1->setRandomMode(25,120);
+                
+                break;
+                
+            case "gameStartTrees":
+                //Wind Ambiance
+                CIrrKlangSceneNode* soundNodeAmbiance =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                soundNodeAmbiance->setSoundFileName("WindThroughTrees.mp3")
+                //Set distance sound can be heard
+                soundNodeAmbiance->setMinMaxSoundDistance(30.0f);
+                //Set sound to loop
+                soundNodeAmbiance->setLoopingStreamMode();
+                
+                //Distant Bird Sound
+                CIrrKlangSceneNode* soundSpotEffect1 =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                soundNodeSpotEffect1->setSoundFileName("DistantBird.mp3")
+                //Set distance sound can be heard
+                soundNodeSpotEffect1->setMinMaxSoundDistance(30.0f);
+                //Set sound to play randomly with random interval
+                soundNodeSpotEffect1->setRandomMode(25,120);
+                
+                //Medium Close Bird Sound
+                CIrrKlangSceneNode* soundNodeSpotEffect2 =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                soundNodeSpotEffect2->setSoundFileName("BirdMediumClose.mp3")
+                //Set distance sound can be heard
+                soundNodeSpotEffect2->setMinMaxSoundDistance(30.0f);
+                //Set sound to play randomly with random interval
+                soundNodeSpotEffect2->setRandomMode(10,250);
+               
+                break;
+                
+            case "gameStartFull":
+                /*
+                //Fade In Sound Ambiance
+                CIrrKlangSceneNode* soundNodeAmbiance=
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                //Wind Ambiance
+                soundNode->setSoundFileName("FullAmbianceQuietRiverFadeIn.mp3")
+                //Set distance sound can be heard
+                soundNodeAmbiance->setMinMaxSoundDistance(30.0f);
+                //Set sound to play only once
+                soundNodeAmbiance->setPlayOnceMode();
+                
+                //Wait for Fade in Sound Ambiance to finish
+                bool fadeInFinished = false;
+                while (fadeInFinished == false) {
+                    if (soundNodeAmbiance == NULL) {
+                        fadeInFinished = true;
+                    }
+                }
+                */
+                
+                //Full Ambiance (Wind, Birds, River)
+                CIrrKlangSceneNode* soundNodeAmbiance=
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                //Wind Ambiance
+                soundNodeAmbiance->setSoundFileName("FullAmbianceQuietRiver.mp3")
+                //Set distance sound can be heard
+                soundNodeAmbiance->setMinMaxSoundDistance(30.0f);
+                //Set sound to play only once
+                soundNodeAmbiance->setLoopingStreamMode();
+                
+                break;
+
+            default:
+                break;
+        }
+        
+        int randomMusic = rand()%(5-1))+1;
+        
+        switch (randomMusic) {
+            case 1:
+                //Flute Music
+                CIrrKlangSceneNode* soundNodeMusic =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                //Flute Song
+                soundNodeMusic->setSoundFileName("Flute.mp3");
+                //Set distance sound can be heard
+                soundNodeMusic->setMinMaxSoundDistance(30.0f);
+                //Set sound to play randomly
+                soundNodeMusic->setPlayOnceMode();
+                
+                break;
+                
+            case 2:
+                //Percussion Track
+                //Music
+                CIrrKlangSceneNode* soundNodeMusic =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                //Flute Song
+                soundNodeMusic->setSoundFileName("Timpani.mp3");
+                //Set distance sound can be heard
+                soundNodeMusic->setMinMaxSoundDistance(30.0f);
+                //Set sound to play randomly
+                soundNodeMusic->setPlayOnceMode();
+                
+                break;
+                
+            case 3:
+                //Cymbal Clash (temporary)
+                //Music
+                CIrrKlangSceneNode* soundNodeMusic =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                //Flute Song
+                soundNodeMusic->setSoundFileName("CymbalHit1.mp3");
+                //Set distance sound can be heard
+                soundNodeMusic->setMinMaxSoundDistance(30.0f);
+                //Set sound to play randomly
+                soundNodeMusic->setPlayOnceMode();
+                
+                break;
+                
+            case 4:
+                //Cymbal Crash (temporary)
+                CIrrKlangSceneNode* soundNodeMusic =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                //Flute Song
+                soundNodeMusic->setSoundFileName("CymbalHit2.mp3");
+                //Set distance sound can be heard
+                soundNodeMusic->setMinMaxSoundDistance(30.0f);
+                //Set sound to play randomly
+                soundNodeMusic->setPlayOnceMode();
+                
+                break;
+                
+            case 5:
+                //Cymbal Crash (temporary)
+                CIrrKlangSceneNode* soundNodeMusic =
+                new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+                //Flute Song
+                soundNodeMusic->setSoundFileName("CymbalHit3");
+                //Set distance sound can be heard
+                soundNodeMusic->setMinMaxSoundDistance(30.0f);
+                //Set sound to play randomly
+                soundNodeMusic->setPlayOnceMode();
+                
+                break;
+                
+            default:
+                break;
+        }
+        
+        clockTick:
+            //Clock Ticks
+            CIrrKlangSceneNode* soundNodeClock=
+            new CIrrKlangSceneNode(soundEngine, smgr->getRootSceneNode(), smgr, 666);
+            //Wind Ambiance
+            soundNodeClock->setSoundFileName("TimpaniHit.mp3")
+            //Set distance sound can be heard
+            soundNodeClock->setMinMaxSoundDistance(30.0f);
+            //Set sound to play only once
+            soundNodeClock->setLoopingStreamMode();
+    }
+}
+
+void Game::stopSound(){
+
+    //soundNode->drop();
+    soundNodeAmbiance->drop();
+    soundNodeSpotEffect1->drop();
+    soundNodeSpotEffect2->drop();
+    soundNodeMusic->drop();
+    soundNodeClock->drop();
+
+}

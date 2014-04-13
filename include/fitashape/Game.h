@@ -126,6 +126,8 @@ public:
 	void retryMenu(); //delete this later
 	void pauseMenu();
 	void drawObjects();
+    void playSound();
+    void stopSound();
 	
 	// int viconInit();
 	// void viconExit();
