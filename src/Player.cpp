@@ -581,19 +581,19 @@ void Player::createButtons(){
 	IMesh* mesh = smgr->getMesh("../assets/New.3ds");
 	bNewGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(NewGame.getPosition().X, NewGame.getPosition().Y, 29));
 	bNewGame->setMaterialFlag(EMF_LIGHTING, false);
-	bNewGame->setScale(vector3df(4, 4, 4));
+	bNewGame->setScale(vector3df(3,3,3));
 	mesh = smgr->getMesh("../assets/Exit.3ds");
 	bExitGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(ExitGame.getPosition().X, ExitGame.getPosition().Y, 29));
 	bExitGame->setMaterialFlag(EMF_LIGHTING, false);
-	bExitGame->setScale(vector3df(4, 4, 4));
+	bExitGame->setScale(vector3df(3,3,3));
 	mesh = smgr->getMesh("../assets/Resume.3ds");
 	bResumeGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(ResumeGame.getPosition().X, ResumeGame.getPosition().Y, 29));
 	bResumeGame->setMaterialFlag(EMF_LIGHTING, false);
-	bResumeGame->setScale(vector3df(4, 4, 4));
+	bResumeGame->setScale(vector3df(3,3,3));
 	mesh = smgr->getMesh("../assets/Select.3ds");
 	bSelect = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(Select.getPosition().X, Select.getPosition().Y, 29));
 	bSelect->setMaterialFlag(EMF_LIGHTING, false);
-	bSelect->setScale(vector3df(4, 4, 4));
+	bSelect->setScale(vector3df(3,3,3));
 
 	/*Select.setPosition(vector3df(px + 3, py + 12, 30));
 	NewGame.setPosition(vector3df(px -5, py + 12, 30));
