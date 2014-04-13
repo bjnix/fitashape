@@ -808,6 +808,8 @@ void Game::drawObjects(){
 	
 	int x1 = 520, y1 = 0, x2 = 920, y2 = 70;
 	int color;
+
+	double f3left = 0, f3right = 0, f3bottom = 0, f3top = 0, f7left = 0, f7right = 0, f7bottom = 0, f7top = 0;
 	
 	//draw the background
 	if(!local){
@@ -818,11 +820,6 @@ void Game::drawObjects(){
 		#endif
 	}
 	
-	if(!local){
-		x1 = 4160;
-		x2 = 7360;
-		y2 = 560;
-	}
 	
 
 	//driver->enableMaterial2D();
@@ -831,12 +828,29 @@ void Game::drawObjects(){
 			zenBarSize++;
 		else if(zenBarSize > zen)
 			zenBarSize--;
-		driver->draw2DImage(zenBar, rect<s32>(x1, y1, x2, y2), rect<s32>(0, 0, 1780, 300), NULL, NULL, true);
+		
 		color = 255 - (zenBarSize * 2.55);
-		if(local)
+
+		#ifdef DRG_MASTER
+			driver->draw2DImage(zenBar, rect<s32>(x1, y1, x2, y2), rect<s32>(0, 0, 1780, 300), NULL, NULL, true);
 			driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+37, y1+22, x1 +37 + (zenBarSize * 3.3), y2-27), NULL);
-		else
-			driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+296, y1+167, x1 +296 + (zenBarSize * 26.4), y2-216), NULL);
+		#else
+			if(f3left == frustum_left && f3right == frustum_right && f3bottom == frustum_bottom && f3top == frustum_top){
+				x1 = 4160;
+				x2 = 7360;
+				y2 = 560;
+				driver->draw2DImage(zenBar, rect<s32>(x1, y1, x2, y2), rect<s32>(0, 0, 1780, 300), NULL, NULL, true);
+				driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+296, y1+167, x1 +296 + (zenBarSize * 26.4), y2-216), NULL);
+			}
+			else if(f7left == frustum_left && f7right == frustum_right && f7bottom == frustum_bottom && f7top == frustum_top){
+				x1 = -1600;
+				x2 = 1600;
+				y2 = 560;
+				driver->draw2DImage(zenBar, rect<s32>(x1, y1, x2, y2), rect<s32>(0, 0, 1780, 300), NULL, NULL, true);
+				driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+296, y1+167, x1 +296 + (zenBarSize * 26.4), y2-216), NULL);
+			}
+			
+		#endif
 	}
 	smgr->drawAll(); // draw the 3d scene
 	driver->endScene();
