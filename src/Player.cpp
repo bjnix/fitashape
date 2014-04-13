@@ -425,9 +425,13 @@ void Player::setTargetVisible(bool visibility, bool resume){
 	RHTarget.node->setVisible(visibility);
 	LHTarget.node->setVisible(visibility);
 	NewGame.node->setVisible(!visibility);
+	bNewGame->setVisible(!visibility);
 	ResumeGame.node->setVisible(!visibility && !resume);
+	bResumeGame->setVisible(!visibility && !resume);
 	ExitGame.node->setVisible(!visibility);
+	bExitGame->setVisible(!visibility);
 	Select.node->setVisible(!visibility);
+	bSelect->setVisible(!visibility);
 
 	body->setVisible(visibility);
 }
@@ -437,9 +441,13 @@ void setMenuInvis - make the menu nodes all invisible
 */
 void Player::setMenuInvis(){
 	NewGame.node->setVisible(false);
+	bNewGame->setVisible(false);
 	ResumeGame.node->setVisible(false);
+	bResumeGame->setVisible(false);
 	ExitGame.node->setVisible(false);
+	bExitGame->setVisible(false);
 	Select.node->setVisible(false);
+	bSelect->setVisible(false);
 }
 
 //figure out which resart button is pressed
@@ -502,9 +510,13 @@ void Player::setMenu(){
 	px = LF.getPosition().X;
 	py = LF.getPosition().Y;
 	Select.setPosition(vector3df(px + 3, py + 12, 30));
+	bSelect->setPosition(vector3df(px + 3, py + 11.85, 29));
 	NewGame.setPosition(vector3df(px -5, py + 12, 30));
+	bNewGame->setPosition(vector3df(px -5, py + 11.85, 29));
 	ResumeGame.setPosition(vector3df(px - 5, py + 15, 30));
+	bResumeGame->setPosition(vector3df(px -5, py + 14.85, 29));
 	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
+	bExitGame->setPosition(vector3df(px -5, py + 8.85, 29));
 }
 
 /*
@@ -543,7 +555,7 @@ double Player::abs(double number){
 
 void Player::createBody(){
 	//add the body
-	IMesh* mesh = smgr->getMesh("../assets/circle-stick.3ds");
+	IMesh* mesh = smgr->getMesh("../assets/Character.3ds");
 	if (!mesh)
 	{
 		printf("mesh did not work\n");
@@ -560,6 +572,33 @@ void Player::createBody(){
 		printf("body did not work\n");
 		exit(-1);
 	}
+}
+
+void Player::createButtons(){
+	f32 px, py;
+	px = LF.getPosition().X;
+	py = LF.getPosition().Y;
+	IMesh* mesh = smgr->getMesh("../assets/New.3ds");
+	bNewGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(NewGame.getPosition().X, NewGame.getPosition().Y, 29));
+	bNewGame->setMaterialFlag(EMF_LIGHTING, false);
+	bNewGame->setScale(vector3df(3,3,3));
+	mesh = smgr->getMesh("../assets/Exit.3ds");
+	bExitGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(ExitGame.getPosition().X, ExitGame.getPosition().Y, 29));
+	bExitGame->setMaterialFlag(EMF_LIGHTING, false);
+	bExitGame->setScale(vector3df(3,3,3));
+	mesh = smgr->getMesh("../assets/Resume.3ds");
+	bResumeGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(ResumeGame.getPosition().X, ResumeGame.getPosition().Y, 29));
+	bResumeGame->setMaterialFlag(EMF_LIGHTING, false);
+	bResumeGame->setScale(vector3df(3,3,3));
+	mesh = smgr->getMesh("../assets/Select.3ds");
+	bSelect = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(Select.getPosition().X, Select.getPosition().Y, 29));
+	bSelect->setMaterialFlag(EMF_LIGHTING, false);
+	bSelect->setScale(vector3df(3,3,3));
+
+	/*Select.setPosition(vector3df(px + 3, py + 12, 30));
+	NewGame.setPosition(vector3df(px -5, py + 12, 30));
+	ResumeGame.setPosition(vector3df(px - 5, py + 15, 30));
+	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));*/
 }
 
 void Player::bodyScale(){
