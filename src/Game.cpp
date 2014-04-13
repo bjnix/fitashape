@@ -175,6 +175,7 @@ Game::Game(
 Game::~Game(void){
 	delete p1;
 	delete myDGR;
+	delete zenBackgrounds;
 }
 
 /*
@@ -448,7 +449,19 @@ void Game::createClock(){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
-	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/font.xml"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,29));
+	#ifdef DGR_MASTER
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,10,29));
+	timeText = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(-35,18,29));
+	scoreText = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(35,18,29));
+	#else
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/font.xml"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,10,29));
+	timeText = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/font.xml"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,29));
+	scoreText = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/font.xml"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,29));
+	#endif
+	swprintf(tmp,255, L"Time: 0");
+	timeText->setText(tmp);
+	swprintf(tmp,255, L"Score: 0");
+	scoreText->setText(tmp);
 }
 
 /*
@@ -478,9 +491,16 @@ void pauseMenu - setup the pause menu and interactions, buttons, etc
 void Game::pauseMenu(){
 	wchar_t tmp[100]; //buffer to set display text as
 	p1->setMenu();
+	text->setVisible(true);
+	//scoreText->setVisible(false);
+	if(!gameOver)
+		timeText->setVisible(false);
 	switch(p1->pauseCollide()){ //figure out which selection is pressed
 		case 1: //resume game if paused
 			pause = false;
+			text->setVisible(false);
+			//scoreText->setVisible(true);
+			//timeText->setVisible(true);
 			p1->setTargetVisible(true, gameOver);
 			myClock->start();
 			break;
@@ -497,6 +517,9 @@ void Game::pauseMenu(){
 			zenBarSize = 50;
 			timesUp = 5;
 			score = 0;
+			text->setVisible(false);
+			//scoreText->setVisible(true);
+			timeText->setVisible(true);
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
 			pause = false;
@@ -545,33 +568,14 @@ void Game::updateClock(){
  	
 	//device->setWindowCaption(tmp);
 	text->setText(tmp);
+	swprintf(tmp, 255, L"Score: %d", score);
+	scoreText->setText(tmp);
+	swprintf(tmp, 255, L"Time: %d", timesUp - seconds);
+	timeText->setText(tmp);
 	
 	//check to see if we have ran out of time
 	if(seconds >= timesUp){ 
 	printf("time is up\n");
-		//checks to see if all the nodes match their targets
-		//bool win = p1->collideAll();
-		/*int match = p1->collideNum();
-		//if we won then we gain a point and get a new target
-		if(win){ 
-			p1->randomTargets(); 
-			score++;
-		}else{ 
-			//if we lost then we lose a point
-			score--;
-			//if we hit a score of -10 the game is over, other wise we just get a new target
-			if(score < -10){
-				exit(0);
-			}else{
-				p1->randomTargets(); 
-			}
-		}
-		//reset the clock
-		myClock->setTime(0);
-		
-		//sets what the time is for the next round
-		if(score/2 < 10)
-			timesUp = 10 - (score/2);//*/
 		
 		//get number of orbs matched, then score based on that
 
@@ -593,7 +597,7 @@ void Game::updateClock(){
 				break;
 			case 4:
 				score += 50;
-				zen += 10;
+				zen += 5;
 				break;
 			default:
 				break;
@@ -802,6 +806,9 @@ void exitCallback()
 }
 */
 
+/*
+void drawObjects - Draw all of the 2d and 3d objects
+*/
 void Game::drawObjects(){
 	
 	driver->beginScene(true, true, video::SColor(255,113,113,133));
@@ -809,6 +816,7 @@ void Game::drawObjects(){
 	int x1 = 520, y1 = 0, x2 = 920, y2 = 70;
 	int color;
 
+	//frustum paramater limits, these need to be populated with the actual numbers from frustums 3 and 7
 	double f3left = 0, f3right = 0, f3bottom = 0, f3top = 0, f7left = 0, f7right = 0, f7bottom = 0, f7top = 0;
 	
 	//draw the background
@@ -824,17 +832,23 @@ void Game::drawObjects(){
 
 	//driver->enableMaterial2D();
 	if(!gameOver){//zen bar stuff
+		//smoothly increment the zen bar size each time it is rendered
 		if(zenBarSize < zen - 1)
 			zenBarSize++;
 		else if(zenBarSize > zen)
 			zenBarSize--;
 		
+		//change the color of the zen bar dependant on the how full it is
 		color = 255 - (zenBarSize * 2.55);
 
-		#ifdef DRG_MASTER
+
+		//if dgr master, draws the zen bar normally, with the 1440 size in mind
+		#ifdef DGR_MASTER
 			driver->draw2DImage(zenBar, rect<s32>(x1, y1, x2, y2), rect<s32>(0, 0, 1780, 300), NULL, NULL, true);
 			driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+37, y1+22, x1 +37 + (zenBarSize * 3.3), y2-27), NULL);
+		//if a slave, check if one of the slaves is frustum 3 or 7
 		#else
+			//if frusum 3, render the left half of a large version of the zen bar in the frustum, right 1600 pixels include the bar
 			if(f3left == frustum_left && f3right == frustum_right && f3bottom == frustum_bottom && f3top == frustum_top){
 				x1 = 4160;
 				x2 = 7360;
@@ -842,6 +856,7 @@ void Game::drawObjects(){
 				driver->draw2DImage(zenBar, rect<s32>(x1, y1, x2, y2), rect<s32>(0, 0, 1780, 300), NULL, NULL, true);
 				driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+296, y1+167, x1 +296 + (zenBarSize * 26.4), y2-216), NULL);
 			}
+			//if frustum 7, render right half of zen bar, with the left 1600 pixels of the frustum having the bar
 			else if(f7left == frustum_left && f7right == frustum_right && f7bottom == frustum_bottom && f7top == frustum_top){
 				x1 = -1600;
 				x2 = 1600;
