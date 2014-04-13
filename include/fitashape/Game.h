@@ -115,12 +115,12 @@ public:
 	ITexture* background;
 
 	Game(bool,char*);
-	Game(bool,char*,char*,char*,char*,char*,char*);
+	Game(bool,char*,char*,char*,char*);
 	~Game();
 	
 	int run();
 	void moveKeyboard(MyEventReceiver receiver);
-	void motionTracking();
+	int motionTracking();
 	void createClock();
 	void updateClock();
 	void startLocation();

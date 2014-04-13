@@ -50,13 +50,14 @@ OBJS = $(addprefix $(ODIRS)/,$(_OBJ))
 all: $(MASTEXEC) $(SLAVEXEC) $(RELYEXEC)
 
 $(ODIRM)/%.o: $(SRCDIR)/%.cpp
+	@echo "=== BUILDING "$@" ==="
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DDGR_MASTER=1 -c -o $@ $<
 
 $(ODIRS)/%.o: $(SRCDIR)/%.cpp
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+	@echo "=== BUILDING "$@" ==="
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 $(MASTEXEC): $(OBJM)
-	@echo "++"$(_OBJ)"++"
 	@echo "++"$(OBJM)"++"
 	@echo "=== COMPILING MASTER ==="
 	$(CXX) -o $@ $^ $(CPPFLAGS) $(LDFLAGS)

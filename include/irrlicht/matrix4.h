@@ -282,6 +282,12 @@ namespace core
 			//! Builds a right-handed orthogonal projection matrix.
 			CMatrix4<T>& buildProjectionMatrixOrthoRH(f32 widthOfViewVolume, f32 heightOfViewVolume, f32 zNear, f32 zFar);
 
+			//! Builds a right-handed orthogonal projection matrix.
+			CMatrix4<T>& buildProjectionMatrixFrustumRH(f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar);
+
+			//! Builds a right-handed orthogonal projection matrix.
+			CMatrix4<T>& buildProjectionMatrixFrustumLH(f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar);
+
 			//! Builds a left-handed look-at matrix.
 			CMatrix4<T>& buildCameraLookAtMatrixLH(
 					const vector3df& position,
@@ -1668,6 +1674,110 @@ namespace core
 		return *this;
 	}
 
+// Builds a right-handed glFrustum style projection matrix.
+	template <class T>
+	inline CMatrix4<T>& CMatrix4<T>::buildProjectionMatrixFrustumRH(
+			f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar)
+	{
+		f32 widthOfViewVolume = right - left;
+		f32 heightOfViewVolume = top - bottom;
+		f32 widthSum = right + left;
+		f32 heightSum = top + bottom;
+		f32 zNearx2 = 2*zNear;
+		f32 zDiff = zFar - zNear;
+		_IRR_DEBUG_BREAK_IF(widthOfViewVolume==0.f); //divide by zero
+		_IRR_DEBUG_BREAK_IF(heightOfViewVolume==0.f); //divide by zero
+		_IRR_DEBUG_BREAK_IF(zNear==zFar); //divide by zero
+		M[0] = (T)(zNearx2/widthOfViewVolume); //E
+		M[1] = 0;
+		M[2] = (T)(widthSum/widthOfViewVolume); //A
+		M[3] = 0;
+
+		M[4] = 0;
+		M[5] = (T)(zNearx2/heightOfViewVolume); //F
+		M[6] = (T)(heightSum/heightOfViewVolume); //B
+		M[7] = 0;
+
+		M[8] = 0;
+		M[9] = 0;
+		M[10] = (T)(-(zFar+zNear)/zDiff); //C
+		M[11] = (T)(-(zNearx2*zFar)/zDiff); //D
+
+		M[12] = 0;
+		M[13] = 0;
+		M[14] = -1;
+		M[15] = 0;
+
+#if defined ( USE_MATRIX_TEST )
+		definitelyIdentityMatrix=false;
+#endif
+		return *this;
+	}
+
+	// Builds a left-handed glFrustum style projection matrix.
+	template <class T>
+	inline CMatrix4<T>& CMatrix4<T>::buildProjectionMatrixFrustumLH(
+			f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar)
+	{
+		/*zNear = -zNear;
+		zFar = -zFar;*/
+
+		f32 widthOfViewVolume = right - left;
+		f32 heightOfViewVolume = top - bottom;
+		f32 widthSum = right + left;
+		f32 heightSum = top + bottom;
+		f32 zNearx2 = 2*zNear;
+		f32 zDiff = zFar - zNear;
+
+		_IRR_DEBUG_BREAK_IF(widthOfViewVolume==0.f); //divide by zero
+		_IRR_DEBUG_BREAK_IF(heightOfViewVolume==0.f); //divide by zero
+		_IRR_DEBUG_BREAK_IF(zNear==zFar); //divide by zero
+		M[0] = (T)(2/widthOfViewVolume);
+		M[1] = 0;
+		M[2] = 0;
+		M[3] = 0;
+
+		M[4] = 0;
+		M[5] = (T)(2/heightOfViewVolume);
+		M[6] = 0;
+		M[7] = 0;
+
+		M[8] = 0;
+		M[9] = 0;
+		M[10] = (T)(1/(zFar-zNear));
+		M[11] = 1;
+
+		M[12] = 0;
+		M[13] = 0;
+		M[14] = (T)(zNear/(zNear-zFar));
+		M[15] = 0;
+
+		/*
+		M[0] = (T)(-zNearx2/widthOfViewVolume); //E
+		M[1] = 0;
+		M[2] = 0;
+		M[3] = 0;
+
+		M[4] = 0;
+		M[5] = (T)(-zNearx2/heightOfViewVolume); //F
+		M[6] = 0;
+		M[7] = 0;
+
+		M[8] = (T)(widthSum/widthOfViewVolume); //A
+		M[9] = (T)(heightSum/heightOfViewVolume); //B
+		M[10] = (T)(-(zFar+zNear)/zDiff); //C
+		M[11] = -1;
+
+		M[12] = 0;
+		M[13] = 0;
+		M[14] = (T)(-(zNearx2*zFar)/zDiff); //D
+		M[15] = 0;
+*/
+#if defined ( USE_MATRIX_TEST )
+		definitelyIdentityMatrix=false;
+#endif
+		return *this;
+	}
 
 	// Builds a right-handed perspective projection matrix.
 	template <class T>

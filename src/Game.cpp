@@ -34,8 +34,8 @@ char * RELAY_IP;
 std::string hostname = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
 ViconDataStreamSDK::CPP::Client MyClient;
 
-double frustum_left,frustum_right,frustum_bottom,frustum_top;
-int screen_width,screen_height;
+float frustum_left,frustum_right,frustum_bottom,frustum_top,frustum_near,frustum_far;
+//int screen_width,screen_height;
 
 DGR_framework * myDGR;
 
@@ -146,8 +146,7 @@ Game::Game(bool isLocal, char* relay_ip){
 
 Game::Game(
 	bool isLocal, 
-	char* f_left, char* f_right, char* f_bottom, char* f_top,   //frustum
-	char* s_width, char* s_height)  							//dimentions
+	char* f_left, char* f_right, char* f_bottom, char* f_top)   //frustum dimentions
 {
 	myDGR = new DGR_framework();
 	frustum_left = atof(f_left);
@@ -155,8 +154,7 @@ Game::Game(
 	frustum_bottom = atof(f_bottom);
 	frustum_top = atof(f_top);
 
-	screen_width = atof(s_width);
-	screen_height = atof(s_height);
+	
 
 
 	gameOver = true;
@@ -196,8 +194,8 @@ int Game::run(){
 	#ifdef DGR_MASTER
 	device = createDevice(driverType,core::dimension2d<u32>(1440, 540), 16, false, false, false, &receiver);
 	#else
-	device = createDevice(driverType,core::dimension2d<u32>(11520,4320), 16, false, false, false, &receiver);
-	//device = createDevice(driverType,core::dimension2d<u32>(5760,1080), 16, false, false, false, &receiver);
+	//device = createDevice(driverType,core::dimension2d<u32>(1440,540), 16, false, false, false, &receiver);
+	device = createDevice(driverType,core::dimension2d<u32>(5760,1080), 16, false, false, false, &receiver);
 	#endif
 
 	if (device == 0)
@@ -227,14 +225,68 @@ int Game::run(){
 	//create basic camera
 	float x = 0;
 	float y = 0;
-	float z = 1.5;
+	float z = 100;
 
 	ICameraSceneNode *myCamera;
 	irr::core::CMatrix4<float> MyMatrix;
 	#ifdef DGR_MASTER
 	myCamera = smgr->addCameraSceneNode();
+	irr::core::matrix4 m = core::IdentityMatrix;
+	
+	frustum_near = 1;
+	frustum_far = 1000;
+	frustum_left = -103*4-x; 
+	frustum_right = 103*4-x; 
+	frustum_bottom = 28-z;
+	frustum_top = 260-z;
+      // glFustum
+		float E = 2.f*frustum_near / (frustum_right - frustum_left);
+		float F = 2.f*frustum_near / (frustum_top - frustum_bottom);
+		float A = (frustum_right + frustum_left) / (frustum_right - frustum_left); 
+		float B = (frustum_top + frustum_bottom) / (frustum_top - frustum_bottom);
+		float C =-1.f*(frustum_far + frustum_near) / (frustum_far - frustum_near);  
+		float D = -2.f*frustum_near*frustum_far / (frustum_far - frustum_near); 
+        m(0,0) = -E;
+        m(1,1) = -F;
+        m(2,2) = -C;
+        m(3,3) = 0.0f;
+        m(0,2) =  A;
+        m(1,2) =  B;
+        m(2,3) =  D;
+        m(3,2) = 1.f;
+    //myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixOrthoLH((frustum_right - frustum_left), (frustum_top-frustum_bottom), 0.1f,1000.0f));
+    myCamera->setProjectionMatrix(m);
+	//std::cout << "viewFrustum!! MASTER: "<<myCamera->getNearValue()<< std::endl;
+	/*MyMatrix = myCamera->getProjectionMatrix();
+	for(int i = 0; i < 16; i++){
+		std::cout << i << " :" << MyMatrix[i] << " | ";
+	}*/
+	//std::cout << std::endl;
 	#else
+	irr::core::matrix4 m = core::IdentityMatrix;
+	frustum_near = -0.1;
+	frustum_far = -500;
+      // glFustum
+		float E = 2.f*frustum_near / (frustum_right - frustum_left);          // E
+		float F = 2.f*frustum_near / (frustum_top - frustum_bottom);
+		float A =(frustum_right + frustum_left) / (frustum_right - frustum_left); 
+		float B = (frustum_top + frustum_bottom) / (frustum_top - frustum_bottom);
+		float C =-1.f*(frustum_far + frustum_near) / (frustum_far - frustum_near);  // I.
+		float D = -2.f*frustum_near*frustum_far / (frustum_far - frustum_near); 
+        m(0,0) = -E;
+        m(1,1) = -F;
+        m(2,2) = -C;
+        m(3,3) = 0.0f;
+        m(0,2) =  A;
+        m(1,2) =  B;
+        m(2,3) =  -D;
+        m(3,2) = 1.f;
+    
 	myCamera = smgr->addCameraSceneNode();
+	//std::cout << "viewFrustum!! SLAVE before "<<myCamera->getNearValue()<< std::endl;
+	myCamera->setProjectionMatrix(m);
+	//std::cout << "viewFrustum!! SLAVE after "<<myCamera->getNearValue()<< std::endl;
+	//myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixOrthoLH((frustum_right - frustum_left), (frustum_top-frustum_bottom), 0.1f,1000.0f));
 	//printf("*****view port 1: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
 	//myCamera = smgr->addCameraSceneNode(0, core::vector3df(25,0,0), core::vector3df(25,0,30));
 	//int width = 11520;
@@ -310,12 +362,21 @@ int Game::run(){
 	#else
 	background = driver->getTexture("../assets/Background(Fitashape).png");
 	#endif
-
+	//float rotation_camera = 0;
+	//myDGR->addNode<float>("rotation_camera",&rotation_camera); 
 	while(device->run() && !toExit)
 	{
 
+		
+	
+		#ifdef DGR_MASTER
+		//rotation_camera += 1;
 		//printf("(x,y,z): (%f,%f,%f)\n",p1->LH.node->getPosition().X,p1->LH.node->getPosition().Y,p1->LH.node->getPosition().Z);
-
+		//printf("rotation_camera: %f\n",rotation_camera);
+		#else
+		//printf("rotation_camera: %f\n",rotation_camera);
+		#endif
+		//myCamera->setRotation(core::vector3df(0,rotation_camera,0));
 		//move the orbs around
 		if(local)
 			moveKeyboard(receiver);
@@ -385,47 +446,44 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 
 }
 
-void Game::motionTracking(){
+int Game::motionTracking(){
 	
 #ifdef DGR_MASTER
 	vector3df temp[4];
-	bool OccludedMarker = true;
 
-	while(OccludedMarker){
-		OccludedMarker = false;
-		while(MyClient.GetFrame().Result != Result::Success) 
-		{
-			sleep(1);
-			std::cout << ".";
-		}	
-		std::cout<<std::flush;
-		for(int i = 0; i < 4; i++)
-		{
-			ViconDataStreamSDK::CPP::Output_GetSegmentGlobalTranslation Output = 
-				MyClient.GetSegmentGlobalTranslation(names[i],names[i]);
-			//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
-			if(!Output.Occluded)
-		    	{ 
-				//std::cout<<names[i]<<" NOT occluded!"<< std::endl;
-				/*std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
-							  <<Output.Translation[1]<<", "
-							  <<Output.Translation[2]<<") " 
-							  <<Output.Occluded << std::endl;*/
+	while(MyClient.GetFrame().Result != Result::Success) 
+	{
+		sleep(1);
+		std::cout << ".";
+	}	
+	std::cout<<std::flush;
+	for(int i = 0; i < 4; i++)
+	{
+		ViconDataStreamSDK::CPP::Output_GetSegmentGlobalTranslation Output = 
+			MyClient.GetSegmentGlobalTranslation(names[i],names[i]);
+		//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
+		if(!Output.Occluded)
+	    	{ 
+			//std::cout<<names[i]<<" NOT occluded!"<< std::endl;
+			/*std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
+						  <<Output.Translation[1]<<", "
+						  <<Output.Translation[2]<<") " 
+						  <<Output.Occluded << std::endl;*/
 
-				temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,30);		
-			}
-			else
-			{ 
-				//std::cout<<names[i]<<" IS occluded!"<< std::endl; 
-				OccludedMarker = true;
-				break;
-			}
+			temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,30);		
+		}
+		else
+		{ 
+			//std::cout<<names[i]<<" IS occluded!"<< std::endl;
+			temp[i] = p1->getPosition()[i];
 		}
 	}
 
 	p1->updateBody();
 	p1->setPosition(temp);
+
 #endif
+	return 0;
 }
 
 
@@ -442,7 +500,7 @@ void Game::createClock(){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
-	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,25,30));
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,29));
 }
 
 /*
@@ -801,12 +859,11 @@ void Game::drawObjects(){
 	
 	//draw the background
 	#ifdef DGR_MASTER
-	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+	//driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 	#else
-	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
+	//driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 	#endif
 	
-	smgr->drawAll(); // draw the 3d scene
 	
 
 	//driver->enableMaterial2D();
@@ -819,5 +876,8 @@ void Game::drawObjects(){
 		color = 255 - (zenBarSize * 2.55);
 		driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+37, y1+22, x1 +37 + (zenBarSize * 3.3), y2-27), NULL);
 	}
+
+	smgr->drawAll(); // draw the 3d scene
+
 	driver->endScene();
 }
