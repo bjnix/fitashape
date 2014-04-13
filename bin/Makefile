@@ -17,7 +17,7 @@ X11_INC = -I/usr/X11R6/include
 
 # general compiler settings
 CPPFLAGS = $(X11_INC) $(FIT_INC)
-CXXFLAGS = -O3 -ffast-math -g -Wall -fpermissive
+CXXFLAGS = -O3 -ffast-math -g -Wall -fpermissive 
 
 #default target is Linux
 
@@ -36,7 +36,7 @@ VICON_LIBS = -L../lib/vicon-libs -Wl,-rpath,../lib/vicon-libs -lViconDataStreamS
 
 
 # target specific settings
-LDFLAGS = $(X11_LIBS) $(IRR_LIBS) $(VICON_LIBS)
+LDFLAGS = -lpthread $(X11_LIBS) $(IRR_LIBS) $(VICON_LIBS)
 # name of the binary - only valid for targets which set SYSTEM
 #DESTPATH = ../bin/$(SYSTEM)/$(Target)$(SUF)
 
@@ -50,13 +50,14 @@ OBJS = $(addprefix $(ODIRS)/,$(_OBJ))
 all: $(MASTEXEC) $(SLAVEXEC) $(RELYEXEC)
 
 $(ODIRM)/%.o: $(SRCDIR)/%.cpp
+	@echo "=== BUILDING "$@" ==="
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DDGR_MASTER=1 -c -o $@ $<
 
 $(ODIRS)/%.o: $(SRCDIR)/%.cpp
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+	@echo "=== BUILDING "$@" ==="
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 $(MASTEXEC): $(OBJM)
-	@echo "++"$(_OBJ)"++"
 	@echo "++"$(OBJM)"++"
 	@echo "=== COMPILING MASTER ==="
 	$(CXX) -o $@ $^ $(CPPFLAGS) $(LDFLAGS)

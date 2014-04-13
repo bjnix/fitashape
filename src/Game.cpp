@@ -34,10 +34,10 @@ char * RELAY_IP;
 std::string hostname = "c07-0510-01.ad.mtu.edu";//"141.219.28.17:801";//was 141.219.28.107:801
 ViconDataStreamSDK::CPP::Client MyClient;
 
-double frustum_left,frustum_right,frustum_bottom,frustum_top;
-int screen_width,screen_height;
+f32 frustum_left,frustum_right,frustum_bottom,frustum_top,frustum_near,frustum_far;
+//int screen_width,screen_height;
 
-DGR_framework * myDGR;
+//DGR_framework * myDGR;
 
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
@@ -131,7 +131,7 @@ void viconExit(void)
 }
 
 Game::Game(bool isLocal, char* relay_ip){
-	myDGR = new DGR_framework(relay_ip);
+	//myDGR = new DGR_framework(relay_ip);
 
 	gameOver = true;
 	zen = 50;
@@ -146,17 +146,15 @@ Game::Game(bool isLocal, char* relay_ip){
 
 Game::Game(
 	bool isLocal, 
-	char* f_left, char* f_right, char* f_bottom, char* f_top,   //frustum
-	char* s_width, char* s_height)  							//dimentions
+	char* f_left, char* f_right, char* f_bottom, char* f_top)   //frustum dimentions
 {
-	myDGR = new DGR_framework();
-	frustum_left = atof(f_left);
-	frustum_right = atof(f_right);
-	frustum_bottom = atof(f_bottom);
-	frustum_top = atof(f_top);
+	//myDGR = new DGR_framework();
+	frustum_left = f32(atof(f_left));
+	frustum_right = f32(atof(f_right));
+	frustum_bottom = f32(atof(f_bottom));
+	frustum_top = f32(atof(f_top));
 
-	screen_width = atof(s_width);
-	screen_height = atof(s_height);
+	
 
 
 	gameOver = true;
@@ -174,7 +172,7 @@ Game::Game(
 
 Game::~Game(void){
 	delete p1;
-	delete myDGR;
+	//delete myDGR;
 }
 
 /*
@@ -196,8 +194,8 @@ int Game::run(){
 	#ifdef DGR_MASTER
 	device = createDevice(driverType,core::dimension2d<u32>(1440, 540), 16, false, false, false, &receiver);
 	#else
-	device = createDevice(driverType,core::dimension2d<u32>(11520,4320), 16, false, false, false, &receiver);
-	//device = createDevice(driverType,core::dimension2d<u32>(5760,1080), 16, false, false, false, &receiver);
+	//device = createDevice(driverType,core::dimension2d<u32>(1440,540), 16, false, false, false, &receiver);
+	device = createDevice(driverType,core::dimension2d<u32>(5760,1080), 16, false, false, false, &receiver);
 	#endif
 
 	if (device == 0)
@@ -218,32 +216,28 @@ int Game::run(){
 	zenBackgrounds[5] = driver->getTexture("../assets/Zen-lvl-6.png");
 
 
-	//ICameraSceneNode *myCamera;
-	//irr::core::matrix4 MyMatrix;
-	//MyMatrix.buildProjectionMatrixOrthoLH(16.0f,12.0f,-1.5f,32.5f);
-	//myCamera = smgr->addCameraSceneNode(0,irr::core::vector3df(-14.0f,14.0f,-14.0f),irr::core::vector3df(0,0,0));
-	//myCamera->setProjectionMatrix(MyMatrix);
-
 	//create basic camera
 	float x = 0;
 	float y = 0;
-	float z = 1.5;
+	float z = 100;
 
 	ICameraSceneNode *myCamera;
 	irr::core::CMatrix4<float> MyMatrix;
-	#ifdef DGR_MASTER
 	myCamera = smgr->addCameraSceneNode();
-	#else
-	myCamera = smgr->addCameraSceneNode();
-	//printf("*****view port 1: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
-	//myCamera = smgr->addCameraSceneNode(0, core::vector3df(25,0,0), core::vector3df(25,0,30));
-	//int width = 11520;
-	//int height = 4320;
-	//driver->setViewPort(rect<s32>(-width/2,0,width,height/2));
-	//printf("*****view port 2: UL(%d,%d) and LR(%d,%d)\n", driver->getViewPort().UpperLeftCorner.X, driver->getViewPort().UpperLeftCorner.Y, driver->getViewPort().LowerRightCorner.X,driver->getViewPort().LowerRightCorner.Y);
+	f32 frustum_near = 30;
+	f32 frustum_far = 400;
 
-	//myCamera = smgr->addCameraSceneNode(/*0,vector3df(screen_width, screen_height, 0),vector3df(screen_width, screen_height, 30)*/);
+	#ifdef DGR_MASTER
+	
+	f32 frustum_left = -103*2-x; 
+	f32 frustum_right = 103*2-x; 
+	f32 frustum_bottom = 28-z;
+	f32 frustum_top = 260-z;
+      	
 	#endif
+	// glFustum
+    myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixFrustumLH(frustum_left , frustum_right, frustum_bottom, frustum_top, frustum_near,frustum_far));
+
 	//creates the clock.
 	createClock();
 	zenBar = driver->getTexture("../assets/Scroll.png");
@@ -270,7 +264,7 @@ int Game::run(){
 		p1->localInitPos();
 		//then sets up the body, arms, and legs
 		p1->initializePosition();
-		myDGR->addNode<Player>("Player1",p1,sizeof(float)*12);
+		//myDGR->addNode<Player>("Player1",p1,sizeof(float)*12);
 
 
 		std::cout << "Just finished Method Calls \n"<< std::flush;
@@ -313,8 +307,6 @@ int Game::run(){
 
 	while(device->run() && !toExit)
 	{
-
-		//printf("(x,y,z): (%f,%f,%f)\n",p1->LH.node->getPosition().X,p1->LH.node->getPosition().Y,p1->LH.node->getPosition().Z);
 
 		//move the orbs around
 		if(local)
@@ -385,47 +377,44 @@ void Game::moveKeyboard(MyEventReceiver receiver){
 
 }
 
-void Game::motionTracking(){
+int Game::motionTracking(){
 	
 #ifdef DGR_MASTER
 	vector3df temp[4];
-	bool OccludedMarker = true;
 
-	while(OccludedMarker){
-		OccludedMarker = false;
-		while(MyClient.GetFrame().Result != Result::Success) 
-		{
-			sleep(1);
-			std::cout << ".";
-		}	
-		std::cout<<std::flush;
-		for(int i = 0; i < 4; i++)
-		{
-			ViconDataStreamSDK::CPP::Output_GetSegmentGlobalTranslation Output = 
-				MyClient.GetSegmentGlobalTranslation(names[i],names[i]);
-			//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
-			if(!Output.Occluded)
-		    	{ 
-				//std::cout<<names[i]<<" NOT occluded!"<< std::endl;
-				/*std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
-							  <<Output.Translation[1]<<", "
-							  <<Output.Translation[2]<<") " 
-							  <<Output.Occluded << std::endl;*/
+	while(MyClient.GetFrame().Result != Result::Success) 
+	{
+		sleep(1);
+		std::cout << ".";
+	}	
+	std::cout<<std::flush;
+	for(int i = 0; i < 4; i++)
+	{
+		ViconDataStreamSDK::CPP::Output_GetSegmentGlobalTranslation Output = 
+			MyClient.GetSegmentGlobalTranslation(names[i],names[i]);
+		//std::cout<<names[i]<<": "<<Output.Translation << std::endl;
+		if(!Output.Occluded)
+	    	{ 
+			//std::cout<<names[i]<<" NOT occluded!"<< std::endl;
+			/*std::cout<<names[i]<<": ("<<Output.Translation[0]<<", "
+						  <<Output.Translation[1]<<", "
+						  <<Output.Translation[2]<<") " 
+						  <<Output.Occluded << std::endl;*/
 
-				temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,30);		
-			}
-			else
-			{ 
-				//std::cout<<names[i]<<" IS occluded!"<< std::endl; 
-				OccludedMarker = true;
-				break;
-			}
+			temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,30);		
+		}
+		else
+		{ 
+			//std::cout<<names[i]<<" IS occluded!"<< std::endl;
+			temp[i] = p1->getPosition()[i];
 		}
 	}
 
 	p1->updateBody();
 	p1->setPosition(temp);
+
 #endif
+	return 0;
 }
 
 
@@ -442,7 +431,7 @@ void Game::createClock(){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
-	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,25,30));
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,29));
 }
 
 /*
@@ -518,12 +507,6 @@ void Game::pauseMenu(){
 			break;
 	}
 }
-
-
-
-
-
-
 
 /*
 This method updates our clock in the title bar 
@@ -607,7 +590,6 @@ void Game::updateClock(){
 		}else if(zen >= 84){
 			background = zenBackgrounds[5];
 		}
-
 
 		if(zen > 100) // so zen cant get above 100%
 			zen = 100;
@@ -806,7 +788,6 @@ void Game::drawObjects(){
 	driver->draw2DImage(background,position2d<s32>(0.0f,0.0f));
 	#endif
 	
-	smgr->drawAll(); // draw the 3d scene
 	
 
 	//driver->enableMaterial2D();
@@ -819,5 +800,8 @@ void Game::drawObjects(){
 		color = 255 - (zenBarSize * 2.55);
 		driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+37, y1+22, x1 +37 + (zenBarSize * 3.3), y2-27), NULL);
 	}
+
+	smgr->drawAll(); // draw the 3d scene
+
 	driver->endScene();
 }

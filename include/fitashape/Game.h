@@ -6,6 +6,7 @@
 #include <iostream>
 #include "time.h"
 #include "irrlicht/irrlicht.h"
+#include "irrlicht/irrTypes.h"
 #include "irrlicht/vector3d.h"
 #include "vicon/ViconClient.h"
 #include "fitashape/Player.h"
@@ -115,12 +116,12 @@ public:
 	ITexture* background;
 
 	Game(bool,char*);
-	Game(bool,char*,char*,char*,char*,char*,char*);
+	Game(bool,char*,char*,char*,char*);
 	~Game();
 	
 	int run();
 	void moveKeyboard(MyEventReceiver receiver);
-	void motionTracking();
+	int motionTracking();
 	void createClock();
 	void updateClock();
 	void startLocation();
