@@ -2,7 +2,7 @@
 Class for the Game object
 */
 #include "fitashape/Game.h"
-
+#define ZDIST 150
 
 template<>
 char * MapNode<Player>::getDataString(){
@@ -37,7 +37,7 @@ ViconDataStreamSDK::CPP::Client MyClient;
 f32 frustum_left,frustum_right,frustum_bottom,frustum_top,frustum_near,frustum_far;
 //int screen_width,screen_height;
 
-//DGR_framework * myDGR;
+DGR_framework * myDGR;
 
 template<typename T, size_t N>
 T * end(T (&ra)[N]) {
@@ -131,7 +131,7 @@ void viconExit(void)
 }
 
 Game::Game(bool isLocal, char* relay_ip){
-	//myDGR = new DGR_framework(relay_ip);
+	myDGR = new DGR_framework(relay_ip);
 
 	gameOver = true;
 	zen = 50;
@@ -148,7 +148,7 @@ Game::Game(
 	bool isLocal, 
 	char* f_left, char* f_right, char* f_bottom, char* f_top)   //frustum dimentions
 {
-	//myDGR = new DGR_framework();
+	myDGR = new DGR_framework();
 	frustum_left = f32(atof(f_left));
 	frustum_right = f32(atof(f_right));
 	frustum_bottom = f32(atof(f_bottom));
@@ -172,7 +172,7 @@ Game::Game(
 
 Game::~Game(void){
 	delete p1;
-	//delete myDGR;
+	delete myDGR;
 }
 
 /*
@@ -219,25 +219,36 @@ int Game::run(){
 	//create basic camera
 	float x = 0;
 	float y = 0;
-	float z = 100;
-
+	float z = 117;
+	
 	ICameraSceneNode *myCamera;
 	irr::core::CMatrix4<float> MyMatrix;
-	myCamera = smgr->addCameraSceneNode();
-	f32 frustum_near = 30;
+
+	f32 frustum_near = 10;
 	f32 frustum_far = 400;
 
 	#ifdef DGR_MASTER
+	myCamera = smgr->addCameraSceneNode();
+	irr::core::matrix4 m = core::IdentityMatrix;
 	
-	f32 frustum_left = -103*2-x; 
-	f32 frustum_right = 103*2-x; 
-	f32 frustum_bottom = 28-z;
-	f32 frustum_top = 260-z;
-      	
-	#endif
-	// glFustum
+	f32 frustum_left = -2.08; 
+	f32 frustum_right = 2.08; 
+	f32 frustum_bottom = -.28;
+	f32 frustum_top = 1.28;
+
     myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixFrustumLH(frustum_left , frustum_right, frustum_bottom, frustum_top, frustum_near,frustum_far));
 
+	#else
+	irr::core::matrix4 m = core::IdentityMatrix;
+	//frustum_bottom -= x;
+	//frustum_top -= x;
+    
+	myCamera = smgr->addCameraSceneNode();
+	//std::cout << "viewFrustum!! SLAVE before "<<myCamera->getNearValue()<< std::endl;
+	
+	myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixFrustumLH(frustum_left , frustum_right, frustum_bottom, frustum_top, frustum_near,frustum_far));
+
+	#endif
 	//creates the clock.
 	createClock();
 	zenBar = driver->getTexture("../assets/Scroll.png");
@@ -264,7 +275,7 @@ int Game::run(){
 		p1->localInitPos();
 		//then sets up the body, arms, and legs
 		p1->initializePosition();
-		//myDGR->addNode<Player>("Player1",p1,sizeof(float)*12);
+		myDGR->addNode<Player>("Player1",p1,sizeof(float)*12);
 
 
 		std::cout << "Just finished Method Calls \n"<< std::flush;
@@ -304,8 +315,8 @@ int Game::run(){
 	#else
 	background = driver->getTexture("../assets/Background(Fitashape).png");
 	#endif
-
-	while(device->run() && !toExit)
+	
+while(device->run() && !toExit)
 	{
 
 		//move the orbs around
@@ -323,10 +334,12 @@ int Game::run(){
 		//normal scoring while the game runs
 		if(!pause){
 			//update the clock and check for win/lose
+			printf("update clock\n");
 			updateClock();
 		}
 		//menu for game overness
 		else{
+			printf("pause!!\n");
 			pauseMenu();
 		}
 
@@ -401,7 +414,7 @@ int Game::motionTracking(){
 						  <<Output.Translation[2]<<") " 
 						  <<Output.Occluded << std::endl;*/
 
-			temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,30);		
+			temp[i] = vector3df(Output.Translation[0]/100,Output.Translation[2]/100,ZDIST);		
 		}
 		else
 		{ 
@@ -431,7 +444,7 @@ void Game::createClock(){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
-	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,18,29));
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,0,30));
 }
 
 /*
@@ -576,7 +589,7 @@ void Game::updateClock(){
 				break;
 		}
 
-		//update background
+		/**///update background
 		if(zen <= 16){
 			background = zenBackgrounds[0];
 		}else if(zen >= 17 && zen <= 33){

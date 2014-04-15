@@ -1686,12 +1686,12 @@ namespace core
 			f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar)
 	{
 
-		_IRR_DEBUG_BREAK_IF(widthOfViewVolume==0.f); //divide by zero
-		_IRR_DEBUG_BREAK_IF(heightOfViewVolume==0.f); //divide by zero
+		_IRR_DEBUG_BREAK_IF(right-left==0.f); //divide by zero
+		_IRR_DEBUG_BREAK_IF(top-bottom==0.f); //divide by zero
 		_IRR_DEBUG_BREAK_IF(zNear==zFar); //divide by zero
 		M[0] = (T)(2*zNear/right-left);
 		M[1] = 0;
-		M[2] = (T)(widthSum/widthOfViewVolume); 
+		M[2] = (T)(right+left/right-left); 
 		M[3] = 0;
 
 		M[4] = 0;
@@ -1727,8 +1727,8 @@ namespace core
 			f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar)
 	{	
 
-		_IRR_DEBUG_BREAK_IF(widthOfViewVolume==0.f); //divide by zero
-		_IRR_DEBUG_BREAK_IF(heightOfViewVolume==0.f); //divide by zero
+		_IRR_DEBUG_BREAK_IF(right-left==0.f); //divide by zero
+		_IRR_DEBUG_BREAK_IF(top-bottom==0.f); //divide by zero
 		_IRR_DEBUG_BREAK_IF(zNear==zFar); //divide by zero
 		M[0] = (T)(2*zNear/right-left);
 		M[1] = 0;
