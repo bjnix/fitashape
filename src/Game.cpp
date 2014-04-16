@@ -2,7 +2,7 @@
 Class for the Game object
 */
 #include "fitashape/Game.h"
-#define ZDIST 150
+#define ZDIST 300
 
 template<>
 char * MapNode<Player>::getDataString(){
@@ -219,25 +219,32 @@ int Game::run(){
 	//create basic camera
 	float x = 0;
 	float y = 0;
-	float z = 117;
+	float z = .5;
 	
 	ICameraSceneNode *myCamera;
 	irr::core::CMatrix4<float> MyMatrix;
 
 	f32 frustum_near = 10;
-	f32 frustum_far = 400;
+	f32 frustum_far = 5000;
 
 	#ifdef DGR_MASTER
 	myCamera = smgr->addCameraSceneNode();
 	irr::core::matrix4 m = core::IdentityMatrix;
 	
-	f32 frustum_left = -2.08; 
-	f32 frustum_right = 2.08; 
-	f32 frustum_bottom = -.28;
-	f32 frustum_top = 1.28;
+	f32 frustum_left = -3.09f; 
+	f32 frustum_right = 3.09f; 
+	f32 frustum_bottom = -2.8f;
+	f32 frustum_top = 2.04f;
 
-    myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixFrustumLH(frustum_left , frustum_right, frustum_bottom, frustum_top, frustum_near,frustum_far));
-
+    myCamera->setProjectionMatrix( 
+    	irr::core::matrix4().buildProjectionMatrixFrustumLH( 
+    		frustum_left , frustum_right, frustum_bottom-z, frustum_top-z, 
+    		frustum_near,frustum_far)
+    	);
+    //frustum_left , frustum_right, frustum_bottom, frustum_top, frustum_near,frustum_far
+    /*(frustum_right-frustum_left), 
+      (frustum_top-frustum_bottom), 
+      frustum_near,frustum_far)*/  
 	#else
 	irr::core::matrix4 m = core::IdentityMatrix;
 	//frustum_bottom -= x;
@@ -246,7 +253,11 @@ int Game::run(){
 	myCamera = smgr->addCameraSceneNode();
 	//std::cout << "viewFrustum!! SLAVE before "<<myCamera->getNearValue()<< std::endl;
 	
-	myCamera->setProjectionMatrix(irr::core::matrix4().buildProjectionMatrixFrustumLH(frustum_left , frustum_right, frustum_bottom, frustum_top, frustum_near,frustum_far));
+	myCamera->setProjectionMatrix(
+		irr::core::matrix4().buildProjectionMatrixFrustumLH( 
+    		frustum_left , frustum_right, frustum_bottom-z, frustum_top-z, 
+    		frustum_near,frustum_far)
+    	);
 
 	#endif
 	//creates the clock.
@@ -334,12 +345,12 @@ while(device->run() && !toExit)
 		//normal scoring while the game runs
 		if(!pause){
 			//update the clock and check for win/lose
-			printf("update clock\n");
+			//printf("update clock\n");
 			updateClock();
 		}
 		//menu for game overness
 		else{
-			printf("pause!!\n");
+			//printf("pause!!\n");
 			pauseMenu();
 		}
 
@@ -444,7 +455,7 @@ void Game::createClock(){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
-	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,0,30));
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,0,ZDIST));
 }
 
 /*

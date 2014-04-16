@@ -20,15 +20,15 @@ ROCKS_BIN=/opt/rocks/bin/rocks
 DGR_BIN='./strace -o /dev/null ./fitashape_S'
 DIR=`pwd`
 
-${ROCKS_BIN} run host tile-0-0 command="cd $DIR && DISPLAY=tile-0-0:0.0 ${DGR_BIN} -2.08 0  -.28	.11" &
-${ROCKS_BIN} run host tile-0-1 command="cd $DIR && DISPLAY=tile-0-1:0.0 ${DGR_BIN} -2.08 0  .11		.5" &
-${ROCKS_BIN} run host tile-0-2 command="cd $DIR && DISPLAY=tile-0-2:0.0 ${DGR_BIN} -2.08 0 .5		.89" &
-${ROCKS_BIN} run host tile-0-3 command="cd $DIR && DISPLAY=tile-0-3:0.0 ${DGR_BIN} -2.08 0 .89 		1.28" &
+${ROCKS_BIN} run host tile-0-0 command="cd $DIR && DISPLAY=tile-0-0:0.0 ${DGR_BIN} -3.09 0 -0.28  .3  5760 1080" &
+${ROCKS_BIN} run host tile-0-1 command="cd $DIR && DISPLAY=tile-0-1:0.0 ${DGR_BIN} -3.09 0 .3  .88     5760 1080" &
+${ROCKS_BIN} run host tile-0-2 command="cd $DIR && DISPLAY=tile-0-2:0.0 ${DGR_BIN} -3.09 0 .88  1.46  5760 1080" &
+${ROCKS_BIN} run host tile-0-3 command="cd $DIR && DISPLAY=tile-0-3:0.0 ${DGR_BIN} -3.09 0 1.46  2.04   5760 1080" &
 
-${ROCKS_BIN} run host tile-0-4 command="cd $DIR && DISPLAY=tile-0-4:0.0 ${DGR_BIN} 0 2.08   -.28	.11" &
-${ROCKS_BIN} run host tile-0-5 command="cd $DIR && DISPLAY=tile-0-5:0.0 ${DGR_BIN} 0 2.08   .11		.5" &
-${ROCKS_BIN} run host tile-0-6 command="cd $DIR && DISPLAY=tile-0-6:0.0 ${DGR_BIN} 0 2.08  .5		.89" &
-${ROCKS_BIN} run host tile-0-7 command="cd $DIR && DISPLAY=tile-0-7:0.0 ${DGR_BIN} 0 2.08  .89 		1.28" &
+${ROCKS_BIN} run host tile-0-4 command="cd $DIR && DISPLAY=tile-0-4:0.0 ${DGR_BIN} 0 3.09  -0.28  .3  5760 1080" &
+${ROCKS_BIN} run host tile-0-5 command="cd $DIR && DISPLAY=tile-0-5:0.0 ${DGR_BIN} 0 3.09  .3  .88    5760 1080" &
+${ROCKS_BIN} run host tile-0-6 command="cd $DIR && DISPLAY=tile-0-6:0.0 ${DGR_BIN} 0 3.09  .88  1.46  5760 1080" &
+${ROCKS_BIN} run host tile-0-7 command="cd $DIR && DISPLAY=tile-0-7:0.0 ${DGR_BIN} 0 3.09  1.46  2.04   5760 1080" &
 
 echo "Starting relay..."
 ./strace -o /dev/null ./fitashape_R 10.2.255.255 &

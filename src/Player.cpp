@@ -1,7 +1,7 @@
 /**
 Class for the player object
 **/
-
+#define ZDIST 300
 #include "fitashape/Player.h"
 Player::Player(IVideoDriver * d, ISceneManager * s){
 driver = d;
@@ -202,7 +202,7 @@ RFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 
 RestartYes.init(smgr, 1);
 RestartYes.setTarget(&LH);
-RestartYes.node->setPosition(core::vector3df(-20, 10, 30));
+RestartYes.node->setPosition(core::vector3df(-20, 10, ZDIST));
 RestartYes.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 RestartYes.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 RestartYes.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -210,7 +210,7 @@ RestartYes.node->setVisible(true);
 
 RestartNo.init(smgr, 1);
 RestartNo.setTarget(&RH);
-RestartNo.node->setPosition(core::vector3df(20,10,30));
+RestartNo.node->setPosition(core::vector3df(20,10,ZDIST));
 RestartNo.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 RestartNo.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 RestartNo.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -218,7 +218,7 @@ RestartNo.node->setVisible(true);
 
 NewGame.init(smgr, 1);
 NewGame.setTarget(&LH);
-NewGame.node->setPosition(core::vector3df(-10, 10, 30));
+NewGame.node->setPosition(core::vector3df(-10, 10, ZDIST));
 NewGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 NewGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 NewGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -226,7 +226,7 @@ NewGame.node->setVisible(true);
 
 ResumeGame.init(smgr, 1);
 ResumeGame.setTarget(&LH);
-ResumeGame.node->setPosition(core::vector3df(-10, 13, 30));
+ResumeGame.node->setPosition(core::vector3df(-10, 13, ZDIST));
 ResumeGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 ResumeGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 ResumeGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -234,7 +234,7 @@ ResumeGame.node->setVisible(true);
 
 ExitGame.init(smgr, 1);
 ExitGame.setTarget(&LH);
-ExitGame.node->setPosition(core::vector3df(-10, 8, 30));
+ExitGame.node->setPosition(core::vector3df(-10, 8, ZDIST));
 ExitGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 ExitGame.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR); //make it transarent
 ExitGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -242,7 +242,7 @@ ExitGame.node->setVisible(true);
 
 Select.init(smgr, 1);
 Select.setTarget(&RH);
-Select.node->setPosition(core::vector3df(0,10,30));
+Select.node->setPosition(core::vector3df(0,10,ZDIST));
 Select.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 Select.node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 Select.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -255,7 +255,7 @@ void Player::drawLimbs(){
 
 LH.init(smgr, 1);
 //if (LH.node){
-LH.node->setPosition(core::vector3df(-13,10,30)); //set its position
+LH.node->setPosition(core::vector3df(-13,10,ZDIST)); //set its position
 LH.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp")); //set the texture
 LH.node->setMaterialFlag(video::EMF_LIGHTING, false); //turn of the emf lighting flag
 //}
@@ -264,7 +264,7 @@ LH.node->setMaterialFlag(video::EMF_LIGHTING, false); //turn of the emf lighting
 //RH.node = smgr->addSphereSceneNode(1);
 RH.init(smgr, 1);
 //if (RH.node){
-RH.node->setPosition(core::vector3df(13,10,30));
+RH.node->setPosition(core::vector3df(13,10,ZDIST));
 RH.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 RH.node->setMaterialFlag(video::EMF_LIGHTING, false);
 //}
@@ -273,7 +273,7 @@ RH.node->setMaterialFlag(video::EMF_LIGHTING, false);
 //LF.node = smgr->addSphereSceneNode(1);
 LF.init(smgr, 1);
 //if (LF.node){
-LF.node->setPosition(core::vector3df(-3,-7,30));
+LF.node->setPosition(core::vector3df(-3,-7,ZDIST));
 LF.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
 LF.node->setMaterialFlag(video::EMF_LIGHTING, false);
 //}
@@ -282,7 +282,7 @@ LF.node->setMaterialFlag(video::EMF_LIGHTING, false);
 //RF.node = smgr->addSphereSceneNode(1);
 RF.init(smgr, 1);
 //if (RF.node){
-RF.node->setPosition(vector3df(3,-7,30));
+RF.node->setPosition(vector3df(3,-7,ZDIST));
 RF.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
 RF.node->setMaterialFlag(video::EMF_LIGHTING, false);
 //}
@@ -501,10 +501,10 @@ void Player::setMenu(){
 f32 px, py;
 px = LF.getPosition().X;
 py = LF.getPosition().Y;
-Select.setPosition(vector3df(px + 3, py + 12, 30));
-NewGame.setPosition(vector3df(px -5, py + 12, 30));
-ResumeGame.setPosition(vector3df(px - 5, py + 15, 30));
-ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
+Select.setPosition(vector3df(px + 3, py + 12, ZDIST));
+NewGame.setPosition(vector3df(px -5, py + 12, ZDIST));
+ResumeGame.setPosition(vector3df(px - 5, py + 15, ZDIST));
+ExitGame.setPosition(vector3df(px - 5, py + 9, ZDIST));
 }
 
 /*
