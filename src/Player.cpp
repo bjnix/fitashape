@@ -193,7 +193,7 @@ void Player::drawTargets(){
 	RestartYes.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//RestartYes.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	RestartYes.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	RestartYes.node->setVisible(true);
+	RestartYes.node->setVisible(false);
 
 	RestartNo.init(smgr, 1);
 	RestartNo.setTarget(&RH);
@@ -201,7 +201,7 @@ void Player::drawTargets(){
 	RestartNo.saveTexture(driver->getTexture("../assets/red-light.png"));
 	//RestartNo.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 	RestartNo.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	RestartNo.node->setVisible(true);
+	RestartNo.node->setVisible(false);
 
 	NewGame.init(smgr, 1);
 	NewGame.setTarget(&LH);
@@ -209,7 +209,7 @@ void Player::drawTargets(){
 	NewGame.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//NewGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	NewGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	NewGame.node->setVisible(true);
+	NewGame.node->setVisible(false);
 
 	ResumeGame.init(smgr, 1);
 	ResumeGame.setTarget(&LH);
@@ -217,7 +217,7 @@ void Player::drawTargets(){
 	ResumeGame.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//ResumeGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	ResumeGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	ResumeGame.node->setVisible(true);
+	ResumeGame.node->setVisible(false);
 
 	ExitGame.init(smgr, 1);
 	ExitGame.setTarget(&LH);
@@ -225,7 +225,7 @@ void Player::drawTargets(){
 	ExitGame.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//ExitGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	ExitGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	ExitGame.node->setVisible(true);
+	ExitGame.node->setVisible(false);
 
 	Select.init(smgr, 1);
 	Select.setTarget(&RH);
@@ -233,7 +233,7 @@ void Player::drawTargets(){
 	Select.saveTexture(driver->getTexture("../assets/red-light.png"));
 	//Select.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 	Select.node->setMaterialFlag(video::EMF_LIGHTING, false);
-	Select.node->setVisible(true);
+	Select.node->setVisible(false);
 }
 /*
 method to draw the limb orbs
@@ -284,7 +284,7 @@ bool Player::collide (CircleNode node){
 		node.resetTexture();
 		return false;
 	}
-	node.collideTexture(driver->getTexture("../assets/particlewhite.bmp"));
+	node.collideTexture(driver->getTexture("../assets/grey-flat.png"));
 	//did collide, change texture to a different one
 	return true;
 }

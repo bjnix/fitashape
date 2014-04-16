@@ -4,6 +4,14 @@ Class for the Game object
 #include "fitashape/Game.h"
 #define ZDIST 300
 
+#define R3_TOP 2.04f
+#define R2_TOP 1.46f
+#define R1_TOP 0.88f
+#define R0_TOP 0.3f
+
+#define COL_R 3.09f
+
+
 template<>
 char * MapNode<Player>::getDataString(){
 	std::vector<vector3df> dataPos = data->getPosition();
@@ -457,7 +465,8 @@ void Game::createClock(){
 	//device->setWindowCaption(tmp);
 	
 	//text that will be displayed on the screen
-	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),tmp,video::SColor(255,0,0,0),0,core::vector3df(0,0,ZDIST));
+	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),
+					tmp,video::SColor(255,0,0,0),0,core::vector3df(0,1,10));
 }
 
 /*
@@ -617,7 +626,7 @@ void Game::updateClock(){
 			background = zenBackgrounds[5];
 		}else if(zen <= 100/8 * 7){
 			background = zenBackgrounds[6];
-		}else{
+		}else {
 			background = zenBackgrounds[7];
 		}
 
@@ -806,9 +815,41 @@ void Game::drawObjects(){
 	int x1 = 520, y1 = 0, x2 = 920, y2 = 70;
 	int color;
 	
-	f32 back1 = -5760.0f;
+	f32 back1 = 0.0f;
 	f32 back2 = 0.0f;
+/*
+	R3_TOP 2.04f
+	R2_TOP 1.46f
+	R1_TOP 0.88f
+	R0_TOP 0.3f
 
+	COL_R 3.09f
+*/
+#ifdef DGR_MASTER
+
+#else
+	y2 = 280;
+	x1 = -5000; x2 = -5000;
+	if(frustum_right == COL_R){ 
+		back1 = -5760.0f;
+	}
+	else if( frustum_right == 0){
+		back1 = 0.0f;	
+	}
+	else{ printf("!!error drawObjects!!\n"); }
+
+	if(frustum_top == R3_TOP){ 
+		back2 = 0.0f;
+		if(frustum_right == COL_R){ x1 = -800; x2 = 800; } 
+		else if(frustum_right == 0){x1 = 4760; x2 = 6760; }
+		else{ printf("!!error drawObjects!!\n"); }
+	}
+	else if(frustum_top == R2_TOP){ back2 = -1080.0f; }
+	else if(frustum_top == R1_TOP){ back2 = -2160.0f; }
+	else if(frustum_top == R0_TOP){ back2 = -3240.0f; }
+	else{ printf("!!error drawObjects!!\n"); }
+	
+#endif
 	//draw the background
 	driver->draw2DImage(background,position2d<s32>(back1,back2));
 	
@@ -822,7 +863,12 @@ void Game::drawObjects(){
 			zenBarSize--;
 		driver->draw2DImage(zenBar, rect<s32>(x1, y1, x2, y2), rect<s32>(0, 0, 1780, 300), NULL, NULL, true);
 		color = 255 - (zenBarSize * 2.55);
+		
+	#ifdef DGR_MASTER	
 		driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+37, y1+22, x1 +37 + (zenBarSize * 3.3), y2-27), NULL);
+	#else		
+		driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+180, y1+85, x1 +182 + (zenBarSize * 12.8), y2-108), NULL);
+	#endif
 	}
 
 	smgr->drawAll(); // draw the 3d scene
