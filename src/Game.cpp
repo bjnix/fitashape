@@ -434,10 +434,11 @@ int Game::motionTracking(){
 		}
 	}
 
-	p1->updateBody();
+	
 	p1->setPosition(temp);
 
 #endif
+	p1->updateBody();
 	return 0;
 }
 
