@@ -15,7 +15,7 @@ class CircleNode
 private:
 	CircleNode* targ;
 	scene::ISceneManager* smgr;
-	
+	ITexture* texture; 
 
 public:
 	scene::ISceneNode* node;
@@ -28,6 +28,10 @@ public:
 	CircleNode* target();
 	void setPosition(vector3df);
 	vector3df getPosition(); //maybe const?
+	void saveTexture(ITexture* color);
+	void collideTexture(ITexture* color);
+	void resetTexture();
+
 
 	/* data */
 };

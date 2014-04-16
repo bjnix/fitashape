@@ -34,3 +34,16 @@ void CircleNode::setPosition(vector3df pos){
 vector3df CircleNode::getPosition(){
 	return node->getPosition();
 }
+
+void CircleNode::saveTexture(ITexture* color){
+	texture = color;
+	node->setMaterialTexture(0, texture);
+}
+
+void CircleNode::collideTexture(ITexture* color){
+	node->setMaterialTexture(0, color);
+}
+
+void CircleNode::resetTexture(){
+	node->setMaterialTexture(0, texture);
+}
