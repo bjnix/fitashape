@@ -4,23 +4,23 @@ Class for the player object
 #define ZDIST 300
 #include "fitashape/Player.h"
 Player::Player(IVideoDriver * d, ISceneManager * s){
-driver = d;
-smgr = s;
-ground = 0;
+	driver = d;
+	smgr = s;
+	ground = 0;
 }
 Player::~Player(void){}
 /*
 get the current node
 */
 scene::ISceneNode * Player::currentNode(){
-return current.node;
+	return current.node;
 }
 
 /*
 set the current node
 */
 void Player::setCurrent(CircleNode& node){
-current = node;
+	current = node;
 }
 
 /*
@@ -28,16 +28,16 @@ This method will detect where the persons body is and the relative shape of the 
 uses the first 4 locations stored in initLoc[] and sets the last 5
 */
 void Player::initializePosition(){
-vector3df LShoulder;
-vector3df RShoulder;
-vector3df LHip;
-vector3df RHip;
-vector3df centerBody;
+	vector3df LShoulder;
+	vector3df RShoulder;
+	vector3df LHip;
+	vector3df RHip;
+	vector3df centerBody;
 
-ground = mid(initLoc[2].Y,initLoc[3].Y); //sets ground to how the average height of the feet are
+	ground = mid(initLoc[2].Y,initLoc[3].Y); //sets ground to how the average height of the feet are
 
-LShoulder = core::vector3df(initLoc[2].X,initLoc[0].Y,initLoc[0].Z);//(leftfoot.x,lefthand.y,lefthand.x)
-RShoulder = core::vector3df(initLoc[3].X,initLoc[1].Y,initLoc[1].Z);//(rightfoot.x,righthand.y,righthand.x)
+	LShoulder = core::vector3df(initLoc[2].X,initLoc[0].Y,initLoc[0].Z);//(leftfoot.x,lefthand.y,lefthand.x)
+	RShoulder = core::vector3df(initLoc[3].X,initLoc[1].Y,initLoc[1].Z);//(rightfoot.x,righthand.y,righthand.x)
 
 LArm = initLoc[0].getDistanceFrom(LShoulder);//from left hand to left shoulder
 RArm = initLoc[1].getDistanceFrom(RShoulder);//from right hand to right shoulder
@@ -49,14 +49,14 @@ RHip = core::vector3df(RShoulder.X,(RShoulder.Y - RArm),RShoulder.Z);
 LLeg = initLoc[2].getDistanceFrom(LHip);//left foot to left hip
 RLeg = initLoc[3].getDistanceFrom(RHip);//right foot to right hip
 
-centerBody = core::vector3df(mid(LHip.X,RHip.X),mid(LHip.Y,LShoulder.Y),LHip.Z);
-
-initLoc[4] = LShoulder;
-initLoc[5] = RShoulder;
-initLoc[6] = LHip;
-initLoc[7] = RHip;
-initLoc[8] = centerBody;
-
+	centerBody = core::vector3df(mid(LHip.X,RHip.X),mid(LHip.Y,LShoulder.Y),LHip.Z);
+	
+	initLoc[4] = LShoulder;
+	initLoc[5] = RShoulder;
+	initLoc[6] = LHip;
+	initLoc[7] = RHip;
+	initLoc[8] = centerBody;
+	
 
 }
 
@@ -65,98 +65,98 @@ initLoc[8] = centerBody;
 This method builds a random shape for the player based off thier initLoc[]
 */
 void Player::randomTargets(){
-f32 spin;
-f32 shift;
-vector3df temp;
-vector3df LShoulder;
-vector3df RShoulder;
-vector3df LHip;
-vector3df RHip;
-vector3df centerBody;
+	f32 spin;
+	f32 shift;
+	vector3df temp;
+	vector3df LShoulder;
+	vector3df RShoulder;
+	vector3df LHip;
+	vector3df RHip;
+	vector3df centerBody;
 
-srand (time(0));
-spin = (f32) (rand() % 90 - 45);
-f32 bodySpin = spin;
+	srand (time(0));
+	spin = (f32) (rand() % 90 - 45);
+	f32 bodySpin = spin;
 
-//rotate the body randomly to one side or the other
-temp = initLoc[4];// position of left shoulder
-temp.rotateXYBy(spin,initLoc[8]);
-LShoulder = temp;
-
-
-temp = initLoc[5];// position of right shoulder
-temp.rotateXYBy(spin,initLoc[8]);
-RShoulder = temp;
+	//rotate the body randomly to one side or the other
+	temp = initLoc[4];// position of left shoulder
+	temp.rotateXYBy(spin,initLoc[8]);
+	LShoulder = temp;
 
 
-temp = initLoc[6];// position of left hip
-temp.rotateXYBy(spin,initLoc[8]);
-LHip = temp;
+	temp = initLoc[5];// position of right shoulder
+	temp.rotateXYBy(spin,initLoc[8]);
+	RShoulder = temp;
 
 
-temp = initLoc[7];// position of right hip
-temp.rotateXYBy(spin,initLoc[8]);
-RHip = temp;
+	temp = initLoc[6];// position of left hip
+	temp.rotateXYBy(spin,initLoc[8]);
+	LHip = temp;
 
-//figure out where the feet should go
-if(bodySpin < 0){//Right foot down!
-spin = (f32) (rand() % 50 - 25);
-temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
-temp.rotateXYBy(spin,RHip);
-RFTarget.setPosition(temp);
 
-//put the left foot somewhere
-temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
-temp.rotateXYBy(spin,LHip);
-LFTarget.setPosition(temp);
+	temp = initLoc[7];// position of right hip
+	temp.rotateXYBy(spin,initLoc[8]);
+	RHip = temp;
 
-//get the amout to move up
-shift = ground - RFTarget.getPosition().Y;
-}else{//left foot down!
-spin = (f32) (rand() % 50 - 25);
-temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
-temp.rotateXYBy(spin,LHip);
-LFTarget.setPosition(temp);
+	//figure out where the feet should go
+	if(bodySpin < 0){//Right foot down!
+		spin = (f32) (rand() % 50 - 25);
+		temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
+		temp.rotateXYBy(spin,RHip);
+		RFTarget.setPosition(temp);
 
-//put the right foot somewhere
-spin = 90 - 45 + bodySpin;
-temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
-temp.rotateXYBy(spin,RHip);
-RFTarget.setPosition(temp);
+		//put the left foot somewhere
+		temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
+		temp.rotateXYBy(spin,LHip);
+		LFTarget.setPosition(temp);
 
-//get the amout to move up
-shift = ground - LFTarget.getPosition().Y;
-}
+		//get the amout to move up
+		shift = ground - RFTarget.getPosition().Y;
+	}else{//left foot down!
+		spin = (f32) (rand() % 50 - 25);
+		temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
+		temp.rotateXYBy(spin,LHip);
+		LFTarget.setPosition(temp);
 
-//move the arms around!
-//left hand first
-spin = rand() % 160 - 80 + bodySpin;
-temp = vector3df(LShoulder.X - LArm,LShoulder.Y ,LShoulder.Z);
-temp.rotateXYBy(spin,LShoulder);
-LHTarget.setPosition(temp);
-//right hand now
-spin = rand() % 160 - 80 + bodySpin;
-temp = vector3df(RShoulder.X + RArm,RShoulder.Y ,RShoulder.Z);
-temp.rotateXYBy(spin,RShoulder);
-RHTarget.setPosition(temp);
+		//put the right foot somewhere
+		spin =  90 - 45 + bodySpin;
+		temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
+		temp.rotateXYBy(spin,RHip);
+		RFTarget.setPosition(temp);
 
-//shift everything to line up with the ground
-LHTarget.setPosition(vector3df(LHTarget.getPosition().X,LHTarget.getPosition().Y + shift,LHTarget.getPosition().Z));
-RHTarget.setPosition(vector3df(RHTarget.getPosition().X,RHTarget.getPosition().Y + shift,RHTarget.getPosition().Z));
-LFTarget.setPosition(vector3df(LFTarget.getPosition().X,LFTarget.getPosition().Y + shift,LFTarget.getPosition().Z));
-RFTarget.setPosition(vector3df(RFTarget.getPosition().X,RFTarget.getPosition().Y + shift,RFTarget.getPosition().Z));
-//LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
-//RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
-//LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
-//RHip = vector3df(RHip.X,RHip.Y + shift, RHip.Z);
-//centerBody = vector3df(centerBody.X,centerBody.Y + shift, centerBody.Z);
+		//get the amout to move up
+		shift = ground - LFTarget.getPosition().Y;
+	}
+
+	//move the arms around!
+	//left hand first
+	spin = rand() % 160 - 80 + bodySpin;
+	temp = vector3df(LShoulder.X - LArm,LShoulder.Y ,LShoulder.Z);
+	temp.rotateXYBy(spin,LShoulder);
+	LHTarget.setPosition(temp);
+	//right hand now
+	spin = rand() % 160 - 80 + bodySpin;
+	temp = vector3df(RShoulder.X + RArm,RShoulder.Y ,RShoulder.Z);
+	temp.rotateXYBy(spin,RShoulder);
+	RHTarget.setPosition(temp);
+
+	//shift everything to line up with the ground
+	LHTarget.setPosition(vector3df(LHTarget.getPosition().X,LHTarget.getPosition().Y + shift,LHTarget.getPosition().Z));
+	RHTarget.setPosition(vector3df(RHTarget.getPosition().X,RHTarget.getPosition().Y + shift,RHTarget.getPosition().Z));
+	LFTarget.setPosition(vector3df(LFTarget.getPosition().X,LFTarget.getPosition().Y + shift,LFTarget.getPosition().Z));
+	RFTarget.setPosition(vector3df(RFTarget.getPosition().X,RFTarget.getPosition().Y + shift,RFTarget.getPosition().Z));
+	//LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
+	//RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
+	//LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
+	//RHip = vector3df(RHip.X,RHip.Y + shift, RHip.Z);
+	//centerBody = vector3df(centerBody.X,centerBody.Y + shift, centerBody.Z);
 }
 
 /*
 method to set up the targets for each limb
 */
 void Player::drawTargets(){
-LHTarget.init(smgr, 1);
+	LHTarget.init(smgr, 1);
 
 LHTarget.setTarget(&LH);
 LHTarget.node->setPosition(LH.node->getPosition()); // set it's position to a temp spot
@@ -420,152 +420,191 @@ bool visibility - true for targets vis, menu invis. false for inverse
 bool resume - whether or not a game is currently running, allowing for the resume game option to be shown.
 */
 void Player::setTargetVisible(bool visibility, bool resume){
-RFTarget.node->setVisible(visibility);
-LFTarget.node->setVisible(visibility);
-RHTarget.node->setVisible(visibility);
-LHTarget.node->setVisible(visibility);
-NewGame.node->setVisible(!visibility);
-ResumeGame.node->setVisible(!visibility && !resume);
-ExitGame.node->setVisible(!visibility);
-Select.node->setVisible(!visibility);
+	RFTarget.node->setVisible(visibility);
+	LFTarget.node->setVisible(visibility);
+	RHTarget.node->setVisible(visibility);
+	LHTarget.node->setVisible(visibility);
+	NewGame.node->setVisible(!visibility);
+	bNewGame->setVisible(!visibility);
+	ResumeGame.node->setVisible(!visibility && !resume);
+	bResumeGame->setVisible(!visibility && !resume);
+	ExitGame.node->setVisible(!visibility);
+	bExitGame->setVisible(!visibility);
+	Select.node->setVisible(!visibility);
+	bSelect->setVisible(!visibility);
 
-body->setVisible(visibility);
+	body->setVisible(visibility);
 }
 
 /*
 void setMenuInvis - make the menu nodes all invisible
 */
 void Player::setMenuInvis(){
-NewGame.node->setVisible(false);
-ResumeGame.node->setVisible(false);
-ExitGame.node->setVisible(false);
-Select.node->setVisible(false);
+	NewGame.node->setVisible(false);
+	bNewGame->setVisible(false);
+	ResumeGame.node->setVisible(false);
+	bResumeGame->setVisible(false);
+	ExitGame.node->setVisible(false);
+	bExitGame->setVisible(false);
+	Select.node->setVisible(false);
+	bSelect->setVisible(false);
 }
 
 //figure out which resart button is pressed
 int Player::restartCollide(){
-if(collide(RestartYes))
-return 1;
-else if(collide(RestartNo))
-return 2;
-else
-return 0;
+	if(collide(RestartYes))
+		return 1;
+	else if(collide(RestartNo))
+		return 2;
+	else 
+		return 0;
 }
 
 /*
 int pauseCollide - return which combination of buttons is pressed for the menu
 returns:
-1 - resume and select button pressed
-2 - newgame and select pressed
-3 - exit game and select pressed
-4 - only resume selected
-5 - only newgame selected
-6 - only exit selected
+	1 - resume and select button pressed
+	2 - newgame and select pressed
+	3 - exit game and select pressed
+	4 - only resume selected
+	5 - only newgame selected
+	6 - only exit selected
 */
 int Player::pauseCollide(){
-int ret = 0;
-if(ResumeGame.node->isVisible() && collide(ResumeGame)){ // only count resume if visible
-if(collide(Select))
-ret = 1;
-else
-ret = 4;
-}
-
-if(collide(NewGame)){
-if(collide(Select))
-ret = 2;
-else
-ret = 5;
-}
-if(collide (ExitGame)){
-if(collide(Select))
-ret = 3;
-else
-ret = 6;
-}
-return ret;
+	int ret = 0;
+	if(ResumeGame.node->isVisible() && collide(ResumeGame)){ // only count resume if visible
+		if(collide(Select))
+			ret = 1;
+		else
+			ret = 4;
+	} 
+		
+	if(collide(NewGame)){
+		if(collide(Select))
+			ret = 2;
+		else
+			ret = 5;
+	}
+	if(collide (ExitGame)){
+		if(collide(Select))
+			ret = 3;
+		else
+			ret = 6;
+	}
+	return ret;
 }
 
 bool Player::jump(){
-//printf("mid: %f, left: %f, right: %f\n", ground, LF.getPosition().Y, RF.getPosition().Y);
-if(LF.getPosition().Y > ground + .5 && RF.getPosition().Y > ground + .5)
-return true;
+	//printf("mid: %f, left: %f, right: %f\n", ground, LF.getPosition().Y, RF.getPosition().Y);
+	if(LF.getPosition().Y > ground + .5 && RF.getPosition().Y > ground + .5)
+		return true;
 
-return false;
+	return false;
 }
 
 /*
 void setmenu - sets the menu buttons to relativly follow the left foot node.
 */
 void Player::setMenu(){
-f32 px, py;
-px = LF.getPosition().X;
-py = LF.getPosition().Y;
-Select.setPosition(vector3df(px + 3, py + 12, ZDIST));
-NewGame.setPosition(vector3df(px -5, py + 12, ZDIST));
-ResumeGame.setPosition(vector3df(px - 5, py + 15, ZDIST));
-ExitGame.setPosition(vector3df(px - 5, py + 9, ZDIST));
+	f32 px, py;
+	px = LF.getPosition().X;
+	py = LF.getPosition().Y;
+	Select.setPosition(vector3df(px + 3, py + 12, 30));
+	bSelect->setPosition(vector3df(px + 3, py + 11.85, 29));
+	NewGame.setPosition(vector3df(px -5, py + 12, 30));
+	bNewGame->setPosition(vector3df(px -5, py + 11.85, 29));
+	ResumeGame.setPosition(vector3df(px - 5, py + 15, 30));
+	bResumeGame->setPosition(vector3df(px -5, py + 14.85, 29));
+	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));
+	bExitGame->setPosition(vector3df(px -5, py + 8.85, 29));
 }
 
 /*
-update the location and rotation of the body object to make it look like it is accurate
+  update the location and rotation of the body object to make it look like it is accurate
 */
 void Player::updateBody(){
-//make sure the body exists already
-if(body){
-//set the position to the middle of the feet
-body->setPosition(vector3df(mid(RF.getPosition().X,LF.getPosition().X), body->getPosition().Y, body->getPosition().Z));
+	//make sure the body exists already
+	if(body){
+		//set the position to the middle of the feet
+		body->setPosition(vector3df(mid(RF.getPosition().X,LF.getPosition().X), body->getPosition().Y, body->getPosition().Z));
 
-//set the rotation based off of the hands
-if(LH.getPosition().X < (body->getPosition().X - abs(initLoc[0].X - initLoc[8].X)))
-body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X)));
+		//set the rotation based off of the hands
+		if(LH.getPosition().X < (body->getPosition().X - abs(initLoc[0].X - initLoc[8].X)))
+			body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X)));
 
-if(RH.getPosition().X > (body->getPosition().X + abs(initLoc[1].X - initLoc[8].X)))
-body->setRotation(vector3df(0,0, -3 * abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X)));
+		if(RH.getPosition().X > (body->getPosition().X + abs(initLoc[1].X - initLoc[8].X)))
+			body->setRotation(vector3df(0,0, -3 * abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X)));
 }
 }
 
 /*
-helper to find the middle of 2 numbers
+   helper to find the middle of 2 numbers
 */
 double Player::mid(double a, double b){
-return (a/2 + b/2);
+	return (a/2 + b/2);
 }
 
 /*
-helper to find the absolute value of a number
+   helper to find the absolute value of a number
 */
 double Player::abs(double number){
-if(number < 0)
-return number * -1;
-return number;
+	if(number < 0)
+		return number * -1;
+	return number;
 }
 
 void Player::createBody(){
-//add the body
-IMesh* mesh = smgr->getMesh("../assets/circle-stick.3ds");
-if (!mesh)
-{
-printf("mesh did not work\n");
-exit(-1);
+	//add the body
+	IMesh* mesh = smgr->getMesh("../assets/Character.3ds");
+	if (!mesh)
+	{
+		printf("mesh did not work\n");
+		exit(-1);
+	}
+	printf("mesh worked\n");
+	body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+	if (body)
+	{
+		body->setMaterialFlag(EMF_LIGHTING, false);
+		printf("body worked\n");	
+	}
+	else{
+		printf("body did not work\n");
+		exit(-1);
+	}
 }
-printf("mesh worked\n");
-body = smgr->addMeshSceneNode( mesh,0,0,vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
-if (body)
-{
-body->setMaterialFlag(EMF_LIGHTING, false);
-printf("body worked\n");	
-}
-else{
-printf("body did not work\n");
-exit(-1);
-}
+
+void Player::createButtons(){
+	f32 px, py;
+	px = LF.getPosition().X;
+	py = LF.getPosition().Y;
+	IMesh* mesh = smgr->getMesh("../assets/New.3ds");
+	bNewGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(NewGame.getPosition().X, NewGame.getPosition().Y, 29));
+	bNewGame->setMaterialFlag(EMF_LIGHTING, false);
+	bNewGame->setScale(vector3df(3,3,3));
+	mesh = smgr->getMesh("../assets/Exit.3ds");
+	bExitGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(ExitGame.getPosition().X, ExitGame.getPosition().Y, 29));
+	bExitGame->setMaterialFlag(EMF_LIGHTING, false);
+	bExitGame->setScale(vector3df(3,3,3));
+	mesh = smgr->getMesh("../assets/Resume.3ds");
+	bResumeGame = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(ResumeGame.getPosition().X, ResumeGame.getPosition().Y, 29));
+	bResumeGame->setMaterialFlag(EMF_LIGHTING, false);
+	bResumeGame->setScale(vector3df(3,3,3));
+	mesh = smgr->getMesh("../assets/Select.3ds");
+	bSelect = smgr->addMeshSceneNode(mesh, 0, 0, vector3df(Select.getPosition().X, Select.getPosition().Y, 29));
+	bSelect->setMaterialFlag(EMF_LIGHTING, false);
+	bSelect->setScale(vector3df(3,3,3));
+
+	/*Select.setPosition(vector3df(px + 3, py + 12, 30));
+	NewGame.setPosition(vector3df(px -5, py + 12, 30));
+	ResumeGame.setPosition(vector3df(px - 5, py + 15, 30));
+	ExitGame.setPosition(vector3df(px - 5, py + 9, 30));*/
 }
 
 void Player::bodyScale(){
-if (body){
-body->setPosition(vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
-double scale = (initLoc[4].Y - initLoc[0].getDistanceFrom(initLoc[4]))/5.0;
-body->setScale(vector3df(scale,scale,scale));
-}
+	if (body){
+		body->setPosition(vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+		double scale = (initLoc[4].Y - initLoc[0].getDistanceFrom(initLoc[4]))/5.0;
+		body->setScale(vector3df(scale,scale,scale));
+	}
 }

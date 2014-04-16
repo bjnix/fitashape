@@ -111,7 +111,7 @@ public:
 	int zen;
 	int score;
 	int timesUp;
-	scene::ITextSceneNode * text;
+	scene::ITextSceneNode * text, * timeText, * scoreText;
 	MyEventReceiver receiver;
 	ITexture* background;
 
