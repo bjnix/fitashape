@@ -89,9 +89,11 @@ public:
 	void setCurrentRH();
 	void setCurrentLF();
 	void setCurrentRF();
-	void setPosition(std::vector<vector3df> vec);
+	void setPosition(std::vector<vector3df> pos);
+	void setNodePositions(std::vector<vector3df> pos);
 	void setPosition(vector3df pos[4]);
 	std::vector<vector3df> getPosition();
+	std::vector<vector3df> getNodePositions();
 	
 	void localInitPos();	
 	void addCameraScene();

@@ -65,91 +65,94 @@ initLoc[8] = centerBody;
 This method builds a random shape for the player based off thier initLoc[]
 */
 void Player::randomTargets(){
-f32 spin;
-f32 shift;
-vector3df temp;
-vector3df LShoulder;
-vector3df RShoulder;
-vector3df LHip;
-vector3df RHip;
-vector3df centerBody;
 
-srand (time(0));
-spin = (f32) (rand() % 90 - 45);
-f32 bodySpin = spin;
+	f32 spin;
+	f32 shift;
+	vector3df temp;
+	vector3df LShoulder;
+	vector3df RShoulder;
+	vector3df LHip;
+	vector3df RHip;
+	vector3df centerBody;
 
-//rotate the body randomly to one side or the other
-temp = initLoc[4];// position of left shoulder
-temp.rotateXYBy(spin,initLoc[8]);
-LShoulder = temp;
+	srand (time(0));
+	spin = (f32) (rand() % 90 - 45);
+	f32 bodySpin = spin;
 
-
-temp = initLoc[5];// position of right shoulder
-temp.rotateXYBy(spin,initLoc[8]);
-RShoulder = temp;
+	//rotate the body randomly to one side or the other
+	temp = initLoc[4];// position of left shoulder
+	temp.rotateXYBy(spin,initLoc[8]);
+	LShoulder = temp;
 
 
-temp = initLoc[6];// position of left hip
-temp.rotateXYBy(spin,initLoc[8]);
-LHip = temp;
+	temp = initLoc[5];// position of right shoulder
+	temp.rotateXYBy(spin,initLoc[8]);
+	RShoulder = temp;
 
 
-temp = initLoc[7];// position of right hip
-temp.rotateXYBy(spin,initLoc[8]);
-RHip = temp;
+	temp = initLoc[6];// position of left hip
+	temp.rotateXYBy(spin,initLoc[8]);
+	LHip = temp;
 
-//figure out where the feet should go
-if(bodySpin < 0){//Right foot down!
-spin = (f32) (rand() % 50 - 25);
-temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
-temp.rotateXYBy(spin,RHip);
-RFTarget.setPosition(temp);
 
-//put the left foot somewhere
-temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
-temp.rotateXYBy(spin,LHip);
-LFTarget.setPosition(temp);
+	temp = initLoc[7];// position of right hip
+	temp.rotateXYBy(spin,initLoc[8]);
+	RHip = temp;
 
-//get the amout to move up
-shift = ground - RFTarget.getPosition().Y;
-}else{//left foot down!
-spin = (f32) (rand() % 50 - 25);
-temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
-temp.rotateXYBy(spin,LHip);
-LFTarget.setPosition(temp);
+	//figure out where the feet should go
+	if(bodySpin < 0){//Right foot down!
+		spin = (f32) (rand() % 50 - 25);
+		temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
+		temp.rotateXYBy(spin,RHip);
+		RFTarget.setPosition(temp);
 
-//put the right foot somewhere
-spin = 90 - 45 + bodySpin;
-temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
-temp.rotateXYBy(spin,RHip);
-RFTarget.setPosition(temp);
+		//put the left foot somewhere
+		temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
+		temp.rotateXYBy(spin,LHip);
+		LFTarget.setPosition(temp);
 
-//get the amout to move up
-shift = ground - LFTarget.getPosition().Y;
-}
+		//get the amout to move up
+		shift = ground - RFTarget.getPosition().Y;
+	}else{//left foot down!
+		spin = (f32) (rand() % 50 - 25);
+		temp = vector3df(LHip.X,LHip.Y - LLeg,LHip.Z);
+		temp.rotateXYBy(spin,LHip);
+		LFTarget.setPosition(temp);
 
-//move the arms around!
-//left hand first
-spin = rand() % 160 - 80 + bodySpin;
-temp = vector3df(LShoulder.X - LArm,LShoulder.Y ,LShoulder.Z);
-temp.rotateXYBy(spin,LShoulder);
-LHTarget.setPosition(temp);
-//right hand now
-spin = rand() % 160 - 80 + bodySpin;
-temp = vector3df(RShoulder.X + RArm,RShoulder.Y ,RShoulder.Z);
-temp.rotateXYBy(spin,RShoulder);
-RHTarget.setPosition(temp);
+		//put the right foot somewhere
+		spin = 90 - 45 + bodySpin;
+		temp = vector3df(RHip.X,RHip.Y - RLeg,RHip.Z);
+		temp.rotateXYBy(spin,RHip);
+		RFTarget.setPosition(temp);
 
-//shift everything to line up with the ground
-LHTarget.setPosition(vector3df(LHTarget.getPosition().X,LHTarget.getPosition().Y + shift,LHTarget.getPosition().Z));
-RHTarget.setPosition(vector3df(RHTarget.getPosition().X,RHTarget.getPosition().Y + shift,RHTarget.getPosition().Z));
-LFTarget.setPosition(vector3df(LFTarget.getPosition().X,LFTarget.getPosition().Y + shift,LFTarget.getPosition().Z));
-RFTarget.setPosition(vector3df(RFTarget.getPosition().X,RFTarget.getPosition().Y + shift,RFTarget.getPosition().Z));
-//LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
-//RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
-//LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
-//RHip = vector3df(RHip.X,RHip.Y + shift, RHip.Z);
-//centerBody = vector3df(centerBody.X,centerBody.Y + shift, centerBody.Z);
+		//get the amout to move up
+		shift = ground - LFTarget.getPosition().Y;
+	}
+
+	//move the arms around!
+	//left hand first
+	spin = rand() % 160 - 80 + bodySpin;
+	temp = vector3df(LShoulder.X - LArm,LShoulder.Y ,LShoulder.Z);
+	temp.rotateXYBy(spin,LShoulder);
+	LHTarget.setPosition(temp);
+	//right hand now
+	spin = rand() % 160 - 80 + bodySpin;
+	temp = vector3df(RShoulder.X + RArm,RShoulder.Y ,RShoulder.Z);
+	temp.rotateXYBy(spin,RShoulder);
+	RHTarget.setPosition(temp);
+
+	//shift everything to line up with the ground
+#ifdef DGR_MASTER
+	LHTarget.setPosition(vector3df(LHTarget.getPosition().X,LHTarget.getPosition().Y + shift,LHTarget.getPosition().Z));
+	RHTarget.setPosition(vector3df(RHTarget.getPosition().X,RHTarget.getPosition().Y + shift,RHTarget.getPosition().Z));
+	LFTarget.setPosition(vector3df(LFTarget.getPosition().X,LFTarget.getPosition().Y + shift,LFTarget.getPosition().Z));
+	RFTarget.setPosition(vector3df(RFTarget.getPosition().X,RFTarget.getPosition().Y + shift,RFTarget.getPosition().Z));
+	//LShoulder = vector3df(LShoulder.X,LShoulder.Y + shift, LShoulder.Z);
+	//RShoulder = vector3df(RShoulder.X,RShoulder.Y + shift, RShoulder.Z);
+	//LHip = vector3df(LHip.X,LHip.Y + shift, LHip.Z);
+	//RHip = vector3df(RHip.X,RHip.Y + shift, RHip.Z);
+	//centerBody = vector3df(centerBody.X,centerBody.Y + shift, centerBody.Z);
+#endif
 }
 
 /*
@@ -158,7 +161,7 @@ method to set up the targets for each limb
 void Player::drawTargets(){
 	LHTarget.init(smgr, 1);
 	LHTarget.setTarget(&LH);
-	LHTarget.node->setPosition(LH.node->getPosition()); // set it's position to a temp spot
+	LHTarget.setPosition(LH.node->getPosition()); // set it's position to a temp spot
 	LHTarget.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//LHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	LHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -166,7 +169,7 @@ void Player::drawTargets(){
 	//target for right hand
 	RHTarget.init(smgr, 1);
 	RHTarget.setTarget(&RH);
-	RHTarget.node->setPosition(RH.node->getPosition());
+	RHTarget.setPosition(RH.node->getPosition());
 	RHTarget.saveTexture(driver->getTexture("../assets/red-light.png"));
 	//RHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 	RHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -174,7 +177,7 @@ void Player::drawTargets(){
 	//target for left foot
 	LFTarget.init(smgr, 1);
 	LFTarget.setTarget(&LF);
-	LFTarget.node->setPosition(LF.node->getPosition());
+	LFTarget.setPosition(LF.node->getPosition());
 	LFTarget.saveTexture(driver->getTexture("../assets/green-light.png"));
 	//LFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
 	LFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -182,14 +185,14 @@ void Player::drawTargets(){
 	//target for right foot
 	RFTarget.init(smgr, 1);
 	RFTarget.setTarget(&RF);
-	RFTarget.node->setPosition(RF.node->getPosition());
+	RFTarget.setPosition(RF.node->getPosition());
 	RFTarget.saveTexture(driver->getTexture("../assets/yellow-light.png"));
 	//RFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
 	RFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
 
 	RestartYes.init(smgr, 1);
 	RestartYes.setTarget(&LH);
-	RestartYes.node->setPosition(core::vector3df(-20, 10, ZDIST));
+	RestartYes.setPosition(core::vector3df(-20, 10, ZDIST));
 	RestartYes.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//RestartYes.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	RestartYes.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -197,7 +200,7 @@ void Player::drawTargets(){
 
 	RestartNo.init(smgr, 1);
 	RestartNo.setTarget(&RH);
-	RestartNo.node->setPosition(core::vector3df(20,10,ZDIST));
+	RestartNo.setPosition(core::vector3df(20,10,ZDIST));
 	RestartNo.saveTexture(driver->getTexture("../assets/red-light.png"));
 	//RestartNo.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 	RestartNo.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -205,7 +208,7 @@ void Player::drawTargets(){
 
 	NewGame.init(smgr, 1);
 	NewGame.setTarget(&LH);
-	NewGame.node->setPosition(core::vector3df(-10, 10, ZDIST));
+	NewGame.setPosition(core::vector3df(-10, 10, ZDIST));
 	NewGame.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//NewGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	NewGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -213,7 +216,7 @@ void Player::drawTargets(){
 
 	ResumeGame.init(smgr, 1);
 	ResumeGame.setTarget(&LH);
-	ResumeGame.node->setPosition(core::vector3df(-10, 13, ZDIST));
+	ResumeGame.setPosition(core::vector3df(-10, 13, ZDIST));
 	ResumeGame.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//ResumeGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	ResumeGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -221,7 +224,7 @@ void Player::drawTargets(){
 
 	ExitGame.init(smgr, 1);
 	ExitGame.setTarget(&LH);
-	ExitGame.node->setPosition(core::vector3df(-10, 8, ZDIST));
+	ExitGame.setPosition(core::vector3df(-10, 8, ZDIST));
 	ExitGame.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//ExitGame.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	ExitGame.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -229,7 +232,7 @@ void Player::drawTargets(){
 
 	Select.init(smgr, 1);
 	Select.setTarget(&RH);
-	Select.node->setPosition(core::vector3df(0,10,ZDIST));
+	Select.setPosition(core::vector3df(0,10,ZDIST));
 	Select.saveTexture(driver->getTexture("../assets/red-light.png"));
 	//Select.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 	Select.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -242,7 +245,7 @@ void Player::drawLimbs(){
 
 LH.init(smgr, 1);
 //if (LH.node){
-LH.node->setPosition(core::vector3df(-13,10,ZDIST)); //set its position
+LH.setPosition(core::vector3df(-13,10,ZDIST)); //set its position
 LH.saveTexture(driver->getTexture("../assets/blue.png"));
 //LH.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp")); //set the texture
 LH.node->setMaterialFlag(video::EMF_LIGHTING, false); //turn of the emf lighting flag
@@ -250,21 +253,21 @@ LH.node->setMaterialFlag(video::EMF_LIGHTING, false); //turn of the emf lighting
 
 //right hand
 RH.init(smgr, 1);
-RH.node->setPosition(core::vector3df(13,10,ZDIST));
+RH.setPosition(core::vector3df(13,10,ZDIST));
 RH.saveTexture(driver->getTexture("../assets/red.png"));
 //RH.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 RH.node->setMaterialFlag(video::EMF_LIGHTING, false);
 
 //left foot
 LF.init(smgr, 1);
-LF.node->setPosition(core::vector3df(-3,-7,ZDIST));
+LF.setPosition(core::vector3df(-3,-7,ZDIST));
 LF.saveTexture(driver->getTexture("../assets/green.png"));
 //LF.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
 LF.node->setMaterialFlag(video::EMF_LIGHTING, false);
 
 //right foot
 RF.init(smgr, 1);
-RF.node->setPosition(vector3df(3,-7,ZDIST));
+RF.setPosition(vector3df(3,-7,ZDIST));
 RF.saveTexture(driver->getTexture("../assets/yellow.png"));
 //RF.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
 RF.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -293,41 +296,72 @@ bool Player::collide (CircleNode node){
 method to update the position of the limbs. pass a vector of vector3df
 with left hand, right hand, left foot, right foot.
 */
-void Player::setPosition(std::vector<vector3df> vec){
-LH.node->setPosition(vec[0]);
-RH.node->setPosition(vec[1]);
-LF.node->setPosition(vec[2]);
-RF.node->setPosition(vec[3]);
+void Player::setPosition(std::vector<vector3df> pos){
+	LH.setPosition(pos[0]);
+	RH.setPosition(pos[1]);
+	LF.setPosition(pos[2]);
+	RF.setPosition(pos[3]);
 }
 void Player::setPosition(vector3df pos[4]){
-LH.setPosition(pos[0]);
-RH.setPosition(pos[1]);
-LF.setPosition(pos[2]);
-RF.setPosition(pos[3]);
+	LH.setPosition(pos[0]);
+	RH.setPosition(pos[1]);
+	LF.setPosition(pos[2]);
+	RF.setPosition(pos[3]);
 }
+/*
+method to update the position of the targets. pass a vector of vector3df
+with left hand Target, right hand Target, left foot Target, right foot Target.
+*/
+
+void Player::setNodePositions(std::vector<vector3df> pos){
+	LH.setPosition(pos[0]);
+	RH.setPosition(pos[1]);
+	LF.setPosition(pos[2]);
+	RF.setPosition(pos[3]);
+	LHTarget.setPosition(pos[4]);
+	RHTarget.setPosition(pos[5]);
+	LFTarget.setPosition(pos[6]);
+	RFTarget.setPosition(pos[7]);
+
+}
+
+
 /*
 Medthod to get the position of all if the limbs. returns a vector of vector3df's
 with left hand, right hand, left foot, right foot.
 */
 std::vector<vector3df> Player::getPosition(){
-std::vector<vector3df> position;
-position.push_back(LH.node->getPosition());
-position.push_back(RH.node->getPosition());
-position.push_back(LF.node->getPosition());
-position.push_back(RF.node->getPosition());
-return position;
+	std::vector<vector3df> position;
+	position.push_back(LH.node->getPosition());
+	position.push_back(RH.node->getPosition());
+	position.push_back(LF.node->getPosition());
+	position.push_back(RF.node->getPosition());
+	return position;
+}
+std::vector<vector3df> Player::getNodePositions(){
+	std::vector<vector3df> position;
+	position.push_back(LH.getPosition());
+	position.push_back(RH.getPosition());
+	position.push_back(LF.getPosition());
+	position.push_back(RF.getPosition());
+	position.push_back(LHTarget.getPosition());
+	position.push_back(RHTarget.getPosition());
+	position.push_back(LFTarget.getPosition());
+	position.push_back(RFTarget.getPosition());
+
+	return position;
 }
 
 /*
 method to update/check if all the orbs are touching their targets
 */
 bool Player::collideAll(){
-bool result = collide(LHTarget);
-result = collide(RHTarget) && result ;
-result = collide(LFTarget) && result ;
-result = collide(RFTarget) && result ;
+	bool result = collide(LHTarget);
+	result = collide(RHTarget) && result ;
+	result = collide(LFTarget) && result ;
+	result = collide(RFTarget) && result ;
 
-return result;
+	return result;
 }
 
 /*
@@ -443,27 +477,27 @@ returns:
 6 - only exit selected
 */
 int Player::pauseCollide(){
-int ret = 0;
-if(ResumeGame.node->isVisible() && collide(ResumeGame)){ // only count resume if visible
-if(collide(Select))
-ret = 1;
-else
-ret = 4;
-}
+	int ret = 0;
+	if(ResumeGame.node->isVisible() && collide(ResumeGame)){ // only count resume if visible
+	if(collide(Select))
+		ret = 1;
+	else
+		ret = 4;
+	}
 
-if(collide(NewGame)){
-if(collide(Select))
-ret = 2;
-else
-ret = 5;
-}
-if(collide (ExitGame)){
-if(collide(Select))
-ret = 3;
-else
-ret = 6;
-}
-return ret;
+	if(collide(NewGame)){
+		if(collide(Select))
+		ret = 2;
+		else
+		ret = 5;
+	}
+	if(collide (ExitGame)){
+		if(collide(Select))
+		ret = 3;
+		else
+		ret = 6;
+	}
+	return ret;
 }
 
 bool Player::jump(){
@@ -491,25 +525,27 @@ ExitGame.setPosition(vector3df(px - 5, py + 9, ZDIST));
 update the location and rotation of the body object to make it look like it is accurate
 */
 void Player::updateBody(){
-//make sure the body exists already
-if(body){
-//set the position to the middle of the feet
-body->setPosition(vector3df(mid(RF.getPosition().X,LF.getPosition().X), body->getPosition().Y, body->getPosition().Z));
+	//make sure the body exists already
+	if(body){
+		//set the position to the middle of the feet
+		body->setPosition(vector3df(mid(RF.getPosition().X,LF.getPosition().X), body->getPosition().Y, body->getPosition().Z));
 
-//set the rotation based off of the hands
-if(LH.getPosition().X < (body->getPosition().X - abs(initLoc[0].X - initLoc[8].X)))
+		//set the rotation based off of the hands
+		if(LH.getPosition().X < (body->getPosition().X - abs(initLoc[0].X - initLoc[8].X)))
 
-body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X)));
+		body->setRotation(vector3df(0,0, 3 * abs((abs(initLoc[0].X - initLoc[8].X) - body->getPosition().X) + LH.getPosition().X)));
 
-if(RH.getPosition().X > (body->getPosition().X + abs(initLoc[1].X - initLoc[8].X)))
-body->setRotation(vector3df(0,0, -3 * abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X)));
-}
+		if(RH.getPosition().X > (body->getPosition().X + abs(initLoc[1].X - initLoc[8].X)))
+		body->setRotation(vector3df(0,0, -3 * abs((abs(initLoc[1].X - initLoc[8].X) + body->getPosition().X) - RH.getPosition().X)));
+	}
 }
 
 /*
 helper to find the middle of 2 numbers
 */
 double Player::mid(double a, double b){
+if(a < 5 || b < 5)
+	return((a + b) / 2);
 return (a/2 + b/2);
 }
 

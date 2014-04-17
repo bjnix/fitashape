@@ -180,7 +180,7 @@ void * slave_auto_kill(void * data){
         else 
         {
             //printf("has not received Packet\n");
-            if (framesPassed > 900){
+            if (framesPassed > 1500){
             //printf("DGR has not revieved a packet and is timing out\n");
             exit(EXIT_SUCCESS); // If your program takes a very long time to initialize,
                                                     // you can increase this value so the slaves don't prematurely

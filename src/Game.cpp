@@ -14,13 +14,17 @@ Class for the Game object
 
 template<>
 char * MapNode<Player>::getDataString(){
-	std::vector<vector3df> dataPos = data->getPosition();
+	std::vector<vector3df> dataPos = data->getNodePositions();
 
-	float float_array[12];
+	float float_array[24];
 	dataPos[0].getAs3Values( &( float_array[0] ) );
 	dataPos[1].getAs3Values( &( float_array[3] ) );
 	dataPos[2].getAs3Values( &( float_array[6] ) );
 	dataPos[3].getAs3Values( &( float_array[9] ) );
+	dataPos[4].getAs3Values( &( float_array[12] ) );
+	dataPos[5].getAs3Values( &( float_array[15] ) );
+	dataPos[6].getAs3Values( &( float_array[18] ) );
+	dataPos[7].getAs3Values( &( float_array[21] ) );
 
     char * data_array = new char[dataLength];
     memcpy(data_array, float_array, dataLength);        
@@ -28,14 +32,18 @@ char * MapNode<Player>::getDataString(){
 }
 template<>
 void MapNode<Player>::setData(char * data_array){
-	float float_array[12];
+	float float_array[24];
     memcpy(float_array, data_array, dataLength);
     std::vector<vector3df> dataPos;
     dataPos.push_back(vector3df(float_array[0],float_array[1],float_array[2]));
     dataPos.push_back(vector3df(float_array[3],float_array[4],float_array[5]));
     dataPos.push_back(vector3df(float_array[6],float_array[7],float_array[8]));
     dataPos.push_back(vector3df(float_array[9],float_array[10],float_array[11]));
-    data->setPosition(dataPos);
+    dataPos.push_back(vector3df(float_array[12],float_array[13],float_array[14]));
+    dataPos.push_back(vector3df(float_array[15],float_array[16],float_array[17]));
+    dataPos.push_back(vector3df(float_array[18],float_array[19],float_array[20]));
+    dataPos.push_back(vector3df(float_array[21],float_array[22],float_array[23]));
+    data->setNodePositions(dataPos);
 }
 
 char * RELAY_IP;
@@ -142,7 +150,7 @@ Game::Game(bool isLocal, char* relay_ip){
 	myDGR = new DGR_framework(relay_ip);
 
 	gameOver = true;
-	zen = 50;
+	zen = 12;
 	zenBarSize = 50;
 	timesUp = 10;
 	score = 0;
@@ -166,7 +174,7 @@ Game::Game(
 
 
 	gameOver = true;
-	zen = 50;
+	zen = 12;
 	zenBarSize = 50;
 	timesUp = 5;
 	score = 0;
@@ -275,6 +283,7 @@ int Game::run(){
 
 	std::cout << "creating the player object \n"<< std::flush;
 	//create player and draw the limbs
+	int state = 2;
 	p1 = new Player(driver,smgr);
 	p1->drawLimbs();
 
@@ -295,7 +304,12 @@ int Game::run(){
 		p1->localInitPos();
 		//then sets up the body, arms, and legs
 		p1->initializePosition();
-		myDGR->addNode<Player>("Player1",p1,sizeof(float)*12);
+		p1->drawTargets();
+		p1->createBody();
+
+		myDGR->addNode<Player>("Player1",p1,sizeof(float)*24);
+		myDGR->addNode<int>("state",&state,sizeof(int));
+		myDGR->addNode<bool>("gameOver",&gameOver,sizeof(bool));
 
 
 		std::cout << "Just finished Method Calls \n"<< std::flush;
@@ -304,12 +318,14 @@ int Game::run(){
 		p1->localInitPos();
 		//then sets up the body, arms, and legs
 		p1->initializePosition();
+		p1->drawTargets();
+		p1->createBody();
 	}
 
 	std::cout << "about to draw targets \n"<< std::flush;
 
 	//set up the target
-	p1->drawTargets();
+	
 		
 
 	std::cout << "calling randomTargets\n"<< std::flush;
@@ -324,41 +340,45 @@ int Game::run(){
 	
 	std::cout << "just setCurrent\n"<< std::flush;
 
-	p1->createBody();
+	
 
 	//reset the clock for the start of the game!
 	myClock->setTime(0);
 	p1->setTargetVisible(false, gameOver);
 	
-	#ifdef DGR_MASTER
-	background = driver->getTexture("../assets/Background(small).png");
-	#else
-	background = driver->getTexture("../assets/Background(Fitashape).png");
-	#endif
+	background = zenBackgrounds[0];
+	
 	
 while(device->run() && !toExit)
 	{
 
+		#ifdef DGR_MASTER
+		if(p1->jump() && !gameOver && !pause) state = 0;
+		else if(!pause) state = 1;
+		else state = 2;
+		#endif
 		//move the orbs around
 		if(local)
 			moveKeyboard(receiver);
 		else
 			motionTracking();
 
-		if(p1->jump() && !gameOver && !pause){
+		if(state == 0){
 			printf("JUMPED\n");
 			myClock->stop();
+		
 			pause = true;
+		
 			p1->setTargetVisible(false, gameOver);
 		}
 		//normal scoring while the game runs
-		if(!pause){
+		if(state == 1){
 			//update the clock and check for win/lose
 			//printf("update clock\n");
 			updateClock();
 		}
 		//menu for game overness
-		else{
+		if(state == 2){
 			//printf("pause!!\n");
 			pauseMenu();
 		}
@@ -466,7 +486,7 @@ void Game::createClock(){
 	
 	//text that will be displayed on the screen
 	text = smgr->addTextSceneNode(device->getGUIEnvironment()->getFont("../assets/bigfont.png"),
-					tmp,video::SColor(255,0,0,0),0,core::vector3df(0,1,10));
+					tmp,video::SColor(255,0,0,0),0,core::vector3df(0,10,ZDIST));
 }
 
 /*
@@ -476,8 +496,10 @@ void Game::retryMenu(){
 	switch(p1->restartCollide()){
 		//if yes is selected, reinitialize the variables
 		case 1:
+			#ifdef DGR_MASTER
 			gameOver = false;
-			zen = 50;
+			#endif
+			zen = 12;
 			timesUp = 5;
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
@@ -510,8 +532,10 @@ void Game::pauseMenu(){
 				startLocation();
 				printf("Done calibrating\n");
 			}
+			#ifdef DGR_MASTER
 			gameOver = false;
-			zen = 50;
+			#endif
+			zen = 12;
 			zenBarSize = 50;
 			timesUp = 5;
 			score = 0;
@@ -605,7 +629,7 @@ void Game::updateClock(){
 				break;
 			case 4:
 				score += 50;
-				zen += 10;
+				zen += 1;
 				break;
 			default:
 				break;
@@ -634,7 +658,9 @@ void Game::updateClock(){
 			zen = 100;
 		if(zen <= 0){ // if zen <= 0 player loses and game quits
 			zen = 0;
+			#ifdef DGR_MASTER
 			gameOver = true;
+			#endif
 			pause = true;
 			p1->setTargetVisible(false, gameOver);
 
@@ -712,10 +738,10 @@ void Game::startLocation(){
 
 		if(!one && last != next){ //check if we want to store this pos
 			printf("CHECK 1\n");
-			LHpos1 = p1->LH.node->getPosition();
-			RHpos1 = p1->RH.node->getPosition();
-			LFpos1 = p1->LF.node->getPosition();
-			RFpos1 = p1->RF.node->getPosition();
+			LHpos1 = p1->LH.getPosition();
+			RHpos1 = p1->RH.getPosition();
+			LFpos1 = p1->LF.getPosition();
+			RFpos1 = p1->RF.getPosition();
 			one = true;
 			last = next;
 		}
@@ -728,10 +754,10 @@ void Game::startLocation(){
 
 		if(!two && last != next){ //check if we want to store this pos
 			printf("CHECK 2\n");
-			LHpos2 = p1->LH.node->getPosition();
-			RHpos2 = p1->RH.node->getPosition();
-			LFpos2 = p1->LF.node->getPosition();
-			RFpos2 = p1->RF.node->getPosition();
+			LHpos2 = p1->LH.getPosition();
+			RHpos2 = p1->RH.getPosition();
+			LFpos2 = p1->LF.getPosition();
+			RFpos2 = p1->RF.getPosition();
 			two = true;
 			last = next;
 		}
@@ -744,10 +770,10 @@ void Game::startLocation(){
 
 		if(!three && last != next){ //check if we want to store this pos
 			printf("CHECK 3\n");
-			LHpos3 = p1->LH.node->getPosition();
-			RHpos3 = p1->RH.node->getPosition();
-			LFpos3 = p1->LF.node->getPosition();
-			RFpos3 = p1->RF.node->getPosition();
+			LHpos3 = p1->LH.getPosition();
+			RHpos3 = p1->RH.getPosition();
+			LFpos3 = p1->LF.getPosition();
+			RFpos3 = p1->RF.getPosition();
 			three = true;
 			last = next;
 		}
@@ -794,7 +820,7 @@ void Game::startLocation(){
 
 	p1->bodyScale();
 
-	background = driver->getTexture("../assets/Background(small).png");
+	background = zenBackgrounds[0];
 
 	return;
 }
@@ -815,8 +841,10 @@ void Game::drawObjects(){
 	int x1 = 520, y1 = 0, x2 = 920, y2 = 70;
 	int color;
 	
-	f32 back1 = 0.0f;
-	f32 back2 = 0.0f;
+	f32 back_x1 = 0.0f;
+	f32 back_y1 = 0.0f;
+	f32 back_x2 = 5760.0f;
+	f32 back_y2 = 2160.0f;
 /*
 	R3_TOP 2.04f
 	R2_TOP 1.46f
@@ -828,30 +856,33 @@ void Game::drawObjects(){
 #ifdef DGR_MASTER
 
 #else
-	y2 = 280;
-	x1 = -5000; x2 = -5000;
+	y2 = 280.0f;
+	x1 = -5000.0f; x2 = -5000.0f;
 	if(frustum_right == COL_R){ 
-		back1 = -5760.0f;
+		back_x1 = 2880.0f;		
+		back_x2 = 5760.0f;
 	}
-	else if( frustum_right == 0){
-		back1 = 0.0f;	
+	else if( frustum_right == 0.0f){
+		back_x1 = 0.0f;		
+		back_x2 = 2880.0f;;	
 	}
 	else{ printf("!!error drawObjects!!\n"); }
 
 	if(frustum_top == R3_TOP){ 
-		back2 = 0.0f;
-		if(frustum_right == COL_R){ x1 = -800; x2 = 800; } 
-		else if(frustum_right == 0){x1 = 4760; x2 = 6760; }
+		back_y1 = 0.0f;
+		back_y2 = 540.0f;
+		if(frustum_right == COL_R){ x1 = -800.0f; x2 = 800.0f; } 
+		else if(frustum_right == 0.0f){x1 = 4960.0f; x2 = 6760.0f; }
 		else{ printf("!!error drawObjects!!\n"); }
 	}
-	else if(frustum_top == R2_TOP){ back2 = -1080.0f; }
-	else if(frustum_top == R1_TOP){ back2 = -2160.0f; }
-	else if(frustum_top == R0_TOP){ back2 = -3240.0f; }
+	else if(frustum_top == R2_TOP){ back_y1 = 540.0f; back_y2 = 1080.0f; }
+	else if(frustum_top == R1_TOP){ back_y1 = 1080.0f; back_y2 = 1620.0f; }
+	else if(frustum_top == R0_TOP){ back_y1 = 1620.0f; back_y2 = 2160.0f; }
 	else{ printf("!!error drawObjects!!\n"); }
 	
 #endif
 	//draw the background
-	driver->draw2DImage(background,position2d<s32>(back1,back2));
+	driver->draw2DImage(background,rect<s32>(0.0f,0.0f,5760.0f,1080.0f),rect<s32>(back_x1,back_y1,back_x2,back_y2), NULL );
 	
 	
 
@@ -867,7 +898,7 @@ void Game::drawObjects(){
 	#ifdef DGR_MASTER	
 		driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+37, y1+22, x1 +37 + (zenBarSize * 3.3), y2-27), NULL);
 	#else		
-		driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+180, y1+85, x1 +182 + (zenBarSize * 12.8), y2-108), NULL);
+		driver->draw2DRectangle(SColor(255,color,255 - color,0), rect<s32>(x1+160, y1+85, x1 +182 + (zenBarSize * 12.8), y2-108), NULL);
 	#endif
 	}
 

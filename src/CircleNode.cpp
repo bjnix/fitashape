@@ -28,7 +28,7 @@ CircleNode::~CircleNode(){
 }
 
 void CircleNode::setPosition(vector3df pos){
-	node->setPosition(pos);
+	node->setPosition(vector3df(pos.X,pos.Y,pos.Z));
 }
 
 vector3df CircleNode::getPosition(){
