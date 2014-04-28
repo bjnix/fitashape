@@ -155,7 +155,9 @@ Game::Game(bool isLocal, char* relay_ip){
 	timesUp = 10;
 	score = 0;
 	toExit = false;
+	#ifdef DGR_MASTER
 	pause = true;
+	#endif
 	local = isLocal;
 	run();
 }
@@ -179,7 +181,9 @@ Game::Game(
 	timesUp = 5;
 	score = 0;
 	toExit = false;
+	#ifdef DGR_MASTER
 	pause = true;
+	#endif
 	local = isLocal;
 	run();
 }
@@ -367,8 +371,9 @@ while(device->run() && !toExit)
 			printf("JUMPED\n");
 			myClock->stop();
 		
+			#ifdef DGR_MASTER
 			pause = true;
-		
+			#endif
 			p1->setTargetVisible(false, gameOver);
 		}
 		//normal scoring while the game runs
@@ -500,6 +505,7 @@ void Game::retryMenu(){
 			gameOver = false;
 			#endif
 			zen = 12;
+			
 			timesUp = 5;
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
@@ -520,7 +526,9 @@ void Game::pauseMenu(){
 	p1->setMenu();
 	switch(p1->pauseCollide()){ //figure out which selection is pressed
 		case 1: //resume game if paused
+			#ifdef DGR_MASTER
 			pause = false;
+			#endif			
 			p1->setTargetVisible(true, gameOver);
 			myClock->start();
 			break;
@@ -536,12 +544,15 @@ void Game::pauseMenu(){
 			gameOver = false;
 			#endif
 			zen = 12;
+			
 			zenBarSize = 50;
 			timesUp = 5;
 			score = 0;
 			p1->setTargetVisible(true, gameOver);
 			myClock->setTime(0);
+			#ifdef DGR_MASTER
 			pause = false;
+			#endif
 			p1->randomTargets();
 			break;
 		
@@ -610,15 +621,15 @@ void Game::updateClock(){
 			timesUp = 10 - (score/2);//*/
 		
 		//get number of orbs matched, then score based on that
-
+		
 		switch(p1->collideNum()){
 			
 			case 0:
-				zen -= 25;
+				zen -= 5;
 				break;
 			case 1:
 				score += 5;
-				zen -= 15;
+				zen -= 5;
 				break;
 			case 2:
 				score += 15;
@@ -629,7 +640,7 @@ void Game::updateClock(){
 				break;
 			case 4:
 				score += 50;
-				zen += 1;
+				zen += 5;
 				break;
 			default:
 				break;
@@ -660,8 +671,8 @@ void Game::updateClock(){
 			zen = 0;
 			#ifdef DGR_MASTER
 			gameOver = true;
-			#endif
 			pause = true;
+			#endif
 			p1->setTargetVisible(false, gameOver);
 
 		} 

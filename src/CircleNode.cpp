@@ -28,11 +28,13 @@ CircleNode::~CircleNode(){
 }
 
 void CircleNode::setPosition(vector3df pos){
-	node->setPosition(vector3df(pos.X,pos.Y,pos.Z));
+	node->setPosition(vector3df(pos.X,pos.Y - 13 ,pos.Z));
 }
 
 vector3df CircleNode::getPosition(){
-	return node->getPosition();
+	vector3df temp = node->getPosition();
+	return vector3df(temp.X,temp.Y+13,temp.Z);
+	//return node->getPosition();
 }
 
 void CircleNode::saveTexture(ITexture* color){

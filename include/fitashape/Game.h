@@ -55,6 +55,7 @@ private:
 	bool toExit;
 	bool pause;
 	bool local;
+	int state;
 	ITexture * zenBar;
 	//vector<ITexture*> zenBackgrounds;
 	ITexture* * zenBackgrounds;
@@ -108,6 +109,7 @@ public:
 	scene::ISceneManager * smgr;
 	IrrlichtDevice * device;
 	ITimer * myClock;
+	int timeKeeper;
 	int zen;
 	int score;
 	int timesUp;

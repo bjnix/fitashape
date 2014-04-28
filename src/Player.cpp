@@ -161,7 +161,7 @@ method to set up the targets for each limb
 void Player::drawTargets(){
 	LHTarget.init(smgr, 1);
 	LHTarget.setTarget(&LH);
-	LHTarget.setPosition(LH.node->getPosition()); // set it's position to a temp spot
+	LHTarget.setPosition(LH.getPosition()); // set it's position to a temp spot
 	LHTarget.saveTexture(driver->getTexture("../assets/blue-light.png"));
 	//LHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/fire.bmp"));
 	LHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -169,7 +169,7 @@ void Player::drawTargets(){
 	//target for right hand
 	RHTarget.init(smgr, 1);
 	RHTarget.setTarget(&RH);
-	RHTarget.setPosition(RH.node->getPosition());
+	RHTarget.setPosition(RH.getPosition());
 	RHTarget.saveTexture(driver->getTexture("../assets/red-light.png"));
 	//RHTarget.node->setMaterialTexture(0, driver->getTexture("../assets/lightFalloff.png"));
 	RHTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -177,7 +177,7 @@ void Player::drawTargets(){
 	//target for left foot
 	LFTarget.init(smgr, 1);
 	LFTarget.setTarget(&LF);
-	LFTarget.setPosition(LF.node->getPosition());
+	LFTarget.setPosition(LF.getPosition());
 	LFTarget.saveTexture(driver->getTexture("../assets/green-light.png"));
 	//LFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/particlegreen.jpg"));
 	LFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -185,7 +185,7 @@ void Player::drawTargets(){
 	//target for right foot
 	RFTarget.init(smgr, 1);
 	RFTarget.setTarget(&RF);
-	RFTarget.setPosition(RF.node->getPosition());
+	RFTarget.setPosition(RF.getPosition());
 	RFTarget.saveTexture(driver->getTexture("../assets/yellow-light.png"));
 	//RFTarget.node->setMaterialTexture(0, driver->getTexture("../assets/portal7.bmp"));
 	RFTarget.node->setMaterialFlag(video::EMF_LIGHTING, false);
@@ -277,8 +277,8 @@ RF.node->setMaterialFlag(video::EMF_LIGHTING, false);
 method to determin if the passed node is close to its targert
 */
 bool Player::collide (CircleNode node){
-	vector3df nodeLocation = node.node->getPosition();
-	vector3df targetLocation = node.target()->node->getPosition();
+	vector3df nodeLocation = node.getPosition();
+	vector3df targetLocation = node.target()->getPosition();
 	double collideDist = 2; // determins how close the orbs have to be. easy to change
 
 	//check to see of the distance between the two nodes is less than the required distance
@@ -332,10 +332,10 @@ with left hand, right hand, left foot, right foot.
 */
 std::vector<vector3df> Player::getPosition(){
 	std::vector<vector3df> position;
-	position.push_back(LH.node->getPosition());
-	position.push_back(RH.node->getPosition());
-	position.push_back(LF.node->getPosition());
-	position.push_back(RF.node->getPosition());
+	position.push_back(LH.getPosition());
+	position.push_back(RH.getPosition());
+	position.push_back(LF.getPosition());
+	position.push_back(RF.getPosition());
 	return position;
 }
 std::vector<vector3df> Player::getNodePositions(){
@@ -581,7 +581,7 @@ exit(-1);
 
 void Player::bodyScale(){
 if (body){
-body->setPosition(vector3df(initLoc[8].X,initLoc[8].Y-2,initLoc[8].Z+10 ));
+body->setPosition(vector3df(initLoc[8].X,initLoc[8].Y-15,initLoc[8].Z+10 ));
 double scale = (initLoc[4].Y - initLoc[0].getDistanceFrom(initLoc[4]))/5.0;
 body->setScale(vector3df(scale,scale,scale));
 }
